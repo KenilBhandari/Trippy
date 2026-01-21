@@ -1,174 +1,221 @@
-import React, { useState, useEffect } from "react";
-import { Search, Calendar, ChevronDown, X, Check, MapPin } from "lucide-react";
+import type { DashboardProps, Trip } from "../../types";
+import { TrendingUp, Calendar, BarChart3, IndianRupee } from "lucide-react";
 
-interface FilterProps {
-  setStartDate: (date: string) => void;
-  setEndDate: (date: string) => void;
-  setSearchQuery?: (query: string) => void; // Optional if you want to filter by text too
-}
+const Dashboard = ({ trips, monthTrips, monthTotal }: DashboardProps) => {
+  const currentMonth = new Date().toLocaleDateString("en-IN", {
+    month: "long",
+    year: "numeric",
+  });
+  
+  const avgFare =
+    monthTrips.length > 0 ? Math.round(monthTotal / monthTrips.length) : 0;
 
-const TripFilterBar = ({ setStartDate, setEndDate }: FilterProps) => {
-  const [search, setSearch] = useState("");
-  const [quickDate, setQuickDate] = useState("recent");
-  const [fromDate, setFromDate] = useState("");
-  const [toDate, setToDate] = useState("");
-  const [showCustomDate, setShowCustomDate] = useState(false);
-  const [showQuickDate, setShowQuickDate] = useState(false);
+  // Get last 7 days data
+  const getDailyData = () => {
+    const last7Days = [];
+    const today = new Date();
 
-  const options = [
-    { value: "recent", label: "Recent" },
-    { value: "today", label: "Today" },
-    { value: "week", label: "This week" },
-    { value: "month", label: "This month" }
-  ];
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date(today);
+      date.setDate(date.getDate() - i);
+      date.setHours(0, 0, 0, 0);
+      
+      const dayTrips = trips.filter((t) => {
+        const tripDate = new Date(t.createdAt);
+        tripDate.setHours(0, 0, 0, 0);
+        return tripDate.getTime() === date.getTime();
+      });
+      
+      const dayTotal = dayTrips.reduce((sum, t) => sum + t.fare, 0);
 
-  // Sync internal state to Parent component
-  useEffect(() => {
-    if (fromDate || toDate) {
-      setStartDate(fromDate);
-      setEndDate(toDate);
-    } else {
-      // Handle Quick Date logic
-      const now = new Date();
-      let start = "";
-      if (quickDate === "today") {
-        start = now.toISOString().split("T")[0];
-      } else if (quickDate === "week") {
-        const weekAgo = new Date();
-        weekAgo.setDate(now.getDate() - 7);
-        start = weekAgo.toISOString().split("T")[0];
-      }
-      // Note: "recent" (default) usually means no date filter/limit to 25
-      setStartDate(quickDate === "recent" ? "" : start);
-      setEndDate(""); 
+      last7Days.push({
+        date: date.toLocaleDateString("en-IN", {
+          weekday: "short",
+          day: "numeric",
+        }),
+        amount: dayTotal,
+        trips: dayTrips.length,
+      });
     }
-  }, [quickDate, fromDate, toDate, setStartDate, setEndDate]);
 
-  const handleReset = () => {
-    setSearch("");
-    setFromDate("");
-    setToDate("");
-    setShowCustomDate(false);
-    setQuickDate("recent");
+    return last7Days;
   };
 
-  const hasActiveFilters = search || fromDate || quickDate !== "recent";
+  // Get last 7 days total
+  const dailyData = getDailyData();
+  const last7DaysTotal = dailyData.reduce((sum, d) => sum + d.amount, 0);
+  const maxDailyAmount = Math.max(...dailyData.map((d) => d.amount), 1);
+
+  // Get monthly data for current year
+  const getMonthlyData = () => {
+    const currentYear = new Date().getFullYear();
+    const monthlyData = [];
+    
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    
+    for (let month = 0; month < 12; month++) {
+      const monthTrips = trips.filter((t) => {
+        const tripDate = new Date(t.createdAt);
+        return tripDate.getFullYear() === currentYear && tripDate.getMonth() === month;
+      });
+      
+      const monthTotal = monthTrips.reduce((sum, t) => sum + t.fare, 0);
+      
+      monthlyData.push({
+        month: monthNames[month],
+        amount: monthTotal,
+        trips: monthTrips.length,
+      });
+    }
+    
+    return monthlyData;
+  };
+
+  const monthlyData = getMonthlyData();
+  const maxMonthlyAmount = Math.max(...monthlyData.map((m) => m.amount), 1);
 
   return (
-    <div className="w-full font-sans">
-      <div className="relative bg-white border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] rounded-2xl transition-all duration-500 hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)]">
-        <div className="flex items-center h-14 sm:h-16">
-          
-          {/* 1. Quick Date Dropdown */}
-          <div className="relative h-full shrink-0">
-            <button
-              onClick={() => {
-                setShowQuickDate(!showQuickDate);
-                setShowCustomDate(false);
-              }}
-              className="flex items-center h-full px-5 sm:px-6 gap-2.5 hover:bg-gray-50 transition-colors rounded-l-2xl border-r border-gray-100 group"
-            >
-              <span className="text-xs font-bold text-gray-900">
-                {options.find((o) => o.value === quickDate)?.label}
-              </span>
-              <ChevronDown
-                size={14}
-                className={`text-gray-400 transition-transform duration-300 ${showQuickDate ? "rotate-180" : ""}`}
-              />
-            </button>
+    <div className="space-y-5 md:space-y-6">
+      {/* Stats Cards - Clean & Light */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+        {/* This Month Revenue */}
+        <div className="bg-white rounded-xl md:rounded-2xl p-4 md:p-5 border border-gray-100 hover:shadow-md transition-shadow">
+          <div className="flex items-start justify-between mb-2 md:mb-3">
+            <div className="bg-blue-50 p-1.5 md:p-2 rounded-lg">
+              <IndianRupee size={16} className="text-blue-600 md:w-5 md:h-5" />
+            </div>
+          </div>
+          <p className="text-xs text-gray-500 mb-1">This Month</p>
+          <p className="text-xl md:text-2xl font-bold text-gray-900">
+            ₹{monthTotal.toLocaleString("en-IN")}
+          </p>
+        </div>
 
-            {showQuickDate && (
-              <>
-                <div className="fixed inset-0 z-10" onClick={() => setShowQuickDate(false)} />
-                <div className="absolute top-full mt-2 left-0 w-44 bg-white border border-gray-200 shadow-xl rounded-xl p-1 z-20">
-                  {options.map((opt) => (
-                    <button
-                      key={opt.value}
-                      onClick={() => {
-                        setQuickDate(opt.value);
-                        setFromDate(""); // Clear custom dates when picking quick option
-                        setToDate("");
-                        setShowQuickDate(false);
-                      }}
-                      className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-bold transition-colors ${
-                        quickDate === opt.value ? "bg-blue-50 text-blue-600" : "text-gray-600 hover:bg-gray-50"
-                      }`}
-                    >
-                      {opt.label}
-                      {quickDate === opt.value && <Check size={14} strokeWidth={2.5} />}
-                    </button>
-                  ))}
-                </div>
-              </>
-            )}
+        {/* Last 7 Days Revenue */}
+        <div className="bg-white rounded-xl md:rounded-2xl p-4 md:p-5 border border-gray-100 hover:shadow-md transition-shadow">
+          <div className="flex items-start justify-between mb-2 md:mb-3">
+            <div className="bg-green-50 p-1.5 md:p-2 rounded-lg">
+              <TrendingUp size={16} className="text-green-600 md:w-5 md:h-5" />
+            </div>
+          </div>
+          <p className="text-xs text-gray-500 mb-1">Last 7 Days</p>
+          <p className="text-xl md:text-2xl font-bold text-gray-900">
+            ₹{last7DaysTotal.toLocaleString("en-IN")}
+          </p>
+        </div>
+
+        {/* Total Trips This Month */}
+        <div className="bg-white rounded-xl md:rounded-2xl p-4 md:p-5 border border-gray-100 hover:shadow-md transition-shadow">
+          <div className="flex items-start justify-between mb-2 md:mb-3">
+            <div className="bg-purple-50 p-1.5 md:p-2 rounded-lg">
+              <Calendar size={16} className="text-purple-600 md:w-5 md:h-5" />
+            </div>
+          </div>
+          <p className="text-xs text-gray-500 mb-1">Trips</p>
+          <p className="text-xl md:text-2xl font-bold text-gray-900">
+            {monthTrips.length}
+          </p>
+        </div>
+
+        {/* Average Fare */}
+        <div className="bg-white rounded-xl md:rounded-2xl p-4 md:p-5 border border-gray-100 hover:shadow-md transition-shadow">
+          <div className="flex items-start justify-between mb-2 md:mb-3">
+            <div className="bg-orange-50 p-1.5 md:p-2 rounded-lg">
+              <BarChart3 size={16} className="text-orange-600 md:w-5 md:h-5" />
+            </div>
+          </div>
+          <p className="text-xs text-gray-500 mb-1">Avg Fare</p>
+          <p className="text-xl md:text-2xl font-bold text-gray-900">
+            ₹{avgFare.toLocaleString("en-IN")}
+          </p>
+        </div>
+      </div>
+
+      {/* Last 7 Days Chart - Minimal & Clean */}
+   <div className="bg-white rounded-xl md:rounded-2xl p-4 md:p-6 border border-gray-100">
+  <h3 className="text-sm md:text-base font-bold text-gray-800 mb-4 md:mb-5">
+    Last 7 Days Performance
+  </h3>
+
+  {/* Vertical bars container */}
+  <div className="flex items-end justify-between h-40 md:h-52 gap-2 md:gap-3">
+    {dailyData.map((day, idx) => {
+      const barHeight = day.amount > 0 ? Math.max((day.amount / maxDailyAmount) * 100, 10) : 0; // min height 10% for visibility
+      return (
+        <div key={idx} className="flex flex-col items-center flex-1">
+          {/* Amount label on top */}
+          <div className="text-xs md:text-sm font-semibold text-gray-700 mb-1">
+            {day.amount > 0 ? `₹${day.amount.toLocaleString("en-IN")}` : ""}
           </div>
 
-          {/* 2. Search Segment */}
-          <div className="flex flex-1 items-center px-2 sm:px-4 min-w-0">
-            <Search size={16} className="text-gray-400 shrink-0" />
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search destination..."
-              className="w-full px-2 sm:px-3 bg-transparent border-none focus:ring-0 text-sm text-gray-700 placeholder:text-gray-400 focus:outline-none"
+          {/* Vertical bar */}
+          <div className="w-6 md:w-8 bg-gray-50 rounded-lg relative flex items-end overflow-hidden h-full">
+            <div
+              className="w-full bg-gradient-to-t from-blue-500 to-blue-600 rounded-lg transition-all duration-700 ease-out"
+              style={{ height: `${barHeight}%` }}
             />
           </div>
 
-          {/* 3. Custom Date Toggle */}
-          <div className="flex items-center gap- px-3 shrink-0">
-            <button
-              onClick={() => {
-                setShowCustomDate(!showCustomDate);
-                setShowQuickDate(false);
-              }}
-              className={`flex items-center gap-2 px-3 py-2 rounded-xl transition-all duration-300 ${
-                showCustomDate || fromDate ? "bg-gray-900 text-white shadow-lg" : "text-gray-400 hover:bg-gray-50"
-              }`}
-            >
-              <div className="flex flex-col items-end">
-                <span className={`text-[7px] font-black uppercase leading-none mb-1 ${
-                  showCustomDate || fromDate ? "text-blue-400" : "text-gray-400"
-                }`}>Dates</span>
-                <Calendar size={15} />
-              </div>
-            </button>
-            {hasActiveFilters && (
-              <button onClick={handleReset} className="p-2 text-gray-300 hover:text-red-500 rounded-xl">
-                <X size={18} />
-              </button>
-            )}
+          {/* Date label */}
+          <div className="text-xs md:text-sm text-gray-600 mt-2">
+            {day.date}
+          </div>
+
+          {/* Trips count */}
+          <div className="text-xs md:text-sm text-gray-500">
+            {day.trips} trips
           </div>
         </div>
+      );
+    })}
+  </div>
+</div>
 
-        {/* Custom Date Input Panel */}
-        {showCustomDate && (
-          <div className="border-t border-gray-100 px-5 py-2.5 bg-gray-50/30 rounded-b-2xl">
-            <div className="flex items-center gap-3 max-w-sm">
-              <div className="flex flex-col gap-0.5 flex-1">
-                <label className="text-[9px] text-gray-400">From</label>
-                <input
-                  type="date"
-                  value={fromDate}
-                  onChange={(e) => setFromDate(e.target.value)}
-                  className="bg-white px-2.5 py-1.5 rounded-lg text-[11px] border border-gray-200"
-                />
+      {/* Monthly Trends Chart - Clean Vertical Bars */}
+      <div className="bg-white rounded-xl md:rounded-2xl p-4 md:p-6 border border-gray-100">
+        <h3 className="text-sm md:text-base font-bold text-gray-800 mb-4 md:mb-6">
+          Monthly Revenue Trends ({new Date().getFullYear()})
+        </h3>
+        
+        <div className="flex items-end justify-between gap-1 md:gap-2 h-48 md:h-64">
+          {monthlyData.map((month, idx) => {
+            const heightPercent = month.amount > 0 
+              ? Math.max((month.amount / maxMonthlyAmount) * 100, 3)
+              : 0;
+            
+            return (
+              <div key={idx} className="flex-1 flex flex-col items-center gap-2 group">
+                {/* Bar */}
+                <div className="w-full flex flex-col items-center justify-end h-full">
+                  <div className="relative w-full flex flex-col items-center">
+                    {/* Amount Label on Hover */}
+                    {month.amount > 0 && (
+                      <div className="opacity-0 group-hover:opacity-100 transition-opacity mb-1">
+                        <div className="bg-gray-900 text-white text-[10px] md:text-xs font-semibold px-2 py-1 rounded whitespace-nowrap">
+                          ₹{month.amount.toLocaleString("en-IN")}
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* Bar */}
+                    <div
+                      className="w-full bg-gradient-to-t from-indigo-500 to-indigo-400 rounded-t-md md:rounded-t-lg transition-all duration-700 ease-out hover:from-indigo-600 hover:to-indigo-500 cursor-pointer"
+                      style={{ height: `${heightPercent}%` }}
+                    />
+                  </div>
+                </div>
+                
+                {/* Month Label */}
+                <div className="text-[10px] md:text-xs font-semibold text-gray-600">
+                  {month.month}
+                </div>
               </div>
-              <div className="flex flex-col gap-0.5 flex-1">
-                <label className="text-[9px] text-gray-400">To</label>
-                <input
-                  type="date"
-                  value={toDate}
-                  onChange={(e) => setToDate(e.target.value)}
-                  className="bg-white px-2.5 py-1.5 rounded-lg text-[11px] border border-gray-200"
-                />
-              </div>
-            </div>
-          </div>
-        )}
+            );
+          })}
+        </div>
       </div>
     </div>
   );
 };
 
-export default TripFilterBar;
+export default Dashboard;

@@ -32,7 +32,7 @@ export interface TripFilter {
 
 // Dashboard component props
 export interface DashboardProps {
-  trips?: Trip[];
+  trips: Trip[];
   monthTrips: Trip[];
   monthTotal: number;
 }

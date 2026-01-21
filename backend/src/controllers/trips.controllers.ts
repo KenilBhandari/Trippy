@@ -177,3 +177,78 @@ export const deleteTripByID = async (req: Request, res: Response) => {
     });
   }
 };
+
+
+
+export const getDashboardSummary = async (req: Request, res: Response) => {
+  try {
+    const now = new Date();
+
+    const startOfMonth = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      1,
+    ).getTime();
+    const endOfMonth = new Date(
+      now.getFullYear(),
+      now.getMonth() + 1,
+      0,
+      23,
+      59,
+      59,
+    ).getTime();
+
+    const startOfYear = new Date(now.getFullYear(), 0, 1).getTime();
+    const endOfYear = new Date(now.getFullYear(), 11, 31, 23, 59, 59).getTime();
+
+    const monthStats = await Trip.aggregate([
+      { $match: { tripDate: { $gte: startOfMonth, $lte: endOfMonth } } },
+      {
+        $group: {
+          _id: null,
+          totalRevenue: { $sum: "$fare" },
+          totalTrips: { $sum: 1 },
+          avgFare: { $avg: "$fare" },
+        },
+      },
+    ]);
+
+    const last7Days = await Trip.aggregate([
+      {
+        $group: {
+          _id: {
+            $dateToString: {
+              format: "%Y-%m-%d",
+              date: { $toDate: "$tripDate" },
+              timezone: "Asia/Kolkata", // ✅ CRITICAL
+            },
+          },
+          totalRevenue: { $sum: "$fare" },
+          totalTrips: { $sum: 1 },
+          lastTripDate: { $max: "$tripDate" },
+        },
+      },
+      { $sort: { lastTripDate: -1 } },
+      { $limit: 7 },
+      { $sort: { _id: 1 } },
+    ]);
+
+    const monthlyTotals = await Trip.aggregate([
+      { $match: { tripDate: { $gte: startOfYear, $lte: endOfYear } } },
+      {
+        $group: {
+          _id: { $month: { $toDate: "$tripDate" } },
+          totalRevenue: { $sum: "$fare" },
+        },
+      },
+      { $sort: { _id: 1 } },
+    ]);
+
+    res.send({ monthlyTotals, last7Days, monthStats });
+    
+    return monthlyTotals;
+  } catch (error) {
+    console.error("Dashboard summary error:", error);
+    res.status(500).json({ error: "Failed to fetch dashboard data" });
+  }
+}

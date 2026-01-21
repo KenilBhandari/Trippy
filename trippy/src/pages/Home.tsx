@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import type { NewTripInput, DashboardProps, TripFilter } from "../types";
+import type { NewTripInput, TripFilter } from "../types";
 import {
   TrendingUp,
   Calendar,
@@ -13,9 +13,10 @@ import {
 import NewTrip from "../components/New/New";
 import Latest from "../components/Latest/Latest";
 import TripManager from "../components/TripManager/TripManager";
-import { fetchCustomTrips, sendTrip } from "../api/trips";
+import { dashboardSummary, fetchCustomTrips, sendTrip } from "../api/trips";
 import { useDataContext } from "../context/TripContext";
 import ReportsTab from "../components/Reports/Reports";
+import Dashboard from "../components/Dashboard/Dashboard";
 
 const Start = () => {
   const { last10Trips, setLast10Trips, setRecent25Trips } = useDataContext();
@@ -69,6 +70,23 @@ const Start = () => {
     };
     fetchFreshTrips();
   }, []);
+
+
+    const handleDashboardData = async () => {
+    try {
+      const result = await dashboardSummary();
+      if (result.status === "success") {
+        return result
+      }
+      else{
+        throw new Error("Api refused Dashboard Data");
+      }
+    } catch (err) {
+      console.error("Failed to send trip to server", err);
+      throw err;
+    }
+  };
+
 
   const getMonthTrips = () => {
     const now = new Date();
@@ -226,127 +244,127 @@ const Start = () => {
   );
 };
 
-const Dashboard = ({ monthTrips, monthTotal }: DashboardProps) => {
-  const currentMonth = new Date().toLocaleDateString("en-IN", {
-    month: "long",
-    year: "numeric",
-  });
-  const avgFare =
-    monthTrips.length > 0 ? Math.round(monthTotal / monthTrips.length) : 0;
+// const Dashboard = ({ monthTrips, monthTotal }: DashboardProps) => {
+//   const currentMonth = new Date().toLocaleDateString("en-IN", {
+//     month: "long",
+//     year: "numeric",
+//   });
+//   const avgFare =
+//     monthTrips.length > 0 ? Math.round(monthTotal / monthTrips.length) : 0;
 
-  const getDailyData = () => {
-    const last7Days = [];
-    const today = new Date();
+//   const getDailyData = () => {
+//     const last7Days = [];
+//     const today = new Date();
 
-    for (let i = 6; i >= 0; i--) {
-      const date = new Date(today);
-      date.setDate(date.getDate() - i);
-      const dateStr = date.toLocaleDateString("en-IN");
+//     for (let i = 6; i >= 0; i--) {
+//       const date = new Date(today);
+//       date.setDate(date.getDate() - i);
+//       const dateStr = date.toLocaleDateString("en-IN");
 
-      const dayTrips = monthTrips.filter((t) => {
-        const tripDateStr = new Date().toLocaleDateString("en-IN");
-        return tripDateStr === dateStr;
-      });
-      const dayTotal = dayTrips.reduce((sum, t) => sum + t.fare, 0);
+//       const dayTrips = monthTrips.filter((t) => {
+//         const tripDateStr = new Date().toLocaleDateString("en-IN");
+//         return tripDateStr === dateStr;
+//       });
+//       const dayTotal = dayTrips.reduce((sum, t) => sum + t.fare, 0);
 
-      last7Days.push({
-        date: date.toLocaleDateString("en-IN", {
-          weekday: "short",
-          day: "numeric",
-        }),
-        amount: dayTotal,
-        trips: dayTrips.length,
-      });
-    }
+//       last7Days.push({
+//         date: date.toLocaleDateString("en-IN", {
+//           weekday: "short",
+//           day: "numeric",
+//         }),
+//         amount: dayTotal,
+//         trips: dayTrips.length,
+//       });
+//     }
 
-    return last7Days;
-  };
+//     return last7Days;
+//   };
 
-  const dailyData = getDailyData();
-  const maxAmount = Math.max(...dailyData.map((d) => d.amount), 1);
+//   const dailyData = getDailyData();
+//   const maxAmount = Math.max(...dailyData.map((d) => d.amount), 1);
 
-  return (
-    <div className="space-y-6">
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white rounded-2xl shadow-lg p-6 border-l-4 border-blue-500">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600 mb-1">This Month Revenue</p>
-              <p className="text-3xl font-bold text-gray-900">
-                ₹{monthTotal.toLocaleString()}
-              </p>
-              <p className="text-xs text-gray-500 mt-1">{currentMonth}</p>
-            </div>
-            <div className="bg-blue-100 p-3 rounded-full">
-              <TrendingUp className="text-blue-600" size={24} />
-            </div>
-          </div>
-        </div>
+//   return (
+//     <div className="space-y-6">
+//       {/* Stats Cards */}
+//       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+//         <div className="bg-white rounded-2xl shadow-lg p-6 border-l-4 border-blue-500">
+//           <div className="flex items-center justify-between">
+//             <div>
+//               <p className="text-sm text-gray-600 mb-1">This Month Revenue</p>
+//               <p className="text-3xl font-bold text-gray-900">
+//                 ₹{monthTotal.toLocaleString()}
+//               </p>
+//               <p className="text-xs text-gray-500 mt-1">{currentMonth}</p>
+//             </div>
+//             <div className="bg-blue-100 p-3 rounded-full">
+//               <TrendingUp className="text-blue-600" size={24} />
+//             </div>
+//           </div>
+//         </div>
 
-        <div className="bg-white rounded-2xl shadow-lg p-6 border-l-4 border-green-500">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600 mb-1">Total Trips</p>
-              <p className="text-3xl font-bold text-gray-900">
-                {monthTrips.length}
-              </p>
-              <p className="text-xs text-gray-500 mt-1">This month</p>
-            </div>
-            <div className="bg-green-100 p-3 rounded-full">
-              <Calendar className="text-green-600" size={24} />
-            </div>
-          </div>
-        </div>
+//         <div className="bg-white rounded-2xl shadow-lg p-6 border-l-4 border-green-500">
+//           <div className="flex items-center justify-between">
+//             <div>
+//               <p className="text-sm text-gray-600 mb-1">Total Trips</p>
+//               <p className="text-3xl font-bold text-gray-900">
+//                 {monthTrips.length}
+//               </p>
+//               <p className="text-xs text-gray-500 mt-1">This month</p>
+//             </div>
+//             <div className="bg-green-100 p-3 rounded-full">
+//               <Calendar className="text-green-600" size={24} />
+//             </div>
+//           </div>
+//         </div>
 
-        <div className="bg-white rounded-2xl shadow-lg p-6 border-l-4 border-purple-500">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600 mb-1">Average Fare</p>
-              <p className="text-3xl font-bold text-gray-900">₹{avgFare}</p>
-              <p className="text-xs text-gray-500 mt-1">Per trip</p>
-            </div>
-            <div className="bg-purple-100 p-3 rounded-full">
-              <BarChart3 className="text-purple-600" size={24} />
-            </div>
-          </div>
-        </div>
-      </div>
+//         <div className="bg-white rounded-2xl shadow-lg p-6 border-l-4 border-purple-500">
+//           <div className="flex items-center justify-between">
+//             <div>
+//               <p className="text-sm text-gray-600 mb-1">Average Fare</p>
+//               <p className="text-3xl font-bold text-gray-900">₹{avgFare}</p>
+//               <p className="text-xs text-gray-500 mt-1">Per trip</p>
+//             </div>
+//             <div className="bg-purple-100 p-3 rounded-full">
+//               <BarChart3 className="text-purple-600" size={24} />
+//             </div>
+//           </div>
+//         </div>
+//       </div>
 
-      {/* Chart */}
-      <div className="bg-white rounded-2xl shadow-lg p-6">
-        <h3 className="text-lg font-bold text-gray-800 mb-6">
-          Last 7 Days Performance
-        </h3>
-        <div className="space-y-4">
-          {dailyData.map((day, idx) => (
-            <div key={idx} className="flex items-center gap-4">
-              <div className="w-20 text-sm font-medium text-gray-700">
-                {day.date}
-              </div>
-              <div className="flex-1">
-                <div className="bg-gray-100 rounded-full h-10 relative overflow-hidden">
-                  <div
-                    className="bg-gradient-to-r from-blue-500 to-indigo-600 h-full rounded-full transition-all duration-500 flex items-center justify-end pr-3"
-                    style={{ width: `${(day.amount / maxAmount) * 100}%` }}
-                  >
-                    {day.amount > 0 && (
-                      <span className="text-white font-semibold text-sm">
-                        ₹{day.amount}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </div>
-              <div className="w-20 text-sm text-gray-600 text-right">
-                {day.trips} trips
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-};
+//       {/* Chart */}
+//       <div className="bg-white rounded-2xl shadow-lg p-6">
+//         <h3 className="text-lg font-bold text-gray-800 mb-6">
+//           Last 7 Days Performance
+//         </h3>
+//         <div className="space-y-4">
+//           {dailyData.map((day, idx) => (
+//             <div key={idx} className="flex items-center gap-4">
+//               <div className="w-20 text-sm font-medium text-gray-700">
+//                 {day.date}
+//               </div>
+//               <div className="flex-1">
+//                 <div className="bg-gray-100 rounded-full h-10 relative overflow-hidden">
+//                   <div
+//                     className="bg-gradient-to-r from-blue-500 to-indigo-600 h-full rounded-full transition-all duration-500 flex items-center justify-end pr-3"
+//                     style={{ width: `${(day.amount / maxAmount) * 100}%` }}
+//                   >
+//                     {day.amount > 0 && (
+//                       <span className="text-white font-semibold text-sm">
+//                         ₹{day.amount}
+//                       </span>
+//                     )}
+//                   </div>
+//                 </div>
+//               </div>
+//               <div className="w-20 text-sm text-gray-600 text-right">
+//                 {day.trips} trips
+//               </div>
+//             </div>
+//           ))}
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
 
 export default Start;

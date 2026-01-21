@@ -1,9 +1,16 @@
 import { useEffect, useState } from "react";
-import { ArrowUp, ArrowDown, Pencil, Loader2, Check, XCircle } from "lucide-react";
+import {
+  ArrowUp,
+  ArrowDown,
+  Pencil,
+  Loader2,
+  Check,
+  XCircle,
+} from "lucide-react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useDataContext } from "../../context/TripContext";
-import type { Trip } from "../../types"; 
+import type { Trip } from "../../types";
 
 type EditModalProps = {
   onUpdate: (updatedTrip: Trip) => Promise<void>;
@@ -225,19 +232,26 @@ export default function EditModal({ onUpdate }: EditModalProps) {
           {/* Footer Buttons */}
           <div className="flex gap-3 pt-4">
             <button
+              onClick={() => setActiveTrip(null)}
+              className="flex-1 py-3.5 bg-gray-100 text-gray-600 rounded-xl font-bold hover:bg-gray-200 transition-all"
+            >
+              Cancel
+            </button>
+
+            <button
               onClick={handleUpdate}
               disabled={updating || updateSuccess}
               className={`flex-[2] py-3.5 font-bold rounded-xl shadow-lg transition-all duration-200 flex items-center justify-center
-    ${
-      updateFailed
-        ? "bg-red-600 text-white"
-        : updateSuccess
-          ? "bg-green-600 text-white"
-          : updating
-            ? "bg-blue-600 text-white"
-            : "bg-blue-600 hover:bg-blue-700 text-white"
-    }
-  `}
+              ${
+                updateFailed
+                  ? "bg-red-600 text-white"
+                  : updateSuccess
+                    ? "bg-green-600 text-white"
+                    : updating
+                      ? "bg-blue-600 text-white"
+                      : "bg-blue-600 hover:bg-blue-700 text-white"
+              }
+            `}
             >
               {updating ? (
                 <div className="flex items-center gap-2">
