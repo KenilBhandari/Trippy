@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   Download,
   Calendar,
@@ -17,36 +17,57 @@ const ReportsTab = () => {
   const { monthlyReport, setMonthlyReport } = useDataContext();
 
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
-  const [activeMonth, setActiveMonth] = useState<{ name: string; index: number } | null>(null);
+  const [activeMonth, setActiveMonth] = useState<{
+    name: string;
+    index: number;
+  } | null>(null);
   const [viewReport, setViewReport] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
 
   const months = [
-    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
   ];
+let s = 0
+  const isDataValid = useMemo(() => {
+    if (!monthlyReport.length || !activeMonth) return false;
 
-const isDataValid = () => {
-  if (!monthlyReport.length || !activeMonth) return false;
-
-  return monthlyReport.every((trip) => {
-    const d = new Date(trip.tripDate);
-    return (
-      d.getMonth() === activeMonth.index &&
-      d.getFullYear() === selectedYear
-    );
-  });
-};
+    return monthlyReport.every((trip) => {
+      const d = new Date(trip.tripDate);
+      console.log(++s);
+      
+      return (
+        d.getMonth() === activeMonth.index && d.getFullYear() === selectedYear
+      );
+    });
+  }, [monthlyReport, activeMonth, selectedYear]);
 
   const loadReportData = async () => {
     if (!activeMonth) return false;
-    if (isDataValid()) return true;
+    if (isDataValid) return true;
 
     setIsFetching(true);
 
     const startOfMonth = new Date(selectedYear, activeMonth.index, 1).getTime();
-    const endOfMonth = new Date(selectedYear, activeMonth.index + 1, 0, 23, 59, 59).getTime();
-    
+    const endOfMonth = new Date(
+      selectedYear,
+      activeMonth.index + 1,
+      0,
+      23,
+      59,
+      59,
+    ).getTime();
+
     const filter = {
       limit: -1,
       sort: "tripdate_asc",
@@ -54,7 +75,7 @@ const isDataValid = () => {
       dateTo: endOfMonth,
     };
     // console.log(formatDate(startOfMonth), formatDate(endOfMonth));
-    
+
     try {
       await fetchReports(filter, { setMonthlyReport });
       return true;
@@ -91,7 +112,7 @@ const isDataValid = () => {
               <h2 className="text-2xl font-black text-gray-900 tracking-tight">
                 Reports
               </h2>
-              <div className="h-1 w-6 bg-indigo-500 rounded-full mt-1" />
+              <div className="h-1 w-6 bg-blue-500 rounded-full mt-1" />
             </div>
 
             <div className="flex items-center gap-1 bg-white p-1 rounded-2xl border border-gray-200 shadow-sm">
@@ -108,7 +129,7 @@ const isDataValid = () => {
               </button>
 
               <div className="flex flex-col items-center px-2 min-w-[56px]">
-                <span className="text-[10px] font-black text-indigo-500 uppercase leading-none mb-0.5">
+                <span className="text-[10px] font-black text-blue-500 uppercase leading-none mb-0.5">
                   Year
                 </span>
                 <span className="font-bold text-sm tabular-nums text-gray-900 leading-none">
@@ -131,9 +152,9 @@ const isDataValid = () => {
               <button
                 key={month}
                 onClick={() => setActiveMonth({ name: month, index })}
-                className="group relative flex flex-col items-center justify-center aspect-square bg-white rounded-3xl border border-gray-100 shadow-sm hover:shadow-xl hover:shadow-indigo-500/10 transition-all duration-300 active:scale-95"
+                className="group relative flex flex-col items-center justify-center aspect-square bg-white rounded-3xl border border-gray-100 shadow-sm hover:shadow-xl hover:shadow-blue-500/10 transition-all duration-300 active:scale-95"
               >
-                <div className="p-2.5 rounded-2xl bg-indigo-50 text-indigo-600 mb-2 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                <div className="p-2.5 rounded-2xl bg-blue-50 text-blue-600 mb-2 group-hover:bg-blue-600 group-hover:text-white transition-colors">
                   <Calendar size={18} strokeWidth={2.5} />
                 </div>
                 <span className="text-xs font-bold text-gray-700 uppercase tracking-wider">
@@ -160,7 +181,7 @@ const isDataValid = () => {
                         {selectedYear}
                       </span>
                     </h3>
-                    <p className="text-[10px] font-bold text-indigo-500 uppercase tracking-wider">
+                    <p className="text-[10px] font-bold text-blue-500 uppercase tracking-wider">
                       Monthly Report
                     </p>
                   </div>
@@ -182,23 +203,23 @@ const isDataValid = () => {
                       ${
                         isFetching
                           ? "bg-gray-50 border-gray-100 opacity-60"
-                          : "bg-white border-indigo-100 hover:border-indigo-200"
+                          : "bg-white border-blue-100 hover:border-blue-200"
                       }`}
                   >
-                    <div className="text-indigo-600">
+                    <div className="text-blue-600">
                       {isFetching ? (
-                        <div className="w-5 h-5 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+                        <div className="w-5 h-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
                       ) : (
                         <Eye size={20} strokeWidth={2.5} />
                       )}
                     </div>
-                    <span className="text-[11px] font-black text-indigo-600 uppercase">
+                    <span className="text-[11px] font-black text-blue-600 uppercase">
                       {isFetching ? "Loading" : "View"}
                     </span>
                   </button>
 
                   {/* PDF Button – smart: show direct download when data ready */}
-                  {isDataValid() ? (
+                  {isDataValid ? (
                     <PDFDownloadLink
                       document={
                         <MonthlyReportPDF
@@ -213,7 +234,7 @@ const isDataValid = () => {
                       {({ loading }) => (
                         <button
                           disabled={loading}
-                          className="flex flex-col items-center gap-2 py-4 rounded-2xl bg-indigo-600 text-white w-full transition-all active:scale-95 shadow-lg shadow-indigo-200"
+                          className="flex flex-col items-center gap-2 py-4 rounded-2xl bg-blue-600 text-white w-full transition-all active:scale-95 shadow-lg shadow-blue-200"
                         >
                           {loading ? (
                             <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -230,7 +251,7 @@ const isDataValid = () => {
                     <button
                       onClick={loadReportData}
                       disabled={isFetching}
-                      className="flex flex-col items-center gap-2 py-4 rounded-2xl bg-indigo-600 text-white w-full transition-all active:scale-95 opacity-90 shadow-lg shadow-indigo-200"
+                      className="flex flex-col items-center gap-2 py-4 rounded-2xl bg-blue-600 text-white w-full transition-all active:scale-95 opacity-90 shadow-lg shadow-blue-200"
                     >
                       {isFetching ? (
                         <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />

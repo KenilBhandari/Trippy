@@ -1,7 +1,7 @@
 import { useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
 import type { NewTripInput } from "../../types";
-import { ArrowDown, ArrowUp, Check, Plus, XCircle } from "lucide-react";
+import { ArrowDown, ArrowUp, Check, XCircle } from "lucide-react";
 import DatePicker from "react-datepicker";
 import { useDataContext } from "../../context/TripContext";
 
@@ -26,8 +26,8 @@ const NewTripTab = ({ onAddTrip }: NewTripTabProps) => {
   const tripTimestamp = tripDate.setHours(0, 0, 0, 0);
 
   const isDisabledAddBtn =
-    !(startPoint.trim()) ||
-    !(startPoint.trim()) ||
+    !startPoint.trim() ||
+    !startPoint.trim() ||
     !tripDate ||
     fare <= 0 ||
     addSuccess ||
@@ -71,19 +71,21 @@ const NewTripTab = ({ onAddTrip }: NewTripTabProps) => {
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg p-6">
-      <div className="flex items-center gap-2 mb-6">
-        <div className="bg-gradient-to-br from-blue-500 to-indigo-600 p-1.5 md:p-2 rounded-lg">
-          <Plus className="text-white" size={16} />
-        </div>
-        <h2 className="text-xl font-bold text-gray-800">New Trip</h2>
+    <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6 w-full">
+      <div className="flex items-center gap-3 mb-6">
+        {/* The Accent: Slimmer, taller, and rounded for a modern look */}
+        <div className="w-1.5 h-6 bg-gradient-to-b from-blue-500 to-indigo-600 rounded-full shadow-sm" />
+
+        <h2 className="text-lg sm:text-xl font-extrabold tracking-tight text-gray-800">
+          New Trip
+        </h2>
       </div>
 
-      <div className="space-y-6">
+      <div className="space-y-5 sm:space-y-6">
         {/* Points */}
-        <div className="space-y-4">
+        <div className="space-y-3 sm:space-y-4">
           {/* From Section */}
-          <div className="relative group">
+          <div className="relative">
             <input
               type="text"
               value={startPoint}
@@ -96,11 +98,11 @@ const NewTripTab = ({ onAddTrip }: NewTripTabProps) => {
               onBlur={() =>
                 setTimeout(() => setShowStartSuggestions(false), 200)
               }
-              className="w-full font-bold text-base px-4 py-4 bg-white border border-gray-200 rounded-2xl text-gray-900 shadow-sm transition-all hover:border-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 focus:outline-none"
+              className="w-full font-bold text-sm sm:text-base px-3 sm:px-4 py-3 sm:py-4 bg-white border border-gray-200 rounded-xl sm:rounded-2xl text-gray-900 shadow-sm transition-all hover:border-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 focus:outline-none"
             />
 
             {showStartSuggestions && (
-              <div className="absolute z-20 w-full mt-2 p-2 bg-white border border-gray-100 rounded-2xl shadow-xl animate-in fade-in zoom-in-95 duration-150">
+              <div className="absolute z-20 w-full mt-2 p-2 bg-white border border-gray-100 rounded-xl sm:rounded-2xl shadow-xl animate-in fade-in zoom-in-95 duration-150">
                 <div className="flex flex-col gap-2">
                   {startLocations.map((loc) => (
                     <button
@@ -117,8 +119,8 @@ const NewTripTab = ({ onAddTrip }: NewTripTabProps) => {
             )}
           </div>
 
-          {/* Middle Connector*/}
-          <div className="flex items-center justify-center -my-2 relative z-10">
+          {/* Middle Connector */}
+          <div className="flex items-center justify-center -my-1 sm:-my-2 relative z-10">
             <button
               type="button"
               onClick={() => setIsReturnTrip((prev) => !prev)}
@@ -126,17 +128,17 @@ const NewTripTab = ({ onAddTrip }: NewTripTabProps) => {
             >
               {isReturnTrip ? (
                 <div className="flex gap-1 text-blue-600 items-center leading-none">
-                  <ArrowUp size={18} strokeWidth={3} />
-                  <ArrowDown size={18} strokeWidth={3} />
+                  <ArrowUp size={16} strokeWidth={3} />
+                  <ArrowDown size={16} strokeWidth={3} />
                 </div>
               ) : (
-                <ArrowDown size={20} strokeWidth={3} />
+                <ArrowDown size={18} strokeWidth={3} />
               )}
             </button>
           </div>
 
           {/* To Section */}
-          <div className="relative group">
+          <div className="relative">
             <input
               type="text"
               value={endPoint}
@@ -147,11 +149,11 @@ const NewTripTab = ({ onAddTrip }: NewTripTabProps) => {
               }}
               onFocus={() => setShowEndSuggestions(true)}
               onBlur={() => setTimeout(() => setShowEndSuggestions(false), 200)}
-              className="w-full font-bold text-base px-4 py-4 bg-white border border-gray-200 rounded-2xl text-gray-900 shadow-sm transition-all hover:border-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 focus:outline-none"
+              className="w-full font-bold text-sm sm:text-base px-3 sm:px-4 py-3 sm:py-4 bg-white border border-gray-200 rounded-xl sm:rounded-2xl text-gray-900 shadow-sm transition-all hover:border-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 focus:outline-none"
             />
 
             {showEndSuggestions && (
-              <div className="absolute z-20 w-full mt-2 p-2 bg-white border border-gray-100 rounded-2xl shadow-xl animate-in fade-in zoom-in-95 duration-150">
+              <div className="absolute z-20 w-full mt-2 p-2 bg-white border border-gray-100 rounded-xl sm:rounded-2xl shadow-xl animate-in fade-in zoom-in-95 duration-150">
                 <div className="flex flex-col gap-2">
                   {endLocations.map((loc) => (
                     <button
@@ -171,7 +173,9 @@ const NewTripTab = ({ onAddTrip }: NewTripTabProps) => {
 
         {/* Fare */}
         <div className="space-y-1.5">
-          <label className="ml-1 text-sm font-medium text-gray-400">Fare</label>
+          <label className="ml-1 text-xs sm:text-sm font-medium text-gray-400">
+            Fare
+          </label>
           <input
             type="text"
             inputMode="numeric"
@@ -184,44 +188,39 @@ const NewTripTab = ({ onAddTrip }: NewTripTabProps) => {
               }
             }}
             placeholder="Enter fare"
-            className="w-full font-bold px-4 py-3.5 bg-white border border-gray-300 rounded-xl text-gray-900 text-base shadow-sm hover:border-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 focus:outline-none transition-all"
+            className="w-full font-bold px-3 sm:px-4 py-3 sm:py-3.5 bg-white border border-gray-300 rounded-lg sm:rounded-xl text-gray-900 text-sm sm:text-base shadow-sm hover:border-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 focus:outline-none transition-all"
           />
         </div>
 
-        {/* Date - modern & simple */}
+        {/* Date */}
         <div className="space-y-1.5">
-          <label className="ml-1 text-sm font-medium text-gray-400">
+          <label className="ml-1 text-xs sm:text-sm font-medium text-gray-400">
             Trip Date
           </label>
-
-          <div className="flex items-center gap-3 p-1.5 bg-gray-100/50 rounded-2xl w-fit border border-gray-100">
-            <div className="relative">
-              <DatePicker
-                selected={tripDate}
-                onChange={(date: Date | null) => {
-                  if (date) setTripDate(date);
-                }}
-                maxDate={new Date()}
-                // withPortal
-                popperPlacement="bottom-start"
-                customInput={
-                  <button className="flex items-center gap-2 px-4 py-2 bg-white shadow-sm rounded-xl text-[14px] text-gray-800 font-semibold hover:bg-gray-50 transition-all active:scale-[0.98]">
-                    <span className="text-blue-500 text-lg">●</span>
-                    {tripDate
-                      ? tripDate.toLocaleDateString("en-GB", {
-                          day: "2-digit",
-                          month: "short",
-                          year: "numeric",
-                        })
-                      : "Select date"}
-                  </button>
-                }
-              />
-            </div>
+          <div className="flex items-center gap-2 sm:gap-3 p-1.5 bg-gray-100/50 rounded-lg sm:rounded-2xl w-fit border border-gray-100">
+            <DatePicker
+              selected={tripDate}
+              onChange={(date: Date | null) => {
+                if (date) setTripDate(date);
+              }}
+              maxDate={new Date()}
+              popperPlacement="bottom-start"
+              customInput={
+                <button className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-white shadow-sm rounded-lg sm:rounded-xl text-xs sm:text-sm text-gray-800 font-semibold hover:bg-gray-50 transition-all active:scale-95">
+                  <span className="text-blue-500 text-base sm:text-lg">●</span>
+                  {tripDate.toLocaleDateString("en-GB", {
+                    day: "2-digit",
+                    month: "short",
+                    year: "2-digit",
+                  })}
+                </button>
+              }
+            />
 
             <button
+              type="button"
               onClick={() => setTripDate(new Date())}
-              className="pr-4 pl-2 py-2 text-[13px] font-medium text-gray-500 hover:text-gray-900 transition-colors"
+              className="pr-2 sm:pr-4 pl-1 sm:pl-2 py-2 text-xs sm:text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors whitespace-nowrap"
             >
               Today
             </button>
@@ -232,7 +231,7 @@ const NewTripTab = ({ onAddTrip }: NewTripTabProps) => {
         <button
           onClick={handleAdd}
           disabled={isDisabledAddBtn}
-          className={`w-full py-3.5 font-medium rounded-xl shadow-md transition-all duration-200 mt-2 flex items-center justify-center
+          className={`w-full py-3 sm:py-3.5 font-medium rounded-lg sm:rounded-xl shadow-md transition-all duration-200 mt-2 flex items-center justify-center text-sm sm:text-base
           ${
             addFailed
               ? "bg-red-600 text-white cursor-not-allowed"
@@ -243,21 +242,18 @@ const NewTripTab = ({ onAddTrip }: NewTripTabProps) => {
                   : isDisabledAddBtn
                     ? "bg-gray-400 cursor-not-allowed"
                     : "bg-blue-600 hover:bg-blue-700 text-white"
-          }
-
-          `}
+          }`}
         >
           {addingTrip ? (
             <span>Adding…</span>
           ) : addSuccess ? (
-            <div className="flex items-center gap-2.5">
-              <Check className="h-5 w-5" />
+            <div className="flex items-center gap-2">
+              <Check className="h-4 w-4 sm:h-5 sm:w-5" />
               <span>Trip Added!</span>
             </div>
           ) : addFailed ? (
-            <div className="flex items-center gap-2.5 ">
-              <XCircle className="h-5 w-5" />{" "}
-              {/* Use your preferred error icon */}
+            <div className="flex items-center gap-2">
+              <XCircle className="h-4 w-4 sm:h-5 sm:w-5" />
               <span>Failed to Add Trip</span>
             </div>
           ) : (

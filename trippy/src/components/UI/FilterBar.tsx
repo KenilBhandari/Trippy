@@ -59,7 +59,7 @@ const TripFilterBar: React.FC<TripFilterBarProps> = ({ onFilter }) => {
     <div className="w-full font-sans">
       {/* Main Filter Bar */}
       <div className="relative bg-white border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] rounded-2xl transition-all duration-500 hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)]">
-        <div className="flex items-center h-14 sm:h-16">
+        <div className="flex items-center h-12 sm:h-16">
           {/* Quick Date Selector */}
           <div className="relative h-full shrink-0">
             <button
@@ -67,7 +67,7 @@ const TripFilterBar: React.FC<TripFilterBarProps> = ({ onFilter }) => {
                 setShowQuickDate(!showQuickDate);
                 setShowCustomDate(false);
               }}
-              className="flex items-center h-full px-5 sm:px-6 gap-2.5 hover:bg-gray-50 transition-colors rounded-l-2xl border-r border-gray-100 group"
+              className="flex items-center h-full md:px-5 px-4 gap-2 md:gap-2.5 hover:bg-gray-50 transition-colors rounded-l-2xl border-r border-gray-100 group"
             >
               <span className="text-xs font-bold text-gray-900">
                 {options.find((o) => o.value === quickDate)?.label}
@@ -116,7 +116,7 @@ const TripFilterBar: React.FC<TripFilterBarProps> = ({ onFilter }) => {
           </div>
 
           {/* Search Input */}
-          <div className="flex flex-1 items-center px-2 sm:px-4 min-w-0">
+          <div className="flex flex-1 items-center md:px-2 px-4 min-w-0">
             <Search size={16} className="text-gray-400 shrink-0" />
             <input
               type="text"

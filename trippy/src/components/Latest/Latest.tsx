@@ -5,59 +5,76 @@ import { formatDate, formatTime } from "../../utils/FormatDate";
 const Latest = () => {
   const { last10Trips } = useDataContext();
 
-  return (
-    <div className="bg-white rounded-2xl shadow-lg p-6">
-      <h2 className="text-xl font-bold text-gray-800 mb-4">Last 10 Trips</h2>
+return (
+  <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6 w-full max-w-full">
+    <h2 className="text-lg font-bold text-gray-800 mb-4 tracking-tight">Last 10 Trips</h2>
 
-      {last10Trips.length === 0 ? (
-        <p className="text-gray-500 text-center py-10">No trips yet</p>
-      ) : (
-        <div className="space-y-3">
-          {last10Trips.map((trip) => (
-            <div
-              key={trip._id}
-              className="border text-black border-gray-200 rounded-xl p-4 flex justify-between items-center"
-            >
-              <div>
-                {/* Trip Start */}
+    {last10Trips.length === 0 ? (
+      <p className="text-gray-500 text-center py-10 text-sm">No trips yet</p>
+    ) : (
+      <div className="space-y-3">
+        {last10Trips.map((trip) => (
+          <div
+            key={trip._id}
+            className="group flex items-center justify-between gap-3 p-3 border border-gray-100 rounded-xl bg-gray-50/30 hover:bg-gray-50 hover:border-blue-100 transition-all w-full overflow-hidden"
+          >
+            {/* Left Section: Routes & Meta */}
+            <div className="flex-1 min-w-0">
+              {/* Route Line */}
+              <div className="flex items-center font-semibold text-gray-900 text-[13px] sm:text-[15px] mb-1 min-w-0">
+                <span className="truncate max-w-[45%] shrink-0">{trip.startPoint}</span>
+                <ArrowRight
+                  size={14}
+                  className="mx-2 text-gray-400 shrink-0 opacity-70"
+                />
+                <span className="truncate">{trip.endPoint}</span>
+              </div>
 
-                <div className="flex flex-col gap-1">
-                  <div className="flex items-center gap-2 font-semibold text-gray-900">
-                    <span>{trip.startPoint}</span>
-
-                    <ArrowRight size={14} className="text-gray-400" />
-
-                    <span>{trip.endPoint}</span>
-
-                    {trip.returnTrip && (
-                      <span className="ml-1 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide bg-blue-50 text-blue-600 border border-blue-100">
-                        Return
-                      </span>
-                    )}
-                  </div>
-
-                  <div className="flex items-center gap-1 text-xs text-gray-500">
-                    <div className="flex items-center flex-wrap gap-x-1.5 gap-y-0.5 text-xs text-gray-500">
-                      <Calendar size={13} className="text-gray-400" />
-                      <span>{formatDate(trip.tripDate)}</span>
-
-                      <span className="opacity-60">•</span>
-
-                      <Clock size={13} className="text-gray-400" />
-                      <span>{formatTime(trip.createdAt)}</span>
-                    </div>
-                  </div>
+              {/* Combined Meta Info Row */}
+              <div className="flex items-center flex-wrap gap-x-2 gap-y-1">
+                {/* Date */}
+                <div className="flex items-center text-[10px] sm:text-[11px] font-semibold text-gray-500 shrink-0">
+                  <Calendar size={11} className="mr-1 text-gray-400 shrink-0" />
+                  <span className="whitespace-nowrap">{formatDate(trip.tripDate)}</span>
                 </div>
 
-                {/* Trip End */}
+                {/* Separator Dot */}
+                <span className="w-0.5 h-0.5 rounded-full bg-gray-300 shrink-0" />
+
+                {/* Time */}
+                <div className="flex items-center text-[10px] sm:text-[11px] font-semibold text-gray-500 shrink-0">
+                  <Clock size={11} className="mr-1 text-gray-400 shrink-0" />
+                  <span className="whitespace-nowrap">{formatTime(trip.createdAt)}</span>
+                </div>
+
+                {/* Return Badge - Clean and Small */}
+                {trip.returnTrip && (
+                  <>
+                    <span className="hidden xs:block w-0.5 h-0.5 rounded-full bg-gray-300 shrink-0" />
+                    <span className="inline-flex px-1.5 py-0.5 rounded-md bg-blue-50 text-blue-600 border border-blue-100 text-[10px] sm:text-[11px] font-black ">
+                      Return
+                    </span>
+                  </>
+                )}
               </div>
-              <div className="font-bold text-green-700">₹{trip.fare}</div>
             </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
+
+            {/* Right Section: Price */}
+            <div className="shrink-0 text-right pl-1 border-l border-gray-100 sm:border-0">
+              <div className="font-extrabold text-emerald-500 text-sm sm:text-lg whitespace-nowrap">
+                ₹{trip.fare}
+              </div>
+              <div className="hidden xs:block text-[8px] font-bold text-gray-400 uppercase tracking-widest">
+                Amount
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    )}
+  </div>
+);
+
 };
 
 export default Latest;
