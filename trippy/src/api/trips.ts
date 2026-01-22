@@ -54,17 +54,16 @@ export const deleteTripByID = async (tripId: string) => {
   }
 };
 
-
-export const dashboardSummary = async () => {
+export const fetchDashboardStats = async () => {
   try {
     const response = await axios.get(`${API_URL}/trip/dashboard`);
     if (response.data && response.data.status === "success") {
       return response.data;
     } else {
-      throw new Error(response.data?.message || "Failed to fetch trip");
+      throw new Error(response.data?.message || "Failed to fetch dashboard");
     }
   } catch (error) {
-    console.error("Failed to fetch dashboard summary", error);
+    console.error("Failed to fetch dashboard", error);
     throw error;
   }
 };

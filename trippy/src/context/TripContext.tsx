@@ -4,7 +4,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import type { Trip } from "../types";
+import type { DashboardData, Trip } from "../types";
 
 type TripContextType = {
   
@@ -46,6 +46,11 @@ type TripContextType = {
 
   startLocations: string[];
   endLocations: string[];
+
+  dashboardData: DashboardData | null
+  setDashboardData: React.Dispatch<React.SetStateAction<DashboardData | null>>
+
+
 };
 
 const TripContext = createContext<TripContextType | undefined>(undefined);
@@ -74,6 +79,9 @@ export function TripProvider({ children }: { children: ReactNode }) {
     "Vapi - Shree Transport",
     "Dadra",
   ];
+
+    const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
+
 
   return (
     <TripContext.Provider
@@ -104,6 +112,8 @@ export function TripProvider({ children }: { children: ReactNode }) {
         setToDate,
         startLocations,
         endLocations,
+        dashboardData,
+        setDashboardData
       }}
     >
       {children}

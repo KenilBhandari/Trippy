@@ -30,16 +30,21 @@ export interface TripFilter {
   dateTo?: number;
 }
 
-// Dashboard component props
-export interface DashboardProps {
-  trips: Trip[];
-  monthTrips: Trip[];
-  monthTotal: number;
+
+export interface DashboardData {
+  monthStats: {
+    totalRevenue: number;
+    totalTrips: number;
+    avgFare: number;
+  };
+  last7Days: {
+    _id: string;
+    totalRevenue: number;
+    totalTrips: number;
+  }[];
+  monthlyTotals: {
+    _id: number;
+    totalRevenue: number;
+  }[];
 }
 
-// API response types (recommended)
-export interface ApiResponse<T> {
-  status: "success" | "error";
-  data: T;
-  message?: string;
-}

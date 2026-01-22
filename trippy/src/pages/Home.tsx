@@ -13,13 +13,14 @@ import {
 import NewTrip from "../components/New/New";
 import Latest from "../components/Latest/Latest";
 import TripManager from "../components/TripManager/TripManager";
-import { dashboardSummary, fetchCustomTrips, sendTrip } from "../api/trips";
+import { fetchCustomTrips, sendTrip } from "../api/trips";
 import { useDataContext } from "../context/TripContext";
 import ReportsTab from "../components/Reports/Reports";
 import Dashboard from "../components/Dashboard/Dashboard";
+import { loadDashboard } from "../api/dashboard.service";
 
 const Start = () => {
-  const { last10Trips, setLast10Trips, setRecent25Trips } = useDataContext();
+  const { last10Trips, setLast10Trips, setRecent25Trips, dashboardData, setDashboardData } = useDataContext();
 
   const [activeTab, setActiveTab] = useState("new");
 
@@ -53,39 +54,33 @@ const Start = () => {
     }
   };
 
+
+  const fetchFreshTrips = async () => {
+    const filter10: TripFilter = { limit: 10, sort: "created" };
+    const filter25: TripFilter = { limit: 25, sort: "updated" };
+
+    const last10List = await fetchCustomTrips(filter10);
+    const recent25List = await fetchCustomTrips(filter25);
+
+    if (last10List.status === "success") {
+      setLast10Trips(last10List.data);
+    }
+    if (recent25List.status === "success") {
+      setRecent25Trips(recent25List.data);
+    }
+  };
+  
   useEffect(() => {
-    const fetchFreshTrips = async () => {
-      const filter10: TripFilter = { limit: 10, sort: "created" };
-      const filter25: TripFilter = { limit: 25, sort: "updated" };
+    loadDashboard(setDashboardData);
+  }, [])
 
-      const last10List = await fetchCustomTrips(filter10);
-      const recent25List = await fetchCustomTrips(filter25);
+  console.log(dashboardData);
 
-      if (last10List.status === "success") {
-        setLast10Trips(last10List.data);
-      }
-      if (recent25List.status === "success") {
-        setRecent25Trips(recent25List.data);
-      }
-    };
+
+  useEffect(() => {
     fetchFreshTrips();
   }, []);
 
-
-    const handleDashboardData = async () => {
-    try {
-      const result = await dashboardSummary();
-      if (result.status === "success") {
-        return result
-      }
-      else{
-        throw new Error("Api refused Dashboard Data");
-      }
-    } catch (err) {
-      console.error("Failed to send trip to server", err);
-      throw err;
-    }
-  };
 
 
   const getMonthTrips = () => {
@@ -210,11 +205,7 @@ const Start = () => {
         <div className="max-w-7xl mx-auto px-4 py-5 md:px-6 md:py-8">
           
           {activeTab === "dashboard" && (
-            <Dashboard
-              trips={last10Trips}
-              monthTrips={monthTrips}
-              monthTotal={monthTotal}
-            />
+            <Dashboard/>
           )}
 
           {activeTab === "new" && (

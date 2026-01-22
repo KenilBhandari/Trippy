@@ -1,217 +1,271 @@
-import type { DashboardProps, Trip } from "../../types";
+import { useEffect } from "react";
+import { useDataContext } from "../../context/TripContext";
 import { TrendingUp, Calendar, BarChart3, IndianRupee } from "lucide-react";
+import { loadDashboard } from "../../api/dashboard.service";
 
-const Dashboard = ({ trips, monthTrips, monthTotal }: DashboardProps) => {
-  const currentMonth = new Date().toLocaleDateString("en-IN", {
-    month: "long",
-    year: "numeric",
-  });
-  
-  const avgFare =
-    monthTrips.length > 0 ? Math.round(monthTotal / monthTrips.length) : 0;
+const Dashboard = () => {
+  const { setDashboardData, dashboardData } = useDataContext();
 
-  // Get last 7 days data
-  const getDailyData = () => {
-    const last7Days = [];
-    const today = new Date();
+  useEffect(() => {
+    loadDashboard(setDashboardData);
+  }, [setDashboardData]);
 
-    for (let i = 6; i >= 0; i--) {
-      const date = new Date(today);
-      date.setDate(date.getDate() - i);
-      date.setHours(0, 0, 0, 0);
-      
-      const dayTrips = trips.filter((t) => {
-        const tripDate = new Date(t.createdAt);
-        tripDate.setHours(0, 0, 0, 0);
-        return tripDate.getTime() === date.getTime();
-      });
-      
-      const dayTotal = dayTrips.reduce((sum, t) => sum + t.fare, 0);
-
-      last7Days.push({
-        date: date.toLocaleDateString("en-IN", {
-          weekday: "short",
-          day: "numeric",
-        }),
-        amount: dayTotal,
-        trips: dayTrips.length,
-      });
-    }
-
-    return last7Days;
+  const monthStats = dashboardData?.monthStats || {
+    totalRevenue: 0,
+    totalTrips: 0,
+    avgFare: 0,
   };
 
-  // Get last 7 days total
-  const dailyData = getDailyData();
-  const last7DaysTotal = dailyData.reduce((sum, d) => sum + d.amount, 0);
-  const maxDailyAmount = Math.max(...dailyData.map((d) => d.amount), 1);
+  const last7Days = Array.isArray(dashboardData?.last7Days)
+    ? dashboardData.last7Days
+    : [];
 
-  // Get monthly data for current year
-  const getMonthlyData = () => {
-    const currentYear = new Date().getFullYear();
-    const monthlyData = [];
-    
-    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-    
-    for (let month = 0; month < 12; month++) {
-      const monthTrips = trips.filter((t) => {
-        const tripDate = new Date(t.createdAt);
-        return tripDate.getFullYear() === currentYear && tripDate.getMonth() === month;
-      });
-      
-      const monthTotal = monthTrips.reduce((sum, t) => sum + t.fare, 0);
-      
-      monthlyData.push({
-        month: monthNames[month],
-        amount: monthTotal,
-        trips: monthTrips.length,
-      });
-    }
-    
-    return monthlyData;
+  const monthlyTotals = Array.isArray(dashboardData?.monthlyTotals)
+    ? dashboardData.monthlyTotals
+    : [];
+
+  const maxDailyAmount =
+    last7Days.length > 0
+      ? Math.max(...last7Days.map((d) => d?.totalRevenue || 0), 1)
+      : 1;
+
+  const maxMonthlyAmount =
+    monthlyTotals.length > 0
+      ? Math.max(...monthlyTotals.map((m) => m?.totalRevenue || 0), 1)
+      : 1;
+
+  const getMonthName = (monthNum: number) => {
+    const months = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
+    return months[monthNum] || `M${monthNum + 1}`;
   };
 
-  const monthlyData = getMonthlyData();
-  const maxMonthlyAmount = Math.max(...monthlyData.map((m) => m.amount), 1);
+  const formatCurrency = (amount: number) => {
+    if (!amount || isNaN(amount)) return "0";
+    return Math.round(amount).toLocaleString("en-IN");
+  };
+
+  const todayRevenue =
+    last7Days.length > 0
+      ? last7Days[last7Days.length - 1]?.totalRevenue || 0
+      : 0;
+
+  const statCards = [
+    {
+      icon: IndianRupee,
+      label: "This Month",
+      value: `₹${formatCurrency(monthStats.totalRevenue)}`,
+      bgColor: "bg-blue-50",
+      iconColor: "text-blue-600",
+    },
+    {
+      icon: Calendar,
+      label: "Total Trips",
+      value: monthStats.totalTrips || 0,
+      bgColor: "bg-purple-50",
+      iconColor: "text-purple-600",
+    },
+    {
+      icon: BarChart3,
+      label: "Avg Fare",
+      value: `₹${formatCurrency(monthStats.avgFare)}`,
+      bgColor: "bg-orange-50",
+      iconColor: "text-orange-600",
+    },
+    {
+      icon: TrendingUp,
+      label: "Today",
+      value: `₹${formatCurrency(todayRevenue)}`,
+      bgColor: "bg-green-50",
+      iconColor: "text-green-600",
+    },
+  ];
 
   return (
-    <div className="space-y-5 md:space-y-6">
-      {/* Stats Cards - Clean & Light */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-        {/* This Month Revenue */}
-        <div className="bg-white rounded-xl md:rounded-2xl p-4 md:p-5 border border-gray-100 hover:shadow-md transition-shadow">
-          <div className="flex items-start justify-between mb-2 md:mb-3">
-            <div className="bg-blue-50 p-1.5 md:p-2 rounded-lg">
-              <IndianRupee size={16} className="text-blue-600 md:w-5 md:h-5" />
-            </div>
-          </div>
-          <p className="text-xs text-gray-500 mb-1">This Month</p>
-          <p className="text-xl md:text-2xl font-bold text-gray-900">
-            ₹{monthTotal.toLocaleString("en-IN")}
-          </p>
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-7xl mx-auto px-2 py-4 md:px-6 md:py-6 space-y-4 md:space-y-6">
+        <div>
+          <h1 className="text-xl md:text-3xl font-bold text-gray-900">
+            Dashboard
+          </h1>
+       
         </div>
 
-        {/* Last 7 Days Revenue */}
-        <div className="bg-white rounded-xl md:rounded-2xl p-4 md:p-5 border border-gray-100 hover:shadow-md transition-shadow">
-          <div className="flex items-start justify-between mb-2 md:mb-3">
-            <div className="bg-green-50 p-1.5 md:p-2 rounded-lg">
-              <TrendingUp size={16} className="text-green-600 md:w-5 md:h-5" />
-            </div>
-          </div>
-          <p className="text-xs text-gray-500 mb-1">Last 7 Days</p>
-          <p className="text-xl md:text-2xl font-bold text-gray-900">
-            ₹{last7DaysTotal.toLocaleString("en-IN")}
-          </p>
-        </div>
-
-        {/* Total Trips This Month */}
-        <div className="bg-white rounded-xl md:rounded-2xl p-4 md:p-5 border border-gray-100 hover:shadow-md transition-shadow">
-          <div className="flex items-start justify-between mb-2 md:mb-3">
-            <div className="bg-purple-50 p-1.5 md:p-2 rounded-lg">
-              <Calendar size={16} className="text-purple-600 md:w-5 md:h-5" />
-            </div>
-          </div>
-          <p className="text-xs text-gray-500 mb-1">Trips</p>
-          <p className="text-xl md:text-2xl font-bold text-gray-900">
-            {monthTrips.length}
-          </p>
-        </div>
-
-        {/* Average Fare */}
-        <div className="bg-white rounded-xl md:rounded-2xl p-4 md:p-5 border border-gray-100 hover:shadow-md transition-shadow">
-          <div className="flex items-start justify-between mb-2 md:mb-3">
-            <div className="bg-orange-50 p-1.5 md:p-2 rounded-lg">
-              <BarChart3 size={16} className="text-orange-600 md:w-5 md:h-5" />
-            </div>
-          </div>
-          <p className="text-xs text-gray-500 mb-1">Avg Fare</p>
-          <p className="text-xl md:text-2xl font-bold text-gray-900">
-            ₹{avgFare.toLocaleString("en-IN")}
-          </p>
-        </div>
-      </div>
-
-      {/* Last 7 Days Chart - Minimal & Clean */}
-   <div className="bg-white rounded-xl md:rounded-2xl p-4 md:p-6 border border-gray-100">
-  <h3 className="text-sm md:text-base font-bold text-gray-800 mb-4 md:mb-5">
-    Last 7 Days Performance
-  </h3>
-
-  {/* Vertical bars container */}
-  <div className="flex items-end justify-between h-40 md:h-52 gap-2 md:gap-3">
-    {dailyData.map((day, idx) => {
-      const barHeight = day.amount > 0 ? Math.max((day.amount / maxDailyAmount) * 100, 10) : 0; // min height 10% for visibility
-      return (
-        <div key={idx} className="flex flex-col items-center flex-1">
-          {/* Amount label on top */}
-          <div className="text-xs md:text-sm font-semibold text-gray-700 mb-1">
-            {day.amount > 0 ? `₹${day.amount.toLocaleString("en-IN")}` : ""}
-          </div>
-
-          {/* Vertical bar */}
-          <div className="w-6 md:w-8 bg-gray-50 rounded-lg relative flex items-end overflow-hidden h-full">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 md:gap-4">
+          {statCards.map((card, idx) => (
             <div
-              className="w-full bg-gradient-to-t from-blue-500 to-blue-600 rounded-lg transition-all duration-700 ease-out"
-              style={{ height: `${barHeight}%` }}
-            />
-          </div>
-
-          {/* Date label */}
-          <div className="text-xs md:text-sm text-gray-600 mt-2">
-            {day.date}
-          </div>
-
-          {/* Trips count */}
-          <div className="text-xs md:text-sm text-gray-500">
-            {day.trips} trips
-          </div>
+              key={idx}
+              className="bg-white rounded-xl md:rounded-2xl p-3 md:p-5 border border-gray-100 hover:border-gray-200 transition-all hover:shadow-md"
+            >
+              <div
+                className={`${card.bgColor} w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl flex items-center justify-center mb-2 md:mb-4`}
+              >
+                <card.icon
+                  size={18}
+                  className={card.iconColor}
+                  strokeWidth={2.5}
+                />
+              </div>
+              <p className="text-[10px] md:text-xs font-medium text-gray-500 uppercase tracking-wide mb-1 md:mb-2">
+                {card.label}
+              </p>
+              <p className="text-lg md:text-2xl font-bold text-gray-900">
+                {card.value}
+              </p>
+            </div>
+          ))}
         </div>
-      );
-    })}
-  </div>
-</div>
 
-      {/* Monthly Trends Chart - Clean Vertical Bars */}
-      <div className="bg-white rounded-xl md:rounded-2xl p-4 md:p-6 border border-gray-100">
-        <h3 className="text-sm md:text-base font-bold text-gray-800 mb-4 md:mb-6">
-          Monthly Revenue Trends ({new Date().getFullYear()})
-        </h3>
-        
-        <div className="flex items-end justify-between gap-1 md:gap-2 h-48 md:h-64">
-          {monthlyData.map((month, idx) => {
-            const heightPercent = month.amount > 0 
-              ? Math.max((month.amount / maxMonthlyAmount) * 100, 3)
-              : 0;
-            
-            return (
-              <div key={idx} className="flex-1 flex flex-col items-center gap-2 group">
-                {/* Bar */}
-                <div className="w-full flex flex-col items-center justify-end h-full">
-                  <div className="relative w-full flex flex-col items-center">
-                    {/* Amount Label on Hover */}
-                    {month.amount > 0 && (
-                      <div className="opacity-0 group-hover:opacity-100 transition-opacity mb-1">
-                        <div className="bg-gray-900 text-white text-[10px] md:text-xs font-semibold px-2 py-1 rounded whitespace-nowrap">
-                          ₹{month.amount.toLocaleString("en-IN")}
-                        </div>
+        {/* Weekly Chart */}
+        <div className="bg-white rounded-xl md:rounded-2xl p-4 md:p-6 border border-gray-100">
+          <div className="mb-4 md:mb-6">
+            <h2 className="text-base md:text-lg font-bold text-gray-900">
+              Last 7 Days
+            </h2>
+          
+          </div>
+
+{/* Empty State */}
+          {last7Days.length === 0 ? (
+            <div className="h-48 md:h-64 flex items-center justify-center">
+              <div className="text-center">
+                <div className="w-12 h-12 md:w-16 md:h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-2 md:mb-3">
+                  <BarChart3 size={24} className="text-gray-400" />
+                </div>
+                <p className="text-xs md:text-sm text-gray-500">
+                  No data available
+                </p>
+              </div>
+            </div>
+          ) : (
+            <div className="flex items-end justify-between h-48 md:h-64 gap-1.5 md:gap-3">
+              {last7Days.map((day, idx) => {
+                const revenue = day?.totalRevenue || 0;
+                const barHeight =
+                  maxDailyAmount > 0 ? (revenue / maxDailyAmount) * 100 : 0;
+
+                let dateDisplay = "N/A";
+                try {
+                  if (day?._id) {
+                    const dateObj = new Date(day._id);
+                    if (!isNaN(dateObj.getTime())) {
+                      dateDisplay = dateObj.toLocaleDateString("en-IN", {
+                        weekday: "short",
+                      });
+                    }
+                  }
+                } catch (error) {
+                  dateDisplay = "N/A";
+                }
+
+                return (
+                  <div
+                    key={idx}
+                    className="flex-1 flex flex-col items-center min-w-0"
+                  >
+                    {revenue > 0 && (
+                      <div className="mb-1 md:mb-2 text-[10px] md:text-xs font-semibold text-gray-700">
+                        ₹{formatCurrency(revenue)}
                       </div>
                     )}
-                    
-                    {/* Bar */}
-                    <div
-                      className="w-full bg-gradient-to-t from-indigo-500 to-indigo-400 rounded-t-md md:rounded-t-lg transition-all duration-700 ease-out hover:from-indigo-600 hover:to-indigo-500 cursor-pointer"
-                      style={{ height: `${heightPercent}%` }}
-                    />
+
+                    <div className="w-full max-w-[28px] md:max-w-[40px] h-36 md:h-48 bg-gray-100 rounded-t-lg flex items-end overflow-hidden">
+                      <div
+                        className="w-full bg-gradient-to-t from-blue-600 to-blue-500 rounded-t-lg transition-all duration-700 ease-out"
+                        style={{
+                          height: `${Math.max(barHeight, revenue > 0 ? 5 : 0)}%`,
+                        }}
+                      />
+                    </div>
+
+                    <p className="text-[10px] md:text-xs font-semibold text-gray-600 mt-2 md:mt-3 truncate w-full text-center">
+                      {dateDisplay}
+                    </p>
                   </div>
-                </div>
-                
-                {/* Month Label */}
-                <div className="text-[10px] md:text-xs font-semibold text-gray-600">
-                  {month.month}
-                </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
+        {/* Monthly Chart */}
+        <div className="bg-white rounded-xl md:rounded-2xl p-3 md:p-6 border border-gray-100">
+          <div className="mb-3 md:mb-6">
+            <h2 className="text-sm md:text-lg font-bold text-gray-900">
+              Monthly Trends
+            </h2>
+           
+          </div>
+
+
+{/* Empty State */}
+
+          {monthlyTotals.length === 0 ? (
+            <div className="h-40 md:h-64 flex items-center justify-center border-2 border-dashed border-gray-200 rounded-xl">
+              <div className="text-center">
+                <BarChart3 size={20} className="text-gray-300 mx-auto mb-2" />
+                <p className="text-[10px] md:text-sm text-gray-400">
+                  No data for this period
+                </p>
               </div>
-            );
-          })}
+            </div>
+          ) : (
+            <div className="w-full overflow-x-auto">
+              <div className="flex items-end justify-between h-44 md:h-64 min-w-full gap-1 md:gap-1.5">
+                {monthlyTotals.map((item, idx) => {
+                  const revenue = item?.totalRevenue || 0;
+                  const height =
+                    maxMonthlyAmount > 0
+                      ? (revenue / maxMonthlyAmount) * 100
+                      : 0;
+
+                  return (
+                    <div
+                      key={idx}
+                      className="flex-1 flex flex-col items-center min-w-0"
+                    >
+                    
+                    {/* Revenue Tooltip */}
+                      <div className="h-4 flex items-end justify-center mb-1">
+                        {revenue > 0 && (
+                          <span className="text-[8px] md:text-xs font-bold text-gray-600">
+                            {revenue >= 1000
+                              ? `${(revenue / 1000).toFixed(1)}k`
+                              : revenue}
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="w-full max-w-[13px] md:max-w-[28px] h-32 md:h-52 bg-gray-50 rounded-t-lg flex items-end overflow-hidden">
+                        <div
+                          className="w-full bg-gradient-to-t from-indigo-600 to-indigo-500 transition-all duration-1000 ease-out"
+                          style={{
+                            height: `${Math.max(height, revenue > 0 ? 4 : 0)}%`,
+                          }}
+                        />
+                      </div>
+
+                      <p className="text-[8px] md:text-xs font-bold text-gray-400 mt-1.5 md:mt-2 uppercase tracking-tight">
+                        {getMonthName(idx)}
+                      </p>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
