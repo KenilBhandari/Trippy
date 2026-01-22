@@ -46,5 +46,8 @@ export interface DashboardData {
     _id: number;
     totalRevenue: number;
   }[];
+  thisWeek: {
+    thisWeekRevenue: number;
+  }
 }
 

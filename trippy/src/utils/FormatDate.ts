@@ -22,3 +22,5 @@ export function toTimestamp(dateStr?: string): number | undefined {
     if (isNaN(date.getTime())) return undefined; // invalid date
     return date.getTime(); // returns timestamp in milliseconds
 }
+
+

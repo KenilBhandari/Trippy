@@ -56,6 +56,8 @@ export const deleteTripByID = async (tripId: string) => {
 
 export const fetchDashboardStats = async () => {
   try {
+    console.log("BE");
+    
     const response = await axios.get(`${API_URL}/trip/dashboard`);
     if (response.data && response.data.status === "success") {
       return response.data;

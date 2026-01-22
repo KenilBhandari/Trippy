@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
 import type { NewTripInput, TripFilter } from "../types";
 import {
-  TrendingUp,
-  Calendar,
   BarChart3,
   Home,
   ClipboardCheck,
@@ -38,15 +36,13 @@ const Start = () => {
         const filter10: TripFilter = { limit: 10, sort: "created" };
         const filter25: TripFilter = { limit: 25, sort: "updated" };
 
-        const last10List = await fetchCustomTrips(filter10);
-        const recent25List = await fetchCustomTrips(filter25);
-
-        if (last10List.status === "success") {
-          setLast10Trips(last10List.data);
-        }
-        if (recent25List.status === "success") {
-          setRecent25Trips(recent25List.data);
-        }
+        const [last10List, recent25List] = await Promise.all([
+          fetchCustomTrips(filter10),
+          fetchCustomTrips(filter25),
+          loadDashboard(setDashboardData),
+        ]);
+        if (last10List.status === "success") setLast10Trips(last10List.data);
+        if (recent25List.status === "success") setRecent25Trips(recent25List.data);
       }
     } catch (err) {
       console.error("Failed to send trip to server", err);
@@ -59,47 +55,20 @@ const Start = () => {
     const filter10: TripFilter = { limit: 10, sort: "created" };
     const filter25: TripFilter = { limit: 25, sort: "updated" };
 
-    const last10List = await fetchCustomTrips(filter10);
-    const recent25List = await fetchCustomTrips(filter25);
+    const [last10List, recent25List] = await Promise.all([
+      fetchCustomTrips(filter10),
+      fetchCustomTrips(filter25),
+    ]);
 
-    if (last10List.status === "success") {
-      setLast10Trips(last10List.data);
-    }
-    if (recent25List.status === "success") {
-      setRecent25Trips(recent25List.data);
-    }
+    if (last10List.status === "success") setLast10Trips(last10List.data);
+    if (recent25List.status === "success") setRecent25Trips(recent25List.data);
   };
-  
-  useEffect(() => {
-    loadDashboard(setDashboardData);
-  }, [])
-
-  console.log(dashboardData);
-
 
   useEffect(() => {
     fetchFreshTrips();
   }, []);
 
-
-
-  const getMonthTrips = () => {
-    const now = new Date();
-    const currentMonth = now.getMonth();
-    const currentYear = now.getFullYear();
-
-    return last10Trips.filter((trip) => {
-      const tripDate = new Date();
-      return (
-        tripDate.getMonth() === currentMonth &&
-        tripDate.getFullYear() === currentYear
-      );
-    });
-  };
-
   const totalFare = last10Trips.reduce((sum, t) => sum + t.fare, 0);
-  const monthTrips = getMonthTrips();
-  const monthTotal = monthTrips.reduce((sum, t) => sum + t.fare, 0);
 
   return (
     <>

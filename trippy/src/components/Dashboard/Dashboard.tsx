@@ -2,13 +2,11 @@ import { useEffect } from "react";
 import { useDataContext } from "../../context/TripContext";
 import { TrendingUp, Calendar, BarChart3, IndianRupee } from "lucide-react";
 import { loadDashboard } from "../../api/dashboard.service";
+import { formatCurrency, formatDayLabel, getMonthName } from "../../utils/dashboard.utils";
 
 const Dashboard = () => {
   const { setDashboardData, dashboardData } = useDataContext();
 
-  useEffect(() => {
-    loadDashboard(setDashboardData);
-  }, [setDashboardData]);
 
   const monthStats = dashboardData?.monthStats || {
     totalRevenue: 0,
@@ -24,6 +22,10 @@ const Dashboard = () => {
     ? dashboardData.monthlyTotals
     : [];
 
+  const weeklyRevenue = Array.isArray(dashboardData?.thisWeek)
+    ? dashboardData.thisWeek[0].thisWeekRevenue
+    : [];
+
   const maxDailyAmount =
     last7Days.length > 0
       ? Math.max(...last7Days.map((d) => d?.totalRevenue || 0), 1)
@@ -34,33 +36,8 @@ const Dashboard = () => {
       ? Math.max(...monthlyTotals.map((m) => m?.totalRevenue || 0), 1)
       : 1;
 
-  const getMonthName = (monthNum: number) => {
-    const months = [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
-    ];
-    return months[monthNum] || `M${monthNum + 1}`;
-  };
 
-  const formatCurrency = (amount: number) => {
-    if (!amount || isNaN(amount)) return "0";
-    return Math.round(amount).toLocaleString("en-IN");
-  };
 
-  const todayRevenue =
-    last7Days.length > 0
-      ? last7Days[last7Days.length - 1]?.totalRevenue || 0
-      : 0;
 
   const statCards = [
     {
@@ -86,12 +63,20 @@ const Dashboard = () => {
     },
     {
       icon: TrendingUp,
-      label: "Today",
-      value: `₹${formatCurrency(todayRevenue)}`,
+      label: "This Week",
+      value: `₹${formatCurrency(weeklyRevenue)}`,
       bgColor: "bg-green-50",
       iconColor: "text-green-600",
     },
   ];
+
+
+useEffect(() => {
+  if (!dashboardData) {
+    loadDashboard(setDashboardData);
+  }
+}, [dashboardData]);
+
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -100,7 +85,6 @@ const Dashboard = () => {
           <h1 className="text-xl md:text-3xl font-bold text-gray-900">
             Dashboard
           </h1>
-       
         </div>
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 md:gap-4">
@@ -134,10 +118,9 @@ const Dashboard = () => {
             <h2 className="text-base md:text-lg font-bold text-gray-900">
               Last 7 Days
             </h2>
-          
           </div>
 
-{/* Empty State */}
+          {/* Empty State */}
           {last7Days.length === 0 ? (
             <div className="h-48 md:h-64 flex items-center justify-center">
               <div className="text-center">
@@ -156,31 +139,21 @@ const Dashboard = () => {
                 const barHeight =
                   maxDailyAmount > 0 ? (revenue / maxDailyAmount) * 100 : 0;
 
-                let dateDisplay = "N/A";
-                try {
-                  if (day?._id) {
-                    const dateObj = new Date(day._id);
-                    if (!isNaN(dateObj.getTime())) {
-                      dateDisplay = dateObj.toLocaleDateString("en-IN", {
-                        weekday: "short",
-                      });
-                    }
-                  }
-                } catch (error) {
-                  dateDisplay = "N/A";
-                }
+                const dateDisplay = formatDayLabel(day?._id);
 
                 return (
                   <div
                     key={idx}
                     className="flex-1 flex flex-col items-center min-w-0"
                   >
+                    {/* Revenue */}
                     {revenue > 0 && (
                       <div className="mb-1 md:mb-2 text-[10px] md:text-xs font-semibold text-gray-700">
                         ₹{formatCurrency(revenue)}
                       </div>
                     )}
 
+                    {/* Bar */}
                     <div className="w-full max-w-[28px] md:max-w-[40px] h-36 md:h-48 bg-gray-100 rounded-t-lg flex items-end overflow-hidden">
                       <div
                         className="w-full bg-gradient-to-t from-blue-600 to-blue-500 rounded-t-lg transition-all duration-700 ease-out"
@@ -190,6 +163,7 @@ const Dashboard = () => {
                       />
                     </div>
 
+                    {/* Date label */}
                     <p className="text-[10px] md:text-xs font-semibold text-gray-600 mt-2 md:mt-3 truncate w-full text-center">
                       {dateDisplay}
                     </p>
@@ -206,11 +180,9 @@ const Dashboard = () => {
             <h2 className="text-sm md:text-lg font-bold text-gray-900">
               Monthly Trends
             </h2>
-           
           </div>
 
-
-{/* Empty State */}
+          {/* Empty State */}
 
           {monthlyTotals.length === 0 ? (
             <div className="h-40 md:h-64 flex items-center justify-center border-2 border-dashed border-gray-200 rounded-xl">
@@ -236,8 +208,7 @@ const Dashboard = () => {
                       key={idx}
                       className="flex-1 flex flex-col items-center min-w-0"
                     >
-                    
-                    {/* Revenue Tooltip */}
+                      {/* Revenue Tooltip */}
                       <div className="h-4 flex items-end justify-center mb-1">
                         {revenue > 0 && (
                           <span className="text-[8px] md:text-xs font-bold text-gray-600">

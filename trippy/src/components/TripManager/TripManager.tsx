@@ -15,9 +15,9 @@ import TripFilterBar from "../UI/FilterBar";
 import { formatDate, formatTime } from "../../utils/FormatDate";
 import type { Trip, TripFilter } from "../../types";
 import DeleteModal from "../UI/DeleteModal";
+import { loadDashboard } from "../../api/dashboard.service";
 
 const TripManagement = () => {
-
   const {
     deletingTrip,
     setDeletingTrip,
@@ -32,6 +32,7 @@ const TripManagement = () => {
     search,
     fromDate,
     toDate,
+    setDashboardData
   } = useDataContext();
 
   const tripsToRender = useMemo(() => {
@@ -42,6 +43,65 @@ const TripManagement = () => {
     return source;
   }, [recent25Trips, filteredTrips]);
 
+  const handleUpdateTrip = async (updatedTrip: Trip) => {
+    try {
+      const result = await editTrip(updatedTrip);
+
+      if (result?.status === "success") {
+        await fetchAndSetTrips({
+          setLast10Trips,
+          setRecent25Trips,
+        });
+        await loadDashboard(setDashboardData)
+      } else {
+        throw new Error("Update failed");
+      }
+    } catch (err) {
+      console.error("Failed to update trip", err);
+      throw err;
+    }
+  };
+
+  const handleDeleteTrip = async (trip: Trip) => {
+    try {
+      const result = await deleteTripByID(trip._id);
+
+      if (
+        result.status === "success" ||
+        result.data?.status === "success" ||
+        result?.data?.isDeleted
+      ) {
+        await fetchAndSetTrips({
+          setLast10Trips,
+          setRecent25Trips,
+        });
+        await loadDashboard(setDashboardData)
+      } else {
+        throw new Error("Delete failed");
+      }
+    } catch (err) {
+      console.error("Failed to delete trip", err);
+      throw err;
+    }
+  };
+
+  const handleFilter = async (filterBar: TripFilter) => {
+    const filters = {
+      limit: filterBar.limit ?? 100,
+      sort: filterBar.sort ?? "created",
+      recent: filterBar.recent,
+      searchString: filterBar.searchString,
+      dateFrom: filterBar.dateFrom,
+      dateTo: filterBar.dateTo,
+    };
+    try {
+      const data = await custFetch(filters, { setFilteredTrips });
+      return data;
+    } catch (err) {
+      console.error("Failed to apply filters", err);
+    }
+  };
+
 
   useEffect(() => {
     fetchAndSetTrips({
@@ -49,69 +109,6 @@ const TripManagement = () => {
       setRecent25Trips,
     });
   }, []);
-
-
-const handleUpdateTrip = async (updatedTrip: Trip) => {
-  try {
-    const result = await editTrip(updatedTrip);
-
-    if (result?.status === "success") {
-      
-      await fetchAndSetTrips({
-        setLast10Trips,
-        setRecent25Trips,
-      });
-      
-    } else {
-      throw new Error("Update failed");
-    }
-  } catch (err) {
-    console.error("Failed to update trip", err);
-    throw err;
-  }
-};
-
-
-const handleDeleteTrip = async (trip: Trip) => {
-  try {
-    const result = await deleteTripByID(trip._id);
-
-    if (
-      result.status === "success" ||
-      result.data?.status === "success" ||
-      result?.data?.isDeleted
-    ) {
-      await fetchAndSetTrips({
-        setLast10Trips,
-        setRecent25Trips,
-      });
-    } else {
-      throw new Error("Delete failed");
-    }
-  } catch (err) {
-    console.error("Failed to delete trip", err);
-    throw err;
-  }
-};
-
-
-const handleFilter = async (filterBar: TripFilter) => {
-  const filters = {
-    limit: filterBar.limit ?? 100,
-    sort: filterBar.sort ?? "created",
-    recent: filterBar.recent,
-    searchString: filterBar.searchString,
-    dateFrom: filterBar.dateFrom,
-    dateTo: filterBar.dateTo,
-  };
-  try {
-    const data = await custFetch(filters, { setFilteredTrips });
-    return data; 
-  } catch (err) {
-    console.error("Failed to apply filters", err);
-  }
-
-};
 
   return (
     <div className="max-w-4xl mx-auto space-y-4">
