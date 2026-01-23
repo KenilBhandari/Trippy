@@ -1,6 +1,7 @@
 import { ArrowRight, Calendar, Clock } from "lucide-react";
 import { useDataContext } from "../../context/TripContext";
 import { formatDate, formatTime } from "../../utils/FormatDate";
+import React from "react";
 
 const Latest = () => {
   const { last10Trips } = useDataContext();
@@ -14,14 +15,14 @@ return (
     ) : (
       <div className="space-y-3">
         {last10Trips.map((trip) => (
-          <div
+          <div  
             key={trip._id}
-            className="group flex items-center justify-between gap-3 p-3 border border-gray-100 rounded-xl bg-gray-50/30 hover:bg-gray-50 hover:border-blue-100 transition-all w-full overflow-hidden"
+            className="group flex items-center justify-between gap-3 p-2.5 border border-gray-100 rounded-xl bg-gray-50/30 hover:bg-gray-50 hover:border-blue-100 transition-all w-full overflow-hidden"
           >
             {/* Left Section: Routes & Meta */}
             <div className="flex-1 min-w-0">
               {/* Route Line */}
-              <div className="flex items-center font-semibold text-gray-900 text-[13px] sm:text-[15px] mb-1 min-w-0">
+              <div className="flex items-center font-extrabold text-gray-900 text-[14px] sm:text-[15px] mb-1.5 min-w-0">
                 <span className="truncate max-w-[45%] shrink-0">{trip.startPoint}</span>
                 <ArrowRight
                   size={14}
@@ -61,12 +62,15 @@ return (
 
             {/* Right Section: Price */}
             <div className="shrink-0 text-right pl-1 border-l border-gray-100 sm:border-0">
-              <div className="font-extrabold text-emerald-500 text-sm sm:text-lg whitespace-nowrap">
+              <div className="font-[1000] text-blue-600 text-md sm:text-lg whitespace-nowrap">
                 ₹{trip.fare}
               </div>
-              <div className="hidden xs:block text-[8px] font-bold text-gray-400 uppercase tracking-widest">
+              {/* <div className="hidden xs:block text-[8px] font-bold text-gray-400 uppercase tracking-widest">
                 Amount
-              </div>
+              </div> */}
+              <div className="text-[9px] font-black text-gray-400 uppercase tracking-[0.2em] leading-none">
+              Fare
+            </div>
             </div>
           </div>
         ))}
@@ -77,4 +81,4 @@ return (
 
 };
 
-export default Latest;
+export default React.memo(Latest);

@@ -51,3 +51,9 @@ export interface DashboardData {
   }
 }
 
+
+export interface CurrentReport {
+  month: number;
+  year: number;
+}
+

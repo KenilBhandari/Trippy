@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   ArrowRight,
   Calendar,
@@ -205,4 +205,4 @@ return (
 
 };
 
-export default ViewReport;
+export default React.memo(ViewReport);

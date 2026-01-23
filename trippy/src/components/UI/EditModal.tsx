@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ArrowUp,
   ArrowDown,
@@ -16,7 +16,7 @@ type EditModalProps = {
   onUpdate: (updatedTrip: Trip) => Promise<void>;
 };
 
-export default function EditModal({ onUpdate }: EditModalProps) {
+const EditModal = ({ onUpdate }: EditModalProps) => {
   const [showStartSuggestions, setShowStartSuggestions] = useState(false);
   const [showEndSuggestions, setShowEndSuggestions] = useState(false);
   const [updating, setUpdating] = useState(false);
@@ -278,3 +278,5 @@ export default function EditModal({ onUpdate }: EditModalProps) {
     </div>
   );
 }
+
+export default React.memo(EditModal);

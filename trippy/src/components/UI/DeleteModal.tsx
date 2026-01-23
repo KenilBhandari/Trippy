@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { Trash2, Check, XCircle, Loader2 } from "lucide-react";
 import type { Trip } from "../../types";
 
@@ -8,11 +8,11 @@ type DeleteModalProps = {
   onClose: () => void;
 };
 
-export default function DeleteModal({
+const DeleteModal = ({
   trip,
   onDelete,
   onClose,
-}: DeleteModalProps) {
+}: DeleteModalProps) => {
   const [deleting, setDeleting] = useState(false);
   const [deleteSuccess, setDeleteSuccess] = useState(false);
   const [deleteFailed, setDeleteFailed] = useState(false);
@@ -144,3 +144,6 @@ const handleDelete = async () => {
     </div>
   );
 }
+
+
+export default React.memo(DeleteModal);

@@ -1,8 +1,9 @@
 import React, { useEffect, useState, Fragment } from "react";
-import { Search, Calendar, ChevronDown, X, Check } from "lucide-react";
+import { Search, Calendar, ChevronDown, X, Check, ArrowRight } from "lucide-react";
 import { toTimestamp } from "../../utils/FormatDate";
 import { useDataContext } from "../../context/TripContext";
 import type { TripFilter } from "../../types";
+import DatePicker from "react-datepicker";
 
 type TripFilterBarProps = {
   onFilter: (filters: TripFilter) => void;
@@ -22,6 +23,8 @@ const TripFilterBar: React.FC<TripFilterBarProps> = ({ onFilter }) => {
 
   const [showCustomDate, setShowCustomDate] = useState(false);
   const [showQuickDate, setShowQuickDate] = useState(false);
+  const [localSearch, setLocalSearch] = useState(search);
+
 
   const options = [
     { value: "recent", label: "Recent" },
@@ -29,17 +32,10 @@ const TripFilterBar: React.FC<TripFilterBarProps> = ({ onFilter }) => {
     { value: "month", label: "This month" },
   ];
 
-  const buildTripFilter = (): TripFilter => ({
-    limit: 100,
-    sort: fromDate || toDate ? "tripdate_asc" : "tripdate_desc",
-    recent: quickDate,
-    searchString: search.trim() || undefined,
-    dateFrom: fromDate ? toTimestamp(fromDate) : undefined,
-    dateTo: toDate ? toTimestamp(toDate) : undefined,
-  });
 
   const handleReset = () => {
     setSearch("");
+    setLocalSearch("");
     setFromDate("");
     setToDate("");
     setShowCustomDate(false);
@@ -47,13 +43,59 @@ const TripFilterBar: React.FC<TripFilterBarProps> = ({ onFilter }) => {
   };
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      onFilter(buildTripFilter());
-    }, 500);
-    return () => clearTimeout(timer);
-  }, [search, fromDate, toDate]);
+    const handler = setTimeout(() => {
+      const trimmed = localSearch.trim();
+
+      onFilter({
+        limit: 100,
+        sort: fromDate || toDate ? "tripdate_asc" : "tripdate_desc",
+        recent: quickDate,
+        searchString: trimmed || undefined,
+        dateFrom: fromDate ? toTimestamp(fromDate) : undefined,
+        dateTo: toDate ? toTimestamp(toDate) : undefined,
+      });
+
+      setSearch(trimmed);
+    }, 300);
+
+    return () => clearTimeout(handler);
+  }, [localSearch, fromDate, toDate, quickDate]);
 
   const hasActiveFilters = !!search || !!fromDate || quickDate !== "recent";
+
+  const DateButtonPicker = ({
+    value,
+    onChange,
+    maxDate = new Date(),
+  }: {
+    value: string | null;
+    onChange: (val: string) => void;
+    maxDate?: Date;
+  }) => (
+    <DatePicker
+      selected={value ? new Date(value) : null}
+      onChange={(date: Date | null) => {
+        if (date) onChange(date.toISOString().split("T")[0]);
+      }}
+      maxDate={maxDate}
+      popperPlacement="bottom-start"
+      customInput={
+        <button
+          type="button"
+          className="w-full flex items-center gap-2 px-3 py-2.5 bg-white rounded-xl text-sm font-medium text-gray-700 border-2 border-gray-200 shadow-sm hover:border-gray-300 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition-all"
+        >
+          <span className="text-blue-500 text-base">●</span>
+          {value
+            ? new Date(value).toLocaleDateString("en-GB", {
+                day: "2-digit",
+                month: "short",
+                year: "numeric",
+              })
+            : "Select date"}
+        </button>
+      }
+    />
+  );
 
   return (
     <div className="w-full font-sans">
@@ -91,14 +133,23 @@ const TripFilterBar: React.FC<TripFilterBarProps> = ({ onFilter }) => {
                     <button
                       key={opt.value}
                       onClick={() => {
-                        setQuickDate(opt.value);
-                        setShowQuickDate(false);
-                        onFilter({
-                          ...buildTripFilter(),
+                        const filter = {
+                          limit: 100,
+                          sort: "tripdate_desc",
                           recent: opt.value,
+                          searchString: localSearch.trim() || undefined,
                           dateFrom: undefined,
                           dateTo: undefined,
-                        });
+                        };
+
+                        setQuickDate(opt.value);
+                        setFromDate("");
+                        setToDate("");
+                        setShowQuickDate(false);
+
+                        if (opt.value !== "recent") {
+                          onFilter(filter);
+                        }
                       }}
                       className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-bold transition-colors ${
                         quickDate === opt.value
@@ -107,7 +158,9 @@ const TripFilterBar: React.FC<TripFilterBarProps> = ({ onFilter }) => {
                       }`}
                     >
                       {opt.label}
-                      {quickDate === opt.value && <Check size={14} strokeWidth={2.5} />}
+                      {quickDate === opt.value && (
+                        <Check size={14} strokeWidth={2.5} />
+                      )}
                     </button>
                   ))}
                 </div>
@@ -120,8 +173,8 @@ const TripFilterBar: React.FC<TripFilterBarProps> = ({ onFilter }) => {
             <Search size={16} className="text-gray-400 shrink-0" />
             <input
               type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              value={localSearch}
+              onChange={(e) => setLocalSearch(e.target.value)}
               placeholder="Search..."
               className="w-full px-2 sm:px-3 bg-transparent border-none focus:ring-0 text-sm text-gray-700 placeholder:text-gray-400 focus:outline-none"
             />
@@ -158,20 +211,14 @@ const TripFilterBar: React.FC<TripFilterBarProps> = ({ onFilter }) => {
         {showCustomDate && (
           <div className="border-t border-gray-100 px-5 py-4 bg-gradient-to-b from-gray-50/50 to-white rounded-b-2xl animate-in fade-in slide-in-from-top-1 duration-200">
             <div className="flex items-center justify-center md:justify-start gap-3 max-w-sm">
-              <div className="flex items-center gap-2 bg-gray-100/50 p-1.5 rounded-2xl border border-gray-200 w-fit">
-                <input
-                  type="date"
-                  value={fromDate}
-                  onChange={(e) => setFromDate(e.target.value)}
-                  className="px-3 py-2.5 bg-white [&::-webkit-calendar-picker-indicator]:brightness-0 rounded-xl text-sm font-medium text-gray-700 border-2 border-gray-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 focus:outline-none shadow-sm hover:border-gray-300 appearance-none"
-                />
-                <span className="text-gray-400 font-semibold select-none">→</span>
-                <input
-                  type="date"
-                  value={toDate}
-                  onChange={(e) => setToDate(e.target.value)}
-                  className="px-3 py-2.5 bg-white [&::-webkit-calendar-picker-indicator]:brightness-0 rounded-xl text-sm font-medium text-gray-700 border-2 border-gray-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 focus:outline-none shadow-sm hover:border-gray-300 appearance-none"
-                />
+              <div className="flex items-center gap-3 bg-gray-100/50 p-1.5 rounded-2xl border border-gray-200 w-fit">
+                <DateButtonPicker value={fromDate} onChange={setFromDate} />
+
+                <span className="text-gray-400 font-semibold select-none">
+                  <ArrowRight size={14}/>
+                </span>
+
+                <DateButtonPicker value={toDate} onChange={setToDate} />
               </div>
             </div>
           </div>
@@ -181,4 +228,4 @@ const TripFilterBar: React.FC<TripFilterBarProps> = ({ onFilter }) => {
   );
 };
 
-export default TripFilterBar;
+export default React.memo(TripFilterBar);

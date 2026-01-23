@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { useDataContext } from "../../context/TripContext";
 import { TrendingUp, Calendar, BarChart3, IndianRupee } from "lucide-react";
 import { loadDashboard } from "../../api/dashboard.service";
@@ -243,4 +243,4 @@ useEffect(() => {
   );
 };
 
-export default Dashboard;
+export default React.memo(Dashboard);

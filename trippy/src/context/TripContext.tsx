@@ -4,18 +4,22 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import type { DashboardData, Trip } from "../types";
+import type { CurrentReport, DashboardData, Trip } from "../types";
 
 type TripContextType = {
   
   addingTrip: boolean;
   setAddingTrip: React.Dispatch<React.SetStateAction<boolean>>;
-
+ 
+  
   activeTrip: Trip | null;
   setActiveTrip: React.Dispatch<React.SetStateAction<Trip | null>>;
-
+  
   deletingTrip: Trip | null;
   setDeletingTrip: React.Dispatch<React.SetStateAction<Trip | null>>;
+  
+  filterActive: boolean;
+  setFilterActive: React.Dispatch<React.SetStateAction<boolean>>;
 
   allTrips: Trip[];
   setAllTrips: React.Dispatch<React.SetStateAction<Trip[]>>;
@@ -50,6 +54,9 @@ type TripContextType = {
   dashboardData: DashboardData | null
   setDashboardData: React.Dispatch<React.SetStateAction<DashboardData | null>>
 
+  currentMonthlyReport: CurrentReport | undefined;
+  setCurrentMonthlyReport: React.Dispatch<React.SetStateAction<CurrentReport | undefined>>;
+
 
 };
 
@@ -61,13 +68,14 @@ export function TripProvider({ children }: { children: ReactNode }) {
   const [addingTrip, setAddingTrip] = useState<boolean>(false);
   const [activeTrip, setActiveTrip] = useState<Trip | null>(null);
   const [deletingTrip, setDeletingTrip] = useState<Trip | null>(null);
-
+  const [filterActive, setFilterActive] = useState<boolean>(false);
+  
   const [allTrips, setAllTrips] = useState<Trip[]>([]);
   const [last10Trips, setLast10Trips] = useState<Trip[]>([]);
   const [recent25Trips, setRecent25Trips] = useState<Trip[]>([]);
   const [filteredTrips, setFilteredTrips] = useState<Trip[]>([]);
   const [monthlyReport, setMonthlyReport] = useState<Trip[]>([]);
-
+  
   const [quickDate, setQuickDate] = useState<string>("recent");
   const [search, setSearch] = useState<string>("");
   const [fromDate, setFromDate] = useState<string>("");
@@ -80,7 +88,10 @@ export function TripProvider({ children }: { children: ReactNode }) {
     "Dadra",
   ];
 
-    const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
+  const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
+
+  const [currentMonthlyReport, setCurrentMonthlyReport] = useState <CurrentReport>()
+
 
 
   return (
@@ -92,6 +103,8 @@ export function TripProvider({ children }: { children: ReactNode }) {
         setActiveTrip,
         deletingTrip,
         setDeletingTrip,
+        filterActive,
+        setFilterActive,
         allTrips,
         setAllTrips,
         last10Trips,
@@ -113,7 +126,9 @@ export function TripProvider({ children }: { children: ReactNode }) {
         startLocations,
         endLocations,
         dashboardData,
-        setDashboardData
+        setDashboardData,
+        currentMonthlyReport,
+        setCurrentMonthlyReport
       }}
     >
       {children}

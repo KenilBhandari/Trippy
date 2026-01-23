@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   Download,
   Calendar,
@@ -7,20 +7,22 @@ import {
   X,
   Eye,
 } from "lucide-react";
-import { PDFDownloadLink } from "@react-pdf/renderer";
+import { pdf } from "@react-pdf/renderer";
 import { useDataContext } from "../../context/TripContext";
 import { fetchReports } from "../../utils/BasicFetch";
 import { MonthlyReportPDF } from "../../utils/MonthlyReportPrint";
 import ViewReport from "../ViewReport/ViewReport";
 
 const ReportsTab = () => {
-  const { monthlyReport, setMonthlyReport } = useDataContext();
+  const {
+    monthlyReport,
+    setMonthlyReport,
+    currentMonthlyReport,
+    setCurrentMonthlyReport,
+  } = useDataContext();
 
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
-  const [activeMonth, setActiveMonth] = useState<{
-    name: string;
-    index: number;
-  } | null>(null);
+  const [activeMonth, setActiveMonth] = useState<{name: string; index: number;} | null>(null);
   const [viewReport, setViewReport] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
 
@@ -38,20 +40,16 @@ const ReportsTab = () => {
     "Nov",
     "Dec",
   ];
-let s = 0
+
   const isDataValid = useMemo(() => {
-    if (!monthlyReport.length || !activeMonth) return false;
+    if (!activeMonth || !currentMonthlyReport) return false;
+    return (
+      currentMonthlyReport.month === activeMonth.index &&
+      currentMonthlyReport.year === selectedYear
+    );
+  }, [currentMonthlyReport, activeMonth, selectedYear]);
 
-    return monthlyReport.every((trip) => {
-      const d = new Date(trip.tripDate);
-      console.log(++s);
-      
-      return (
-        d.getMonth() === activeMonth.index && d.getFullYear() === selectedYear
-      );
-    });
-  }, [monthlyReport, activeMonth, selectedYear]);
-
+  
   const loadReportData = async () => {
     if (!activeMonth) return false;
     if (isDataValid) return true;
@@ -74,14 +72,42 @@ let s = 0
       dateFrom: startOfMonth,
       dateTo: endOfMonth,
     };
-    // console.log(formatDate(startOfMonth), formatDate(endOfMonth));
 
     try {
       await fetchReports(filter, { setMonthlyReport });
+      setCurrentMonthlyReport({ month: activeMonth.index, year: selectedYear });
+      
       return true;
     } catch (error) {
       console.error("Failed to fetch reports:", error);
       return false;
+    } finally {
+      setIsFetching(false);
+    }
+  };
+
+  const handleDownloadPDF = async () => {
+    if (!activeMonth || !isDataValid) return;
+
+    try {
+      setIsFetching(true);
+
+      const blob = await pdf(
+        <MonthlyReportPDF
+          trips={monthlyReport}
+          monthName={activeMonth.name}
+          year={selectedYear}
+        />,
+      ).toBlob();
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `Report-${activeMonth.name}-${selectedYear}.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("PDF generation failed", err);
     } finally {
       setIsFetching(false);
     }
@@ -219,50 +245,20 @@ let s = 0
                   </button>
 
                   {/* PDF Button – smart: show direct download when data ready */}
-                  {isDataValid ? (
-                    <PDFDownloadLink
-                      document={
-                        <MonthlyReportPDF
-                          trips={monthlyReport}
-                          monthName={activeMonth.name}
-                          year={selectedYear}
-                        />
-                      }
-                      fileName={`Report-${activeMonth.name}-${selectedYear}.pdf`}
-                      className="w-full"
-                    >
-                      {({ loading }) => (
-                        <button
-                          disabled={loading}
-                          className="flex flex-col items-center gap-2 py-4 rounded-2xl bg-blue-600 text-white w-full transition-all active:scale-95 shadow-lg shadow-blue-200"
-                        >
-                          {loading ? (
-                            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                          ) : (
-                            <Download size={20} strokeWidth={2.5} />
-                          )}
-                          <span className="text-[11px] font-bold uppercase">
-                            {loading ? "Readying" : "PDF"}
-                          </span>
-                        </button>
-                      )}
-                    </PDFDownloadLink>
-                  ) : (
-                    <button
-                      onClick={loadReportData}
-                      disabled={isFetching}
-                      className="flex flex-col items-center gap-2 py-4 rounded-2xl bg-blue-600 text-white w-full transition-all active:scale-95 opacity-90 shadow-lg shadow-blue-200"
-                    >
-                      {isFetching ? (
-                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      ) : (
-                        <Download size={20} strokeWidth={2.5} />
-                      )}
-                      <span className="text-[11px] font-bold uppercase">
-                        {isFetching ? "Fetching" : "Get PDF"}
-                      </span>
-                    </button>
-                  )}
+                  <button
+                    onClick={isDataValid ? handleDownloadPDF : loadReportData}
+                    disabled={isFetching}
+                    className="flex flex-col items-center gap-2 py-4 rounded-2xl bg-blue-600 text-white w-full transition-all active:scale-95 shadow-lg shadow-blue-200"
+                  >
+                    {isFetching ? (
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                      <Download size={20} strokeWidth={2.5} />
+                    )}
+                    <span className="text-[11px] font-bold uppercase">
+                      {isFetching ? "Working" : isDataValid ? "PDF" : "Get PDF"}
+                    </span>
+                  </button>
                 </div>
               </div>
             </div>
@@ -273,4 +269,4 @@ let s = 0
   );
 };
 
-export default ReportsTab;
+export default React.memo(ReportsTab);
