@@ -1,12 +1,6 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 import type { NewTripInput, TripFilter } from "../types";
-import {
-  FileText,
-  Home,
-  Layers,
-  Plus,
-  Truck,
-} from "lucide-react";
+import { FileText, Home, Layers, Plus } from "lucide-react";
 import NewTrip from "../components/New/New";
 import Latest from "../components/Latest/Latest";
 import TripManager from "../components/TripManager/TripManager";
@@ -14,13 +8,15 @@ import { fetchCustomTrips, sendTrip } from "../api/trips";
 import { useDataContext } from "../context/TripContext";
 import ReportsTab from "../components/Reports/Reports";
 import Dashboard from "../components/Dashboard/Dashboard";
-import { loadDashboard } from "../api/dashboard.service";
 
 const Start = () => {
-  const { setLast10Trips, setRecent25Trips, setDashboardData } =
-    useDataContext();
-
-  const [activeTab, setActiveTab] = useState("new");
+  const {
+    activeTab,
+    setActiveTab,
+    setLast10Trips,
+    setRecent25Trips,
+    setDashboardNeedsRefresh,
+  } = useDataContext();
 
   const homeTabs = useMemo(
     () => [
@@ -42,11 +38,11 @@ const Start = () => {
         const [last10List, recent25List] = await Promise.all([
           fetchCustomTrips(filter10),
           fetchCustomTrips(filter25),
-          loadDashboard(setDashboardData),
         ]);
         if (last10List.status === "success") setLast10Trips(last10List.data);
         if (recent25List.status === "success")
           setRecent25Trips(recent25List.data);
+        setDashboardNeedsRefresh(true);
       }
     } catch (err) {
       console.error("Failed to send trip to server", err);
@@ -149,7 +145,7 @@ const Start = () => {
                       {/* Extraordinary Detail: The "Floating Dot" */}
                       <div
                         className={`
-                absolute bottom-1 md:bottom-2 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-blue-600 transition-all duration-200
+                absolute bottom-1 md:bottom-2 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-blue-600 transition-all duration-100
                 ${isActive ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-0 translate-y-2"}
               `}
                       />
@@ -162,11 +158,9 @@ const Start = () => {
         </div>
 
         <div className="max-w-7xl mx-auto px-4 py-3 md:px-6 md:py-8">
-          <div hidden={activeTab !== "dashboard"}>
-            <Dashboard />
-          </div>
+          {activeTab === "dashboard" && <Dashboard />}
 
-          <div hidden={activeTab !== "new"}>
+          {activeTab === "new" && (
             <div className="flex flex-col gap-6 lg:flex-row">
               <div className="lg:w-1/2">
                 <NewTrip onAddTrip={handleAddTrip} />
@@ -175,15 +169,11 @@ const Start = () => {
                 <Latest />
               </div>
             </div>
-          </div>
+          )}
 
-          <div hidden={activeTab !== "list"}>
-            <TripManager />
-          </div>
+          {activeTab === "list" && <TripManager />}
 
-          <div hidden={activeTab !== "reports"}>
-            <ReportsTab />
-          </div>
+          {activeTab === "reports" && <ReportsTab />}
         </div>
       </div>
     </>

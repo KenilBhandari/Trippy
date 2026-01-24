@@ -100,7 +100,7 @@ const TripFilterBar: React.FC<TripFilterBarProps> = ({ onFilter }) => {
   return (
     <div className="w-full font-sans">
       {/* Main Filter Bar */}
-      <div className="relative bg-white border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] rounded-2xl transition-all duration-500 hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)]">
+      <div className="relative bg-white border border-gray-100 rounded-2xl transition-all duration-500 hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)]">
         <div className="flex items-center h-12 sm:h-16">
           {/* Quick Date Selector */}
           <div className="relative h-full shrink-0">

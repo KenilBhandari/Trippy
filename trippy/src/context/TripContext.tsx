@@ -8,6 +8,9 @@ import type { CurrentReport, DashboardData, Trip } from "../types";
 
 type TripContextType = {
   
+  activeTab: string
+  setActiveTab: React.Dispatch<React.SetStateAction<string>>
+
   addingTrip: boolean;
   setAddingTrip: React.Dispatch<React.SetStateAction<boolean>>;
  
@@ -51,8 +54,12 @@ type TripContextType = {
   startLocations: string[];
   endLocations: string[];
 
-  dashboardData: DashboardData | null
-  setDashboardData: React.Dispatch<React.SetStateAction<DashboardData | null>>
+  dashboardData: DashboardData | null;
+  setDashboardData: React.Dispatch<React.SetStateAction<DashboardData | null>>;
+
+  dashboardNeedsRefresh: boolean;
+  setDashboardNeedsRefresh: React.Dispatch<React.SetStateAction<boolean>>
+
 
   currentMonthlyReport: CurrentReport | undefined;
   setCurrentMonthlyReport: React.Dispatch<React.SetStateAction<CurrentReport | undefined>>;
@@ -65,6 +72,7 @@ const TripContext = createContext<TripContextType | undefined>(undefined);
 
 export function TripProvider({ children }: { children: ReactNode }) {
   
+    const [activeTab, setActiveTab] = useState<string>("new");
   const [addingTrip, setAddingTrip] = useState<boolean>(false);
   const [activeTrip, setActiveTrip] = useState<Trip | null>(null);
   const [deletingTrip, setDeletingTrip] = useState<Trip | null>(null);
@@ -89,6 +97,8 @@ export function TripProvider({ children }: { children: ReactNode }) {
   ];
 
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
+  const [dashboardNeedsRefresh, setDashboardNeedsRefresh] = useState(false);
+
 
   const [currentMonthlyReport, setCurrentMonthlyReport] = useState <CurrentReport>()
 
@@ -97,6 +107,8 @@ export function TripProvider({ children }: { children: ReactNode }) {
   return (
     <TripContext.Provider
       value={{
+        activeTab,
+        setActiveTab,
         addingTrip,
         setAddingTrip,
         activeTrip,
@@ -127,6 +139,8 @@ export function TripProvider({ children }: { children: ReactNode }) {
         endLocations,
         dashboardData,
         setDashboardData,
+        dashboardNeedsRefresh,
+        setDashboardNeedsRefresh,
         currentMonthlyReport,
         setCurrentMonthlyReport
       }}
