@@ -17,7 +17,7 @@ return (
         {last10Trips.map((trip) => (
           <div  
             key={trip._id}
-            className="group flex items-center justify-between gap-3 p-2.5 border border-gray-100 rounded-xl bg-gray-50/30 hover:bg-gray-50 hover:border-blue-100 transition-all w-full overflow-hidden"
+            className="group flex items-center justify-between gap-3 p-2 md:p-3 border border-gray-100 rounded-xl bg-gray-50/30 hover:bg-gray-50 hover:border-blue-100 transition-all w-full overflow-hidden"
           >
             {/* Left Section: Routes & Meta */}
             <div className="flex-1 min-w-0">

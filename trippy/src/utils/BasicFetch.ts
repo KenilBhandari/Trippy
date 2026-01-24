@@ -57,8 +57,13 @@ export const fetchReports = async (filters: TripFilter, { setMonthlyReport }: Fe
   try {
     const result = await fetchCustomTrips(filters);
     if (result && result.status === "success") {
-      setMonthlyReport(result.data);
-      return result.data;
+      const reportData = Array.isArray(result.data) ? result.data : [];
+      if (reportData.length > 0) {
+        setMonthlyReport(reportData);
+      } else {
+        console.log("Empty data received, skipping state update.");
+      }
+      return reportData;
     } else {
       throw new Error("API returned success: false or invalid data");
     }

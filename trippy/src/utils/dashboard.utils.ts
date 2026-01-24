@@ -21,7 +21,7 @@ export const formatCurrency = (amount: number) => {
   return Math.round(amount).toLocaleString("en-IN");
 };
 
-export const formatDayLabel = (dateStr?: string) => {
+export const formatDayLabel = (dateStr: string | number) => {
   if (!dateStr) return "—";
 
   const d = new Date(dateStr);

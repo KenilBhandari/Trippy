@@ -74,9 +74,13 @@ const ReportsTab = () => {
     };
 
     try {
-      await fetchReports(filter, { setMonthlyReport });
+      const report = await fetchReports(filter, { setMonthlyReport });
+      if (Array.isArray(report) && report.length === 0) {
+        console.log("No reports found (Empty Array)");
+        return;
+      }
       setCurrentMonthlyReport({ month: activeMonth.index, year: selectedYear });
-      
+
       return true;
     } catch (error) {
       console.error("Failed to fetch reports:", error);
@@ -133,7 +137,7 @@ const ReportsTab = () => {
       ) : (
         <div className="max-w-md mx-auto px-2">
           {/* Year Header */}
-          <div className="flex items-center justify-between mb-8 mt-4">
+          <div className="flex items-center justify-between mb-8 mt-2">
             <div className="flex flex-col">
               <h2 className="text-2xl font-black text-gray-900 tracking-tight">
                 Reports
