@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo } from "react";
-import { TrendingUp, Truck, BarChart3, IndianRupee } from "lucide-react";
+import { TrendingUp, Truck, BarChart3, IndianRupee, Database } from "lucide-react";
 import { useDataContext } from "../../context/TripContext";
 import { loadDashboard } from "../../api/dashboard.service";
 import {
@@ -141,6 +141,13 @@ const Dashboard = () => {
     );
   };
 
+  const EmptyState = ({ message }: { message: string }) => (
+  <div className="flex flex-col items-center justify-center w-full h-full text-slate-400 py-10">
+    <Database size={32} className="mb-2 opacity-20" />
+    <p className="text-sm font-medium">{message}</p>
+  </div>
+);
+
   return (
     <div className="min-h-screen px-2 mt-2">
       <div className="max-w-7xl mx-auto space-y-3 sm:space-y-4">
@@ -176,37 +183,48 @@ const Dashboard = () => {
         </div>
 
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-5 sm:gap-8">
+          {/* Weekly Revenue Chart */}
           <div className="bg-white rounded-3xl p-5 border border-slate-200/60 shadow-sm">
             <h2 className="text-sm sm:text-lg font-bold text-slate-900 mb-2">
               Weekly Revenue
             </h2>
             <div className="flex items-end justify-between h-56 sm:h-64 gap-2">
-              {stats.last7Days.map((day, i) => (
-                <RenderBar
-                  key={i}
-                  revenue={day.totalRevenue}
-                  max={stats.maxDaily}
-                  label={formatDayLabel(day._id)}
-                  isWeekly={true}
-                />
-              ))}
+              {stats.last7Days.length > 0 ? (
+                stats.last7Days.map((day, i) => (
+                  <RenderBar
+                    key={i}
+                    revenue={day.totalRevenue}
+                    max={stats.maxDaily}
+                    label={formatDayLabel(day._id)}
+                    isWeekly={true}
+                  />
+                ))
+              ) : (
+                <EmptyState message="No weekly data available" />
+              )}
             </div>
           </div>
 
+          {/* Annual Growth Chart */}
           <div className="bg-white rounded-3xl p-5 border border-slate-200/60 shadow-sm">
             <h2 className="text-sm sm:text-lg font-bold text-slate-900 mb-2">
               Annual Growth
             </h2>
             <div className="overflow-x-auto scrollbar-hide">
-              <div className="flex items-end justify-between h-56 sm:h-64 gap-2 min-w-[480px] sm:min-w-full">
-                {stats.monthlyTotals.map((item, i) => (
-                  <RenderBar
-                    key={i}
-                    revenue={item.totalRevenue}
-                    max={stats.maxMonthly}
-                    label={getMonthName(i).substring(0, 3)}
-                  />
-                ))}
+              <div className={`flex items-end justify-between h-56 sm:h-64 gap-2  sm:min-w-full
+                ${stats.monthlyTotals.length > 0 ? "min-w-[480px]" : ""}`}>
+                {stats.monthlyTotals.length > 0 ? (
+                  stats.monthlyTotals.map((item, i) => (
+                    <RenderBar
+                      key={i}
+                      revenue={item.totalRevenue}
+                      max={stats.maxMonthly}
+                      label={getMonthName(i).substring(0, 3)}
+                    />
+                  ))
+                ) : (
+                  <EmptyState message="No monthly data available" />
+                )}
               </div>
             </div>
           </div>

@@ -3,7 +3,7 @@ import type { NewTripInput, Trip, TripFilter } from "../types";
 
 
 
-const API_URL = "http://192.168.0.105:5000";
+const API_URL = import.meta.env.VITE_API_URL;
 
 
 export const sendTrip = async (trip: NewTripInput) => {
@@ -56,7 +56,12 @@ export const deleteTripByID = async (tripId: string) => {
 
 export const fetchDashboardStats = async () => {
   try {
-    const response = await axios.get(`${API_URL}/trip/dashboard`);
+      const response = await axios.get(`${API_URL}/trip/dashboard`, {
+      headers: {
+        "ngrok-skip-browser-warning": "true",
+      },
+    });
+
     if (response.data && response.data.status === "success") {
       return response.data;
     } else {

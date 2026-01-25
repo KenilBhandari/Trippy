@@ -4,6 +4,7 @@ import { getWeekTimestamp } from "../utils/dashboard.utils";
 
 export const getDashboardStats = async (req: Request, res: Response) => {
   try {
+
     const now = new Date();
 
     const startOfMonth = new Date(
@@ -98,13 +99,15 @@ export const getDashboardStats = async (req: Request, res: Response) => {
       const found = monthlyRaw.find((m) => m._id === month);
 
       return {
-        month,
+        _id: month,
         totalRevenue: found?.totalRevenue || 0,
         totalTrips: found?.totalTrips || 0,
       };
     });
 
-    res.json({
+    
+
+    return res.status(200).json({
       status: "success",
       data: {
         monthStats: {
@@ -117,9 +120,9 @@ export const getDashboardStats = async (req: Request, res: Response) => {
         thisWeek,
       },
     });
-    
+  
   } catch (error) {
     console.error("Dashboard summary error:", error);
-    res.status(500).json({ error: "Failed to fetch dashboard data" });
+    return res.status(500).json({ error: "Failed to fetch dashboard data" });
   }
 };
