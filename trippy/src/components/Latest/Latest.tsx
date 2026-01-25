@@ -1,29 +1,38 @@
 import { ArrowRight, Calendar, Clock } from "lucide-react";
 import { useDataContext } from "../../context/TripContext";
 import { formatDate, formatTime } from "../../utils/FormatDate";
-import React from "react";
+import React, { useState } from "react";
+import type { Trip } from "../../types";
+import TripModal from "../UI/TripModal";
 
 const Latest = () => {
   const { last10Trips } = useDataContext();
 
+  const [selectedTrip, setSelectedTrip] = useState<Trip | null>(null)
+
 return (
   <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6 w-full max-w-full">
-    <h2 className="text-lg font-bold text-gray-800 mb-4 tracking-tight">Last 10 Trips</h2>
+    <h2 className="text-lg font-bold text-gray-800 mb-4 tracking-tight">
+      Last 10 Trips
+    </h2>
 
     {last10Trips.length === 0 ? (
       <p className="text-gray-500 text-center py-10 text-sm">No trips yet</p>
     ) : (
       <div className="space-y-3">
         {last10Trips.map((trip) => (
-          <div  
+          <div
             key={trip._id}
-            className="group flex items-center justify-between gap-3 p-2 md:p-3 border border-gray-100 rounded-xl bg-gray-50/30 hover:bg-gray-50 hover:border-blue-100 transition-all w-full overflow-hidden"
+            onClick={() => setSelectedTrip(trip)}
+            className="group flex items-center justify-between cursor-pointer active:scale-[0.98] gap-3 p-2 md:p-3 border border-gray-100 rounded-xl bg-gray-50/30 hover:bg-gray-50 hover:border-blue-100 transition-all w-full overflow-hidden"
           >
             {/* Left Section: Routes & Meta */}
             <div className="flex-1 min-w-0">
               {/* Route Line */}
               <div className="flex items-center font-extrabold text-gray-900 text-[14px] sm:text-[15px] mb-1.5 min-w-0">
-                <span className="truncate max-w-[45%] shrink-0">{trip.startPoint}</span>
+                <span className="truncate max-w-[45%] shrink-0">
+                  {trip.startPoint}
+                </span>
                 <ArrowRight
                   size={14}
                   className="mx-2 text-gray-400 shrink-0 opacity-70"
@@ -36,7 +45,9 @@ return (
                 {/* Date */}
                 <div className="flex items-center text-[10px] sm:text-[11px] font-semibold text-gray-500 shrink-0">
                   <Calendar size={11} className="mr-1 text-gray-400 shrink-0" />
-                  <span className="whitespace-nowrap">{formatDate(trip.tripDate)}</span>
+                  <span className="whitespace-nowrap">
+                    {formatDate(trip.tripDate)}
+                  </span>
                 </div>
 
                 {/* Separator Dot */}
@@ -45,7 +56,9 @@ return (
                 {/* Time */}
                 <div className="flex items-center text-[10px] sm:text-[11px] font-semibold text-gray-500 shrink-0">
                   <Clock size={11} className="mr-1 text-gray-400 shrink-0" />
-                  <span className="whitespace-nowrap">{formatTime(trip.createdAt)}</span>
+                  <span className="whitespace-nowrap">
+                    {formatTime(trip.createdAt)}
+                  </span>
                 </div>
 
                 {/* Return Badge - Clean and Small */}
@@ -69,12 +82,19 @@ return (
                 Amount
               </div> */}
               <div className="text-[9px] font-black text-gray-400 uppercase tracking-[0.2em] leading-none">
-              Fare
-            </div>
+                Fare
+              </div>
             </div>
           </div>
         ))}
       </div>
+    )}
+    {selectedTrip && (
+      <TripModal
+        trip={selectedTrip}
+        isOpen={!!selectedTrip}
+        onClose={() => setSelectedTrip(null)}
+      />
     )}
   </div>
 );

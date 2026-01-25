@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
 import type { NewTripInput } from "../../types";
-import { ArrowDown, ArrowUpDown, Check, MapPin, XCircle } from "lucide-react";
+import { ArrowDown, ArrowUpDown, Check, Loader2, MapPin, XCircle } from "lucide-react";
 import DatePicker from "react-datepicker";
 import { useDataContext } from "../../context/TripContext";
 
@@ -22,7 +22,6 @@ const NewTripTab = ({ onAddTrip }: NewTripTabProps) => {
 
   const { addingTrip, setAddingTrip, startLocations, endLocations } =
     useDataContext();
-
   const tripTimestamp = tripDate.setHours(0, 0, 0, 0);
 
   const isDisabledAddBtn =
@@ -99,14 +98,18 @@ const NewTripTab = ({ onAddTrip }: NewTripTabProps) => {
             className="w-full font-bold text-sm sm:text-base pl-10 pr-4 py-3 sm:py-4 bg-white border border-gray-200 rounded-2xl text-gray-900 shadow-sm transition-all hover:border-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 focus:outline-none"
           />
           {showStartSuggestions && (
-            <div className="absolute z-20 w-full mt-2 p-2 bg-white border border-gray-100 rounded-2xl shadow-xl animate-in fade-in zoom-in-95 duration-150">
-              <div className="flex flex-col gap-2">
+            <div className="absolute z-20 w-full mt-2 bg-white border-2 border-slate-300 rounded-2xl shadow-xl animate-in fade-in zoom-in-95 duration-150 overflow-hidden">
+              {/* Scrollable Area */}
+              <div className="max-h-52 overflow-y-auto p-2 space-y-1 scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent">
                 {startLocations.map((loc) => (
                   <button
                     key={loc}
                     type="button"
-                    onClick={() => setStartPoint(loc)}
-                    className="w-full text-left px-3 py-2 bg-gray-50 hover:bg-blue-50 hover:text-gray-900 rounded-lg text-sm font-bold transition-all"
+                    onClick={() => {
+                      setStartPoint(loc);
+                      setShowStartSuggestions(false); // Close after selection
+                    }}
+                    className="w-full text-left px-4 py-3 bg-gray-50 hover:bg-blue-50 hover:text-blue-600 rounded-xl text-sm font-bold transition-all border border-transparent hover:border-blue-100"
                   >
                     {loc}
                   </button>
@@ -149,22 +152,26 @@ const NewTripTab = ({ onAddTrip }: NewTripTabProps) => {
             onBlur={() => setTimeout(() => setShowEndSuggestions(false), 200)}
             className="w-full font-bold text-sm sm:text-base pl-10 pr-4 py-3 sm:py-4 bg-white border border-gray-200 rounded-2xl text-gray-900 shadow-sm transition-all hover:border-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 focus:outline-none"
           />
-          {showEndSuggestions && (
-            <div className="absolute z-20 w-full mt-2 p-2 bg-white border border-gray-100 rounded-2xl shadow-xl animate-in fade-in zoom-in-95 duration-150">
-              <div className="flex flex-col gap-2">
-                {endLocations.map((loc) => (
-                  <button
-                    key={loc}
-                    type="button"
-                    onClick={() => setEndPoint(loc)}
-                    className="w-full text-left px-3 py-2 bg-gray-50 hover:bg-blue-50 hover:text-gray-900 rounded-lg text-sm font-bold transition-all"
-                  >
-                    {loc}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
+      {showEndSuggestions && (
+  <div className="absolute z-20 w-full mt-2 bg-white border-2 border-slate-300 rounded-2xl shadow-xl animate-in fade-in zoom-in-95 duration-150 overflow-hidden">
+    {/* Scrollable Area */}
+    <div className="max-h-52 overflow-y-auto p-2 space-y-1 scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent">
+      {endLocations.map((loc) => (
+        <button
+          key={loc}
+          type="button"
+          onClick={() => {
+            setEndPoint(loc);
+            setShowEndSuggestions(false); // 👈 Closes the dropdown after picking
+          }}
+          className="w-full text-left px-4 py-3 bg-gray-50 hover:bg-blue-50 hover:text-blue-600 rounded-xl text-sm font-bold transition-all border border-transparent hover:border-blue-100"
+        >
+          {loc}
+        </button>
+      ))}
+    </div>
+  </div>
+)}
         </div>
 
         {/* Fare */}
@@ -243,7 +250,10 @@ const NewTripTab = ({ onAddTrip }: NewTripTabProps) => {
         }`}
         >
           {addingTrip ? (
-            <span>Adding…</span>
+            <div className="flex items-center gap-2">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              <span>Adding...</span>
+            </div>
           ) : addSuccess ? (
             <div className="flex items-center gap-2">
               <Check className="h-4 w-4 sm:h-5 sm:w-5" />

@@ -104,13 +104,11 @@ const Dashboard = () => {
     revenue,
     max,
     label,
-    colorClass,
     isWeekly = false,
   }: {
     revenue: number;
     max: number;
     label: string;
-    colorClass: string;
     isWeekly?: boolean;
   }) => {
     const barHeight = (revenue / max) * 100;
@@ -130,9 +128,9 @@ const Dashboard = () => {
             {displayVal}
           </span>
         )}
-        <div className="w-full max-w-[28px] bg-slate-100 rounded-lg overflow-hidden ring-1 ring-slate-200 relative h-3/4">
+        <div className="w-full max-w-[28px] bg-gray-200 rounded-t-lg overflow-hidden ring-1 ring-slate-200 relative h-3/4">
           <div
-            className={`absolute bottom-0 w-full rounded-t-sm transition-all duration-1000 ease-out ${colorClass.replace("text", "bg")}`}
+            className={`absolute bottom-0 w-full bg-blue-600 rounded-t-lg transition-all duration-1000 ease-out`}
             style={{ height: `${revenue > 0 ? Math.max(barHeight, 8) : 0}%` }}
           />
         </div>
@@ -189,7 +187,6 @@ const Dashboard = () => {
                   revenue={day.totalRevenue}
                   max={stats.maxDaily}
                   label={formatDayLabel(day._id)}
-                  colorClass="text-blue-500"
                   isWeekly={true}
                 />
               ))}
@@ -208,7 +205,6 @@ const Dashboard = () => {
                     revenue={item.totalRevenue}
                     max={stats.maxMonthly}
                     label={getMonthName(i).substring(0, 3)}
-                    colorClass="text-indigo-600"
                   />
                 ))}
               </div>

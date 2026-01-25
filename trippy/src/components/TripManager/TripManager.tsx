@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import {
   ArrowRight,
   Calendar,
@@ -15,6 +15,7 @@ import TripFilterBar from "../UI/FilterBar";
 import { formatDate, formatTime } from "../../utils/FormatDate";
 import type { Trip, TripFilter } from "../../types";
 import DeleteModal from "../UI/DeleteModal";
+import TripModal from "../UI/TripModal";
 
 const TripManagement = () => {
   const {
@@ -33,6 +34,8 @@ const TripManagement = () => {
     toDate,
     setDashboardNeedsRefresh
   } = useDataContext();
+
+    const [selectedTrip, setSelectedTrip] = useState<Trip | null>(null)
 
   const tripsToRender = useMemo(() => {
     const noFilters = quickDate === "recent" && !search && !fromDate && !toDate;
@@ -73,7 +76,6 @@ const TripManagement = () => {
           setRecent25Trips,
         });
          setDashboardNeedsRefresh(true);
-        // await loadDashboard(setDashboardData);
       } else {
         throw new Error("Delete failed");
       }
@@ -123,7 +125,10 @@ const TripManagement = () => {
           tripsToRender.map((trip) => (
             <div
               key={trip._id}
-              className="group bg-white rounded-xl sm:rounded-2xl p-2.5 sm:p-5 border border-gray-100 hover:border-blue-100 hover:shadow-md transition-all"
+              onClick={() => setSelectedTrip(trip)}
+              role="button"
+              tabIndex={0}
+              className="group bg-white rounded-xl cursor-pointer active:scale-[0.98] sm:rounded-2xl p-2.5 sm:p-5 border border-gray-100 hover:border-blue-100 hover:shadow-md transition-all"
             >
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
                 {/* LEFT: Route & Meta */}
@@ -163,9 +168,9 @@ const TripManagement = () => {
                       {formatTime(trip.updatedAt)}
                     </div>
                     {trip.returnTrip && (
-                       <span className="inline-flex px-1.5 md:py-0.5 rounded-md bg-blue-50 text-blue-600 border border-blue-100 text-[10px] sm:text-[11px] font-black ">
-                      Return
-                    </span>
+                      <span className="inline-flex px-1.5 md:py-0.5 rounded-md bg-blue-50 text-blue-600 border border-blue-100 text-[10px] sm:text-[11px] font-black ">
+                        Return
+                      </span>
                     )}
                   </div>
                 </div>
@@ -186,13 +191,19 @@ const TripManagement = () => {
                   {/* Action Buttons */}
                   <div className="flex ml-auto sm:ml-0 gap-1.5 sm:gap-2">
                     <button
-                      onClick={() => setActiveTrip(trip)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setActiveTrip(trip)}
+                      }
                       className="p-2 py-1.5 sm:p-2.5 rounded-lg bg-gray-50 hover:bg-blue-50 text-gray-600 hover:text-blue-600 transition"
                     >
                       <Edit size={16} />
                     </button>
                     <button
-                      onClick={() => setDeletingTrip(trip)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setDeletingTrip(trip)}
+                      }
                       className="p-2 py-1.5 sm:p-2.5 rounded-lg bg-gray-50 hover:bg-red-50 text-gray-600 hover:text-red-600 transition"
                     >
                       <Trash2 size={16} />
@@ -213,6 +224,13 @@ const TripManagement = () => {
           onClose={() => setDeletingTrip(null)}
         />
       )}
+          {selectedTrip && (
+      <TripModal
+        trip={selectedTrip}
+        isOpen={!!selectedTrip}
+        onClose={() => setSelectedTrip(null)}
+      />
+    )}
     </div>
   );
 };
