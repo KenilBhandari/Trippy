@@ -6,28 +6,16 @@ export const getDashboardStats = async (req: Request, res: Response) => {
   try {
     const now = new Date();
 
-    const startOfMonth = new Date(
-      now.getFullYear(),
-      now.getMonth(),
-      1,
-    ).getTime();
+    const startOfMonth = new Date(`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-01T00:00:00+05:30`).getTime();
+    const endOfMonth = new Date(`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate()}T23:59:59+05:30`).getTime();
 
-    const endOfMonth = new Date(
-      now.getFullYear(),
-      now.getMonth() + 1,
-      0,
-      23,
-      59,
-      59,
-    ).getTime();
 
     const { startTimeStamp, endTimeStamp } = getWeekTimestamp();
 
     const startOfYear =
       new Date(Date.UTC(now.getFullYear(), 0, 1, 0, 0, 0)).getTime() +
-      5.5 * 60 * 60 * 1000; // add 5h30m for IST
+      5.5 * 60 * 60 * 1000; 
 
-    // Get end of year in IST
     const endOfYear =
       new Date(Date.UTC(now.getFullYear(), 11, 31, 23, 59, 59, 999)).getTime() +
       5.5 * 60 * 60 * 1000;
