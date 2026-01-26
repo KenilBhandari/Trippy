@@ -7,7 +7,6 @@ import {
   Trash2,
   Edit,
   Truck,
-  Repeat,
 } from "lucide-react";
 import { useDataContext } from "../../context/TripContext";
 import EditModal from "../UI/EditModal";

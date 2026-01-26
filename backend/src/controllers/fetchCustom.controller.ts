@@ -5,6 +5,7 @@ import Trip from "../models/trips.models"
 export const fetchCustomTrips = async (req: Request, res: Response) => {
   try {
     const filter: TripFilter = req.body;
+    
     const { limit, sort, dateFrom, dateTo, searchString, recent } = filter;
 
     let limitDefault = Number(limit) || 100;
@@ -14,14 +15,14 @@ export const fetchCustomTrips = async (req: Request, res: Response) => {
     }
     let sortBy: Record<string, 1 | -1> =
       sort === "updated" ? { updatedAt: -1 } : { createdAt: -1 };
-
+      
     if (sort === "updated") {
       sortBy = { updatedAt: -1 };
     } else if (sort === "tripdate") {
       sortBy = { tripDate: 1 };
     }
 
-    if (searchString || dateFrom || dateTo) {
+    if (searchString || dateFrom || dateTo || recent) {
       sortBy = { tripDate: 1 };
     } else if (sort === "updated") {
       sortBy = { updatedAt: -1 };

@@ -3,6 +3,8 @@ import { fetchDashboardStats } from "./trips";
   export const loadDashboard = async (setDashboardData: (data: any) => void) => {
     try {
       const result = await fetchDashboardStats();
+      console.log(result);
+      
       if (result.status === "success") {
         setDashboardData(result.data);
         return result;

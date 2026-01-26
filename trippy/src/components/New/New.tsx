@@ -13,7 +13,7 @@ const NewTripTab = ({ onAddTrip }: NewTripTabProps) => {
   const [startPoint, setStartPoint] = useState("SDY");
   const [endPoint, setEndPoint] = useState("Vapi");
   const [tripDate, setTripDate] = useState<Date>(new Date());
-  const [fare, setFare] = useState<number>(200);
+  const [fare, setFare] = useState<number>(1200);
   const [numberPlate, setNumberPlate] = useState<string | null>("5281");
   const [showStartSuggestions, setShowStartSuggestions] = useState(false);
   const [showEndSuggestions, setShowEndSuggestions] = useState(false);
@@ -23,7 +23,9 @@ const NewTripTab = ({ onAddTrip }: NewTripTabProps) => {
 
   const { addingTrip, setAddingTrip, startLocations, endLocations } =
     useDataContext();
-  const tripTimestamp = tripDate.setHours(0, 0, 0, 0);
+  const tripTimestamp = tripDate.setHours(0, 1, 0, 1);
+  console.log(tripTimestamp);
+  
 
   const isDisabledAddBtn =
     !startPoint.trim() ||
@@ -53,8 +55,8 @@ const NewTripTab = ({ onAddTrip }: NewTripTabProps) => {
 
       setStartPoint("SDY");
       setEndPoint("Vapi");
-      setTripDate(new Date());
-      setFare(200);
+      setTripDate(tripDate);
+      setFare(1200);
 
       setTimeout(() => {
         setAddSuccess(false);

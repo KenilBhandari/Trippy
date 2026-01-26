@@ -4,7 +4,6 @@ import { getWeekTimestamp } from "../utils/dashboard.utils";
 
 export const getDashboardStats = async (req: Request, res: Response) => {
   try {
-
     const now = new Date();
 
     const startOfMonth = new Date(
@@ -24,9 +23,16 @@ export const getDashboardStats = async (req: Request, res: Response) => {
 
     const { startTimeStamp, endTimeStamp } = getWeekTimestamp();
 
-    const startOfYear = new Date(now.getFullYear(), 0, 1).getTime();
-    const endOfYear = new Date(now.getFullYear(), 11, 31, 23, 59, 59).getTime();
-
+    const startOfYear = new Date(now.getFullYear(), 0, 1, 0, 0, 0, 0).getTime();
+    const endOfYear = new Date(
+      now.getFullYear(),
+      11,
+      31,
+      23,
+      59,
+      59,
+      999,
+    ).getTime();
 
     const monthStatsAgg = await Trip.aggregate([
       { $match: { tripDate: { $gte: startOfMonth, $lte: endOfMonth } } },
@@ -78,22 +84,32 @@ export const getDashboardStats = async (req: Request, res: Response) => {
     ]);
 
     const monthlyRaw = await Trip.aggregate([
-      { $match: { tripDate: { $gte: startOfYear, $lte: endOfYear } } },
+      {
+        $match: {
+          tripDate: { $gte: startOfYear, $lte: endOfYear },
+        },
+      },
       {
         $group: {
-          _id: { $month: { $toDate: "$tripDate" } },
+          _id: {
+            $month: {
+              date: { $toDate: "$tripDate" },
+              timezone: "Asia/Kolkata",
+            },
+          },
           totalRevenue: { $sum: "$fare" },
         },
       },
       { $sort: { _id: 1 } },
     ]);
 
+
     const monthStats = monthStatsAgg[0] || {
       totalRevenue: 0,
       totalTrips: 0,
       avgFare: 0,
     };
-    
+
     const monthlyTotals = Array.from({ length: 12 }, (_, i) => {
       const month = i + 1;
       const found = monthlyRaw.find((m) => m._id === month);
@@ -104,8 +120,6 @@ export const getDashboardStats = async (req: Request, res: Response) => {
         totalTrips: found?.totalTrips || 0,
       };
     });
-
-    
 
     return res.status(200).json({
       status: "success",
@@ -120,7 +134,6 @@ export const getDashboardStats = async (req: Request, res: Response) => {
         thisWeek,
       },
     });
-  
   } catch (error) {
     console.error("Dashboard summary error:", error);
     return res.status(500).json({ error: "Failed to fetch dashboard data" });
