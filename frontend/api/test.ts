@@ -1,4 +1,4 @@
-import connectDB from "../lib/db";
+import connectDB from "../lib/db.js";
 
 export default async function handler(req: any, res: any) {
   try {
