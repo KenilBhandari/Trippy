@@ -82,25 +82,36 @@ export const getDashboardStats = async (req: Request, res: Response) => {
       },
     ]);
 
-    const monthlyRaw = await Trip.aggregate([
-      {
-        $match: {
-          tripDate: { $gte: startOfYear, $lte: endOfYear },
+const monthlyRaw = await Trip.aggregate([
+  {
+    $match: {
+      $expr: {
+        $and: [
+          { $gte: [
+              { $toDate: "$tripDate" },
+              new Date(`${now.getFullYear()}-01-01T00:00:00+05:30`)
+          ] },
+          { $lte: [
+              { $toDate: "$tripDate" },
+              new Date(`${now.getFullYear()}-12-31T23:59:59+05:30`)
+          ] },
+        ],
+      },
+    },
+  },
+  {
+    $group: {
+      _id: {
+        $month: {
+          date: { $toDate: "$tripDate" },
+          timezone: "Asia/Kolkata",
         },
       },
-      {
-        $group: {
-          _id: {
-            $month: {
-              date: { $toDate: "$tripDate" },
-              timezone: "Asia/Kolkata",
-            },
-          },
-          totalRevenue: { $sum: "$fare" },
-        },
-      },
-      { $sort: { _id: 1 } },
-    ]);
+      totalRevenue: { $sum: "$fare" },
+    },
+  },
+  { $sort: { _id: 1 } },
+]);
 
 
     const monthStats = monthStatsAgg[0] || {
