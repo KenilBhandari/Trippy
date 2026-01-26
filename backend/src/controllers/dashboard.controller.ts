@@ -23,16 +23,15 @@ export const getDashboardStats = async (req: Request, res: Response) => {
 
     const { startTimeStamp, endTimeStamp } = getWeekTimestamp();
 
-    const startOfYear = new Date(now.getFullYear(), 0, 1, 0, 0, 0, 0).getTime();
-    const endOfYear = new Date(
-      now.getFullYear(),
-      11,
-      31,
-      23,
-      59,
-      59,
-      999,
-    ).getTime();
+    const startOfYear =
+      new Date(Date.UTC(now.getFullYear(), 0, 1, 0, 0, 0)).getTime() +
+      5.5 * 60 * 60 * 1000; // add 5h30m for IST
+
+    // Get end of year in IST
+    const endOfYear =
+      new Date(Date.UTC(now.getFullYear(), 11, 31, 23, 59, 59, 999)).getTime() +
+      5.5 * 60 * 60 * 1000;
+
 
     const monthStatsAgg = await Trip.aggregate([
       { $match: { tripDate: { $gte: startOfMonth, $lte: endOfMonth } } },
