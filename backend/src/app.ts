@@ -12,8 +12,9 @@ if (!process.env.MONGO_URI) {
 const app = express();
 
 app.use(cors({
-  origin:"*",
+  origin: ["http://localhost:5173", "https://trippyyer.vercel.app"],
 }));
+
 app.use(express.json());
 
 
