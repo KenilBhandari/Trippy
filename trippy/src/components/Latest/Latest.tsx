@@ -1,4 +1,4 @@
-import { ArrowRight, Calendar, Clock } from "lucide-react";
+import { ArrowRight, Calendar, Truck, Clock } from "lucide-react";
 import { useDataContext } from "../../context/TripContext";
 import { formatDate, formatTime } from "../../utils/FormatDate";
 import React, { useState } from "react";
@@ -65,12 +65,23 @@ return (
                 {trip.returnTrip && (
                   <>
                     <span className="hidden xs:block w-0.5 h-0.5 rounded-full bg-gray-300 shrink-0" />
-                    <span className="inline-flex px-1.5 py-0.5 rounded-md bg-blue-50 text-blue-600 border border-blue-100 text-[10px] sm:text-[11px] font-black ">
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-amber-50 text-amber-700 border border-amber-100 text-[10px] sm:text-[11px] font-bold">
                       Return
                     </span>
                   </>
                 )}
               </div>
+              {/* Number Plate – Optional Row */}
+              {trip.numberPlate && (
+                <div
+                  className="flex items-center gap-1.5 mt-1 px-2 py-0.5 rounded-md w-fit bg-blue-50 border border-blue-100"
+                >
+                  <Truck size={11} className="text-blue-500 shrink-0" />
+                  <span className="text-[10px] sm:text-[11px] font-black text-blue-700 tracking-wider">
+                    {trip.numberPlate}
+                  </span>
+                </div>
+              )}
             </div>
 
             {/* Right Section: Price */}
@@ -78,9 +89,6 @@ return (
               <div className="font-[1000] text-blue-600 text-md sm:text-lg whitespace-nowrap">
                 ₹{trip.fare}
               </div>
-              {/* <div className="hidden xs:block text-[8px] font-bold text-gray-400 uppercase tracking-widest">
-                Amount
-              </div> */}
               <div className="text-[9px] font-black text-gray-400 uppercase tracking-[0.2em] leading-none">
                 Fare
               </div>

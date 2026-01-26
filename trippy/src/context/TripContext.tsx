@@ -90,33 +90,20 @@ export function TripProvider({ children }: { children: ReactNode }) {
   const [toDate, setToDate] = useState<string>("");
 
   const startLocations: string[] = [
-    "Surat Transport",
-    "Kamadgiri",
-    "Surat Transport",
-    "Kamadgiri",
-    "Surat Transport",
-    "Kamadgiri",
-    "Surat Transport",
-    "Kamadgiri",
-    "Surat Transport",
-    "Kamadgiri",
-    "Surat Transport",
-    "Kamadgiri",
+    "SDY",
+    "Shree Hans",
   ];
   
   const endLocations: string[] = [
-    "Vapi - Kamadgiri",
-    "Vapi - Shree Transport",
+    "Vapi",
+    "Umbergaon",
     "Dadra",
-    "Vapi - Kamadgiri",
-    "Vapi - Shree Transport",
-    "Dadra",
-    "Vapi - Kamadgiri",
-    "Vapi - Shree Transport",
-    "Dadra",
-    "Vapi - Kamadgiri",
-    "Vapi - Shree Transport",
-    "Dadra",
+    "Daman",
+    "Vapi Karvad",
+    "Surat",
+    "Udvada",
+    "Local",
+    "Phase 3",
   ];
 
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);

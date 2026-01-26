@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
 import type { NewTripInput } from "../../types";
-import { ArrowDown, ArrowUpDown, Check, Loader2, MapPin, XCircle } from "lucide-react";
+import { ArrowDown, ArrowUpDown, Truck, Check, Loader2, MapPin, XCircle } from "lucide-react";
 import DatePicker from "react-datepicker";
 import { useDataContext } from "../../context/TripContext";
 
@@ -11,9 +11,10 @@ interface NewTripTabProps {
 
 const NewTripTab = ({ onAddTrip }: NewTripTabProps) => {
   const [startPoint, setStartPoint] = useState("SDY");
-  const [endPoint, setEndPoint] = useState("Umbergaon");
+  const [endPoint, setEndPoint] = useState("Vapi");
   const [tripDate, setTripDate] = useState<Date>(new Date());
   const [fare, setFare] = useState<number>(200);
+  const [numberPlate, setNumberPlate] = useState<string | null>("5281");
   const [showStartSuggestions, setShowStartSuggestions] = useState(false);
   const [showEndSuggestions, setShowEndSuggestions] = useState(false);
   const [isReturnTrip, setIsReturnTrip] = useState(false);
@@ -43,6 +44,7 @@ const NewTripTab = ({ onAddTrip }: NewTripTabProps) => {
         startPoint,
         endPoint,
         fare,
+        numberPlate: numberPlate,
         tripDate: tripTimestamp,
         returnTrip: isReturnTrip,
       });
@@ -152,26 +154,26 @@ const NewTripTab = ({ onAddTrip }: NewTripTabProps) => {
             onBlur={() => setTimeout(() => setShowEndSuggestions(false), 200)}
             className="w-full font-bold text-sm sm:text-base pl-10 pr-4 py-3 sm:py-4 bg-white border border-gray-200 rounded-2xl text-gray-900 shadow-sm transition-all hover:border-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 focus:outline-none"
           />
-      {showEndSuggestions && (
-  <div className="absolute z-20 w-full mt-2 bg-white border-2 border-slate-300 rounded-2xl shadow-xl animate-in fade-in zoom-in-95 duration-150 overflow-hidden">
-    {/* Scrollable Area */}
-    <div className="max-h-52 overflow-y-auto p-2 space-y-1 scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent">
-      {endLocations.map((loc) => (
-        <button
-          key={loc}
-          type="button"
-          onClick={() => {
-            setEndPoint(loc);
-            setShowEndSuggestions(false); // 👈 Closes the dropdown after picking
-          }}
-          className="w-full text-left px-4 py-3 bg-gray-50 hover:bg-blue-50 hover:text-blue-600 rounded-xl text-sm font-bold transition-all border border-transparent hover:border-blue-100"
-        >
-          {loc}
-        </button>
-      ))}
-    </div>
-  </div>
-)}
+          {showEndSuggestions && (
+            <div className="absolute z-20 w-full mt-2 bg-white border-2 border-slate-300 rounded-2xl shadow-xl animate-in fade-in zoom-in-95 duration-150 overflow-hidden">
+              {/* Scrollable Area */}
+              <div className="max-h-52 overflow-y-auto p-2 space-y-1 scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent">
+                {endLocations.map((loc) => (
+                  <button
+                    key={loc}
+                    type="button"
+                    onClick={() => {
+                      setEndPoint(loc);
+                      setShowEndSuggestions(false); // 👈 Closes the dropdown after picking
+                    }}
+                    className="w-full text-left px-4 py-3 bg-gray-50 hover:bg-blue-50 hover:text-blue-600 rounded-xl text-sm font-bold transition-all border border-transparent hover:border-blue-100"
+                  >
+                    {loc}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Fare */}
@@ -198,37 +200,63 @@ const NewTripTab = ({ onAddTrip }: NewTripTabProps) => {
           </div>
         </div>
 
-        {/* Date */}
-        <div className="space-y-1.5">
-          <label className="ml-1 text-xs sm:text-sm font-medium text-gray-400">
-            Trip Date
-          </label>
-          <div className="flex items-center gap-2 sm:gap-3 p-1.5 bg-gray-100/50 rounded-2xl w-fit border border-gray-100">
-            <DatePicker
-              selected={tripDate}
-              onChange={(date: Date | null) => {
-                if (date) setTripDate(date);
-              }}
-              maxDate={new Date()}
-              popperPlacement="bottom-start"
-              customInput={
-                <button className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-white shadow-sm rounded-2xl text-xs sm:text-sm text-gray-800 font-semibold hover:bg-gray-50 transition-all active:scale-95">
-                  <span className="text-blue-500 text-base sm:text-lg">●</span>
-                  {tripDate.toLocaleDateString("en-GB", {
-                    day: "2-digit",
-                    month: "short",
-                    year: "2-digit",
-                  })}
-                </button>
-              }
-            />
-            <button
-              type="button"
-              onClick={() => setTripDate(new Date())}
-              className="pr-2 sm:pr-4 pl-1 sm:pl-2 py-2 text-xs sm:text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors whitespace-nowrap"
-            >
-              Today
-            </button>
+        {/* Last Row */}
+        <div className="grid grid-cols-2 gap-4 items-end">
+          {/* Trip Date Section */}
+          <div className="flex flex-col space-y-1.5 h-full">
+            <label className="ml-1 text-xs sm:text-sm font-medium text-gray-400">
+              Trip Date
+            </label>
+            {/* Added h-full and flex to the wrapper to match the input height */}
+            <div className="flex items-center justify-between gap-2 sm:gap-3 p-1.5 bg-gray-100/50 rounded-2xl w-fit h-full border border-gray-100 min-h-[46px] sm:min-h-[54px]">
+              <DatePicker
+                selected={tripDate}
+                onChange={(date: Date | null) => {
+                  if (date) setTripDate(date);
+                }}
+                maxDate={new Date()}
+                popperPlacement="bottom-start"
+                customInput={
+                  <button className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-white shadow-sm rounded-2xl text-xs sm:text-sm text-gray-800 font-semibold hover:bg-gray-50 transition-all active:scale-95">
+                    <span className="text-blue-500 text-base sm:text-lg">
+                      ●
+                    </span>
+                    {tripDate.toLocaleDateString("en-GB", {
+                      day: "2-digit",
+                      month: "short",
+                      year: "2-digit",
+                    })}
+                  </button>
+                }
+              />
+              <button
+                type="button"
+                onClick={() => setTripDate(new Date())}
+                className="pr-2 sm:pr-4 pl-1 sm:pl-2 py-2 text-xs sm:text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors whitespace-nowrap"
+              >
+                Today
+              </button>
+            </div>
+          </div>
+
+          {/* Number Plate Section */}
+          <div className="flex flex-col space-y-1.5 h-full">
+            <label className="ml-1 text-xs sm:text-sm font-medium text-gray-400">
+              Vehicle Number 
+            </label>
+            <div className="relative h-full flex items-center">
+              <Truck
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                size={18}
+              />
+              <input
+                type="text"
+                value={numberPlate ?? ""}
+                placeholder="GJ 15 AB 1234"
+                onChange={(e) => setNumberPlate(e.target.value.toUpperCase())}
+                className="w-full h-full font-bold text-sm sm:text-base pl-10 pr-4 py-2.5 sm:py-3 bg-white border border-gray-200 rounded-2xl text-gray-900 shadow-sm transition-all hover:border-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 focus:outline-none min-h-[46px] sm:min-h-[54px]"
+              />
+            </div>
           </div>
         </div>
 

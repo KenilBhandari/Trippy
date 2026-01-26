@@ -3,6 +3,7 @@ export interface Trip {
   endPoint: string;
   fare: number;
   tripDate: Date;
+  numberPlate: string | null;
   returnTrip?: boolean;
   createdAt: number;
   updatedAt: number;
@@ -13,6 +14,7 @@ export interface TripInput {
   endPoint: string;
   fare: number;
   tripDate: Date;
+  numberPlate: string | null;
   returnTrip?: boolean;
 }
 

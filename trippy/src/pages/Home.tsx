@@ -82,9 +82,9 @@ const Start = () => {
                     {/* The Brand Text */}
                     <div className="flex flex-col">
                       <h1 className="text-xl md:text-2xl font-[1000] tracking-tighter text-gray-900 uppercase leading-none">
-                        Harsh{" "}
-                        <span className="text-blue-600 ml-1 not-italic relative">
-                          Transport
+                        
+                        <span className="text-blue-600 ml-1 not-italic relative tracking-widest">
+                          Trippy
                         </span>
                       </h1>
                     </div>

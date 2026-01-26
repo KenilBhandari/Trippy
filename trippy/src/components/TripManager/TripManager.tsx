@@ -6,6 +6,8 @@ import {
   History,
   Trash2,
   Edit,
+  Truck,
+  Repeat,
 } from "lucide-react";
 import { useDataContext } from "../../context/TripContext";
 import EditModal from "../UI/EditModal";
@@ -32,10 +34,10 @@ const TripManagement = () => {
     search,
     fromDate,
     toDate,
-    setDashboardNeedsRefresh
+    setDashboardNeedsRefresh,
   } = useDataContext();
 
-    const [selectedTrip, setSelectedTrip] = useState<Trip | null>(null)
+  const [selectedTrip, setSelectedTrip] = useState<Trip | null>(null);
 
   const tripsToRender = useMemo(() => {
     const noFilters = quickDate === "recent" && !search && !fromDate && !toDate;
@@ -75,7 +77,7 @@ const TripManagement = () => {
           setLast10Trips,
           setRecent25Trips,
         });
-         setDashboardNeedsRefresh(true);
+        setDashboardNeedsRefresh(true);
       } else {
         throw new Error("Delete failed");
       }
@@ -130,6 +132,7 @@ const TripManagement = () => {
               tabIndex={0}
               className="group bg-white rounded-xl cursor-pointer active:scale-[0.98] sm:rounded-2xl p-2.5 sm:p-5 border border-gray-100 hover:border-blue-100 hover:shadow-md transition-all"
             >
+              {/* Trip Manager */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
                 {/* LEFT: Route & Meta */}
                 <div className="flex-1 min-w-0">
@@ -148,7 +151,7 @@ const TripManagement = () => {
                       </span>
                     </div>
 
-                    {/* Fare: Mobile only version */}
+                    {/* Fare: Mobile only */}
                     <div className="sm:hidden font-[1000] text-lg text-gray-900">
                       <span className="text-emerald-600 text-base mr-0.5">
                         ₹
@@ -157,18 +160,34 @@ const TripManagement = () => {
                     </div>
                   </div>
 
-                  {/* Meta Info */}
-                  <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-[10px] sm:text-[13px] text-gray-500 font-medium">
+                  {/* Meta Info + Desktop Inline Number Plate */}
+                  {/* Meta Info + Desktop Inline Number Plate */}
+                  <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-[10px] sm:text-[13px] font-medium">
+                    {/* Date */}
                     <div className="flex items-center gap-1 sm:bg-gray-50 sm:px-2 sm:py-1 sm:rounded-md">
                       <Calendar size={12} className="text-blue-500" />
                       {formatDate(trip.tripDate)}
                     </div>
+
+                    {/* Time */}
                     <div className="flex items-center gap-1 sm:bg-gray-50 sm:px-2 sm:py-1 sm:rounded-md">
                       <Clock size={12} className="text-blue-500" />
                       {formatTime(trip.updatedAt)}
                     </div>
+
+                    {/* Desktop Inline Number Plate */}
+                    {trip.numberPlate && (
+                      <div className="hidden sm:flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-blue-50 border border-blue-100 w-fit font-black">
+                        <Truck size={11} className="text-blue-600 shrink-0" />
+                        <span className="text-[11px] text-blue-700 tracking-wider">
+                          {trip.numberPlate}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Return Badge */}
                     {trip.returnTrip && (
-                      <span className="inline-flex px-1.5 md:py-0.5 rounded-md bg-blue-50 text-blue-600 border border-blue-100 text-[10px] sm:text-[11px] font-black ">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-amber-50 text-amber-700 border border-amber-100 text-[10px] sm:text-[11px] font-bold">
                         Return
                       </span>
                     )}
@@ -176,8 +195,18 @@ const TripManagement = () => {
                 </div>
 
                 {/* RIGHT: Fare (PC) & Actions */}
-                <div className="flex items-center justify-between sm:justify-end gap-4 sm:gap-6  sm:pt-0 borde sm:border-t-0 border-gray-50 sm:border-transparent">
-                  {/* Fare: Desktop only version */}
+                <div className="flex items-center justify-between sm:justify-end gap-4 sm:gap-6 w-full sm:w-auto">
+                  {/* Number Plate – Mobile only */}
+                  {trip.numberPlate && (
+                    <div className="sm:hidden flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-blue-50 border border-blue-100">
+                      <Truck size={11} className="text-blue-500 shrink-0" />
+                      <span className="text-[10px] font-black text-blue-700 tracking-wider">
+                        {trip.numberPlate}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Fare: Desktop only */}
                   <div className="hidden sm:block text-right">
                     <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-0.5">
                       Fare Paid
@@ -189,12 +218,12 @@ const TripManagement = () => {
                   </div>
 
                   {/* Action Buttons */}
-                  <div className="flex ml-auto sm:ml-0 gap-1.5 sm:gap-2">
+                  <div className="flex gap-1.5 sm:gap-2 ml-auto sm:ml-0">
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        setActiveTrip(trip)}
-                      }
+                        setActiveTrip(trip);
+                      }}
                       className="p-2 py-1.5 sm:p-2.5 rounded-lg bg-gray-50 hover:bg-blue-50 text-gray-600 hover:text-blue-600 transition"
                     >
                       <Edit size={16} />
@@ -202,8 +231,8 @@ const TripManagement = () => {
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        setDeletingTrip(trip)}
-                      }
+                        setDeletingTrip(trip);
+                      }}
                       className="p-2 py-1.5 sm:p-2.5 rounded-lg bg-gray-50 hover:bg-red-50 text-gray-600 hover:text-red-600 transition"
                     >
                       <Trash2 size={16} />
@@ -224,13 +253,13 @@ const TripManagement = () => {
           onClose={() => setDeletingTrip(null)}
         />
       )}
-          {selectedTrip && (
-      <TripModal
-        trip={selectedTrip}
-        isOpen={!!selectedTrip}
-        onClose={() => setSelectedTrip(null)}
-      />
-    )}
+      {selectedTrip && (
+        <TripModal
+          trip={selectedTrip}
+          isOpen={!!selectedTrip}
+          onClose={() => setSelectedTrip(null)}
+        />
+      )}
     </div>
   );
 };

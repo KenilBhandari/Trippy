@@ -1,11 +1,4 @@
-import {
-  Document,
-  Page,
-  Text,
-  View,
-  StyleSheet,
-  Font,
-} from "@react-pdf/renderer";
+import { Document, Page, Text, View, StyleSheet, Font } from "@react-pdf/renderer";
 import type { Trip } from "../types";
 import { formatDate } from "./FormatDate";
 
@@ -26,7 +19,6 @@ const styles = StyleSheet.create({
     fontFamily: "NotoSans",
     color: "#111827",
   },
-
   header: {
     position: "absolute",
     top: 16,
@@ -38,86 +30,52 @@ const styles = StyleSheet.create({
     paddingBottom: 6,
     borderBottom: "2 solid #f97316",
   },
-
-  headerLeft: {
-    gap: 2,
-  },
-
-  title: {
-    fontSize: 18,
-    fontWeight: "bold",
-    letterSpacing: 0.5,
-  },
-
-  subtitle: {
-    fontSize: 11,
-    color: "#f97316",
-    fontWeight: "bold",
-  },
-
-  address: {
-    fontSize: 9,
-    color: "#6b7280",
-    marginTop: 2,
-  },
-
-  statementText: {
-    fontSize: 11,
-    fontWeight: "bold",
-  },
-
+  headerLeft: { gap: 2 },
+  title: { fontSize: 18, fontWeight: "bold", letterSpacing: 0.5 },
+  subtitle: { fontSize: 11, color: "#f97316", fontWeight: "bold" },
+  address: { fontSize: 9, color: "#6b7280", marginTop: 2 },
+  statementText: { fontSize: 11, fontWeight: "bold" },
   tableHeader: {
     flexDirection: "row",
     backgroundColor: "#f2f2f2",
-    color: "1f2937",
+    color: "#1f2937",
     paddingVertical: 8,
     paddingHorizontal: 6,
     marginTop: 10,
     fontSize: 10,
     fontWeight: "bold",
   },
-
   row: {
     flexDirection: "row",
-    paddingVertical: 7,
+    paddingVertical: 6,
     paddingHorizontal: 6,
     borderBottom: "1 solid #e5e7eb",
+    alignItems: "center",
   },
-
   cellDate: { width: "15%" },
-  cellRoute: { width: "45%" },
+  cellRoute: { width: "45%", flexDirection: "column", justifyContent: "center" },
   cellType: { width: "15%" },
-  cellAmount: {
-    width: "25%",
-    textAlign: "right",
-    fontWeight: "bold",
-  },
+  cellAmount: { width: "25%", textAlign: "right", fontWeight: "bold" },
+  routeText: { fontSize: 10 },
+  routeSeparator: { color: "#7c828c", fontWeight: "normal" },
 
-  routeConnector: {
-    color: "#6b7280",
-  },
-  routeSeparator: {
-    color: "#7c828c",
-    fontWeight: "normal",
-  },
+  
+plateWrapper: {
+  marginTop: 1,           
+  // paddingVertical: 1,   
+  paddingHorizontal: 3,   
+  backgroundColor: "#f3f4f6", 
+  alignSelf: "flex-start",  
+},
+plateText: {
+  fontSize: 7,               
+  fontWeight: "normal",
+  color: "#111827",          
+  textTransform: "uppercase",
+},
 
-  footer: {
-    position: "absolute",
-    bottom: 24,
-    left: 36,
-    right: 36,
-    paddingTop: 8,
-    borderTop: "1 solid #e5e7eb",
-    flexDirection: "row",
-    justifyContent: "flex-end",
-    fontSize: 10,
-  },
 
-  summarySection: {
-    marginTop: 12,
-    flexDirection: "row",
-    justifyContent: "flex-end",
-  },
+  summarySection: { marginTop: 12, flexDirection: "row", justifyContent: "flex-end" },
   totalBox: {
     width: "40%",
     borderTop: "1.5 solid #f97316",
@@ -129,27 +87,20 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#fff9f2",
   },
-
-  totalLabel: {
-    fontWeight: "bold",
+  totalLabel: { fontWeight: "bold", fontSize: 10, color: "#c2410c" },
+  totalValue: { fontWeight: "bold", fontSize: 11, color: "#111827" },
+  footer: {
+    position: "absolute",
+    bottom: 24,
+    left: 36,
+    right: 36,
+    paddingTop: 8,
+    borderTop: "1 solid #e5e7eb",
+    flexDirection: "row",
+    justifyContent: "flex-end",
     fontSize: 10,
-    color: "#c2410c",
   },
-
-  totalValue: {
-    fontWeight: "bold",
-    fontSize: 11,
-    color: "#111827",
-  },
-
-  total: {
-    fontWeight: "bold",
-    fontSize: 11,
-  },
-
-  sign: {
-    color: "#6b7280",
-  },
+  sign: { color: "#6b7280" },
 });
 
 interface Props {
@@ -168,14 +119,9 @@ export const MonthlyReportPDF = ({ trips, monthName, year }: Props) => {
         <View style={styles.header} fixed>
           <View style={styles.headerLeft}>
             <Text style={styles.title}>NARESH C BHANDARI</Text>
-            <Text style={styles.subtitle}>
-              Tempo Carrier & Transport Services
-            </Text>
-            <Text style={styles.address}>
-              Sarigam Fansa Char Rasta, Umbergaon, Gujarat
-            </Text>
+            <Text style={styles.subtitle}>Tempo Carrier & Transport Services</Text>
+            <Text style={styles.address}>Sarigam Fansa Char Rasta, Umbergaon, Gujarat</Text>
           </View>
-
           <Text style={styles.statementText}>
             Statement - {monthName} {year}
           </Text>
@@ -184,7 +130,7 @@ export const MonthlyReportPDF = ({ trips, monthName, year }: Props) => {
         {/* TABLE HEADER */}
         <View style={styles.tableHeader} fixed>
           <Text style={styles.cellDate}>Date</Text>
-          <Text style={styles.cellRoute}>Route</Text>
+          <Text style={styles.cellRoute}>Route / Vehicle</Text>
           <Text style={styles.cellType}>Type</Text>
           <Text style={styles.cellAmount}>Amount</Text>
         </View>
@@ -194,15 +140,23 @@ export const MonthlyReportPDF = ({ trips, monthName, year }: Props) => {
           <View key={i} style={styles.row} wrap={false}>
             <Text style={styles.cellDate}>{formatDate(trip.tripDate)}</Text>
 
-            <Text style={styles.cellRoute}>
-              {trip.startPoint}
-              <Text style={styles.routeSeparator}> to </Text>
-              {trip.endPoint}
-            </Text>
+            <View style={styles.cellRoute}>
+              <Text style={styles.routeText}>
+                {trip.startPoint}
+                <Text style={styles.routeSeparator}> to </Text>
+                {trip.endPoint}
+              </Text>
 
-            <Text style={styles.cellType}>
-              {trip.returnTrip ? "Return" : "One-Way"}
-            </Text>
+              {/* Number Plate */}
+              {trip.numberPlate && (
+  <View style={styles.plateWrapper}>
+    <Text style={styles.plateText}>{trip.numberPlate.toUpperCase()}</Text>
+  </View>
+)}
+
+            </View>
+
+            <Text style={styles.cellType}>{trip.returnTrip ? "Return" : "One-Way"}</Text>
 
             <Text style={styles.cellAmount}>
               ₹ {Number(trip.fare).toLocaleString("en-IN")}
@@ -210,12 +164,12 @@ export const MonthlyReportPDF = ({ trips, monthName, year }: Props) => {
           </View>
         ))}
 
+        {/* SUMMARY */}
         <View style={styles.summarySection} wrap={false}>
           <View style={styles.totalBox}>
             <Text style={styles.totalLabel}>Grand Total</Text>
             <Text style={styles.totalValue}>
-              ₹{" "}
-              {totalFare.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+              ₹ {totalFare.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
             </Text>
           </View>
         </View>

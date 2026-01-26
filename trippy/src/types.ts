@@ -6,6 +6,7 @@ export interface Trip {
   endPoint: string;
   returnTrip: boolean
   fare: number;
+  numberPlate: string | null;
   recent?: string
   createdAt: number;
   updatedAt: number;
@@ -17,6 +18,7 @@ export interface NewTripInput {
   startPoint: string;
   endPoint: string;
   returnTrip: boolean
+  numberPlate: string | null;
   fare: number;
 }
 

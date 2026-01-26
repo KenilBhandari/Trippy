@@ -1,6 +1,7 @@
 import type { TripInput } from "../types/trips.types";
 import Trip from "../models/trips.models";
 import type { Request, Response } from "express";
+import mongoose from "mongoose";
 
 export const createTrip = async (req: Request, res: Response) => {
   try {
@@ -8,12 +9,11 @@ export const createTrip = async (req: Request, res: Response) => {
 
     const trip = {
       ...input,
+      numberPlate: input.numberPlate ?? null,
       createdAt: Date.now(),
       updatedAt: Date.now(),
     };
-
     const newTrip = await Trip.create(trip);
-
     return res.status(201).json({
       status: "success",
       data: newTrip,
