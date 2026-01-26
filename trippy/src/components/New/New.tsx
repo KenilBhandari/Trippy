@@ -24,9 +24,6 @@ const NewTripTab = ({ onAddTrip }: NewTripTabProps) => {
   const { addingTrip, setAddingTrip, startLocations, endLocations } =
     useDataContext();
   const tripTimestamp = tripDate.setHours(0, 1, 0, 1);
-  console.log(tripTimestamp);
-  
-
   const isDisabledAddBtn =
     !startPoint.trim() ||
     !endPoint.trim() ||

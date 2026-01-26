@@ -35,7 +35,7 @@ const TripList = ({ trips }: TripListProps) => {
         <div className="space-y-3">
           {last10Trips.map((trip) => (
             <div
-              key={trip.id}
+              key={trip._id}
               className="border border-gray-200 rounded-xl p-4 flex justify-between items-center"
             >
               {/* Trip Info */}

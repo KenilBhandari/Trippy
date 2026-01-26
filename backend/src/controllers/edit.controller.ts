@@ -11,6 +11,7 @@ export const editTrip = async (req: Request, res: Response) => {
         endPoint: req.body.endPoint,
         fare: req.body.fare,
         tripDate: req.body.tripDate,
+        numberPlate: req.body.numberPlate,
         returnTrip: req.body.returnTrip,
         updatedAt: Date.now(),
       },
