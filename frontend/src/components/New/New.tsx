@@ -207,7 +207,7 @@ const NewTripTab = ({ onAddTrip }: NewTripTabProps) => {
               Trip Date
             </label>
             {/* Added h-full and flex to the wrapper to match the input height */}
-            <div className="flex items-center justify-between gap-2 sm:gap-3 p-1.5 bg-gray-100/50 rounded-2xl w-fit h-full border border-gray-100 min-h-[46px] sm:min-h-[54px]">
+            <div className="flex items-center p-1.5 bg-gray-100/50 rounded-2xl w-fit h-full border border-gray-100 min-h-[46px] sm:min-h-[54px]">
               <DatePicker
                 selected={tripDate}
                 onChange={(date: Date | null) => {
@@ -215,8 +215,10 @@ const NewTripTab = ({ onAddTrip }: NewTripTabProps) => {
                 }}
                 maxDate={new Date()}
                 popperPlacement="bottom-start"
+                // wrapperClassName allows the datepicker container to fill the parent
+                wrapperClassName="w-full"
                 customInput={
-                  <button className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-white shadow-sm rounded-2xl text-xs sm:text-sm text-gray-800 font-semibold hover:bg-gray-50 transition-all active:scale-95">
+                  <button className="flex items-center justify-center gap-3 px-6 sm:px-10 py-2 bg-white shadow-sm rounded-2xl text-[13px] sm:text-base text-gray-800 font-semibold hover:bg-gray-50 transition-all active:scale-95 min-w-[140px] sm:min-w-[180px]">
                     <span className="text-blue-500 text-base sm:text-lg">
                       ●
                     </span>
@@ -228,20 +230,13 @@ const NewTripTab = ({ onAddTrip }: NewTripTabProps) => {
                   </button>
                 }
               />
-              <button
-                type="button"
-                onClick={() => setTripDate(new Date())}
-                className="pr-2 sm:pr-4 pl-1 sm:pl-2 py-2 text-xs sm:text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors whitespace-nowrap"
-              >
-                Today
-              </button>
             </div>
           </div>
 
           {/* Number Plate Section */}
           <div className="flex flex-col space-y-1.5 h-full">
             <label className="ml-1 text-xs sm:text-sm font-medium text-gray-400">
-              Vehicle Number 
+              Vehicle Number
             </label>
             <div className="relative h-full flex items-center">
               <Truck

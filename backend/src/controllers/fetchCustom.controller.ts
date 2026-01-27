@@ -1,9 +1,11 @@
 import type { Request, Response } from "express";
 import type { TripFilter } from "../types/trips.types";
-import Trip from "../models/trips.models"
+import Trip from "../models/trips.models.js"
+import connectDB from "../db/config.js";
 
 export const fetchCustomTrips = async (req: Request, res: Response) => {
   try {
+    connectDB()
     const filter: TripFilter = req.body;
     
     const { limit, sort, dateFrom, dateTo, searchString, recent } = filter;

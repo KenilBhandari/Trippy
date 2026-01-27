@@ -208,43 +208,34 @@ const EditModal = ({ onUpdate }: EditModalProps) => {
               <label className="ml-1 text-xs sm:text-sm font-medium text-gray-400">
                 Trip Date
               </label>
-              <div className="flex items-center justify-between gap-2 p-1.5 bg-gray-100/50 rounded-2xl h-full border border-gray-100 min-h-[46px] sm:min-h-[54px] w-full">
-                <div className="flex-1 min-w-0">
-                  <DatePicker
-                    selected={new Date(activeTrip.tripDate)}
-                    onChange={(date: Date | null) => {
-                      if (date) handleChange("tripDate", date.getTime());
-                    }}
-                    maxDate={new Date()}
-                    popperPlacement="bottom-start"
-                    wrapperClassName="w-full"
-                    customInput={
-                      <button className="flex items-center gap-2 w-full px-3 py-2 bg-white shadow-sm rounded-2xl text-xs sm:text-sm text-gray-800 font-semibold hover:bg-gray-50 transition-all active:scale-95 whitespace-nowrap overflow-hidden">
-                        <span className="text-blue-500 text-base sm:text-lg flex-shrink-0">
-                          ●
-                        </span>
-                        <span className="truncate">
-                          {new Date(activeTrip.tripDate).toLocaleDateString(
-                            "en-GB",
-                            {
-                              day: "2-digit",
-                              month: "short",
-                              year: "2-digit",
-                            },
-                          )}
-                        </span>
-                      </button>
-                    }
-                  />
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => handleChange("tripDate", Date.now())}
-                  className="pr-2 md:pr-4 pl-1 sm:pl-2 py-2 text-xs sm:text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors whitespace-nowrap flex-shrink-0"
-                >
-                  Today
-                </button>
+              <div className="flex items-center p-1.5 bg-gray-100/50 rounded-2xl h-full border border-gray-100 min-h-[46px] sm:min-h-[54px] w-full">
+                <DatePicker
+                  selected={new Date(activeTrip.tripDate)}
+                  onChange={(date: Date | null) => {
+                    if (date) handleChange("tripDate", date.getTime());
+                  }}
+                  maxDate={new Date()}
+                  popperPlacement="bottom-start"
+                  // Ensures the datepicker library container spans the full width
+                  wrapperClassName="w-full"
+                  customInput={
+                    <button className="flex items-center justify-center gap-2 w-full h-full px-4 py-2 bg-white shadow-sm rounded-2xl text-[13px] sm:text-base text-gray-800 font-semibold hover:bg-gray-50 transition-all active:scale-95">
+                      <span className="text-blue-500 text-base sm:text-lg flex-shrink-0">
+                        ●
+                      </span>
+                      <span className="truncate">
+                        {new Date(activeTrip.tripDate).toLocaleDateString(
+                          "en-GB",
+                          {
+                            day: "2-digit",
+                            month: "short",
+                            year: "2-digit",
+                          },
+                        )}
+                      </span>
+                    </button>
+                  }
+                />
               </div>
             </div>
 

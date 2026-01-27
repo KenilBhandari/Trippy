@@ -1,8 +1,10 @@
 import type { Request, Response } from "express";
-import Trip from "../models/trips.models"
+import Trip from "../models/trips.models.js"
+import connectDB from "../db/config.js";
 
 export const editTrip = async (req: Request, res: Response) => {
   try {
+    await connectDB()
     const { _id } = req.params;
     const updatedTrip = await Trip.findByIdAndUpdate(
       _id,

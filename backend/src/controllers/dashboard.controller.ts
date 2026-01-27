@@ -1,9 +1,12 @@
 import type { Request, Response } from "express";
-import Trip from "../models/trips.models";
-import { getWeekTimestamp } from "../utils/dashboard.utils";
+import Trip from "../models/trips.models.js";
+import { getWeekTimestamp } from "../utils/dashboard.utils.js";
+import connectDB from "../db/config.js";
 
 export const getDashboardStats = async (req: Request, res: Response) => {
   try {
+    await connectDB()
+    console.log("ENV CHECK:", !!process.env.MONGO_URI,process.env.MONGO_URI);
     const now = new Date();
 
     const startOfMonth = new Date(`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-01T00:00:00+05:30`).getTime();

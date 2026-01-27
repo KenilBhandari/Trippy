@@ -1,0 +1,11 @@
+{
+  "functions": {
+    "backend/src/**/*.ts": {
+      "runtime": "vercel-nodejs@18"
+    }
+  },
+  "rewrites": [
+    { "source": "/api/:match*", "destination": "/backend/src/:match*" },
+    { "source": "/(.*)", "destination": "/frontend/$1" }
+  ]
+}

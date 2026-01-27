@@ -1,9 +1,9 @@
 import { Router } from "express";
-import { createTrip } from "../controllers/create.controller";
-import { fetchCustomTrips } from "../controllers/fetchCustom.controller";
-import { editTrip } from "../controllers/edit.controller";
-import { deleteTripByID } from "../controllers/delete.controller";
-import { getDashboardStats } from "../controllers/dashboard.controller";
+import { createTrip } from "../controllers/create.controller.js";
+import { fetchCustomTrips } from "../controllers/fetchCustom.controller.js";
+import { editTrip } from "../controllers/edit.controller.js";
+import { deleteTripByID } from "../controllers/delete.controller.js";
+import { getDashboardStats } from "../controllers/dashboard.controller.js";
 
 
 

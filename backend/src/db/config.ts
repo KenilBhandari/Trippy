@@ -1,20 +1,41 @@
-import mongoose from "mongoose";
-import dotenv from "dotenv";
+import mongoose, { Mongoose } from "mongoose";
 
-dotenv.config();
+const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/traveller";
 
-if (!process.env.MONGO_URI) {
-  throw new Error("MONGO_URI environment variable is not set");
+
+if (!MONGO_URI) {
+  throw new Error("MONGO_URI not defined");
 }
 
-const connectDB = async (): Promise<void> => {
-  try {
-    await mongoose.connect(process.env.MONGO_URI as string);
-    console.log("MongoDB Connected");
-  } catch (error) {
-    console.error("MongoDB connection error:", error);
-    process.exit(1);
-  }
+type MongooseCache = {
+  conn: Mongoose | null;
+  promise: Promise<Mongoose> | null;
 };
 
-export default connectDB;
+const globalWithMongoose = global as typeof globalThis & {
+  _mongooseCache?: MongooseCache;
+};
+
+function getCache(): MongooseCache {
+  if (!globalWithMongoose._mongooseCache) {
+    globalWithMongoose._mongooseCache = {
+      conn: null,
+      promise: null,
+    };
+  }
+  return globalWithMongoose._mongooseCache;
+}
+
+export default async function connectDB(): Promise<Mongoose> {
+  const cache = getCache();
+
+  if (cache.conn) return cache.conn;
+  console.log("ENV CHECK:", !!process.env.MONGO_URI, MONGO_URI);
+
+  if (!cache.promise) {
+    cache.promise = mongoose.connect(MONGO_URI);
+  }
+
+  cache.conn = await cache.promise;
+  return cache.conn;
+}
