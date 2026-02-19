@@ -4,20 +4,21 @@ import { fetchCustomTrips } from "../controllers/fetchCustom.controller.js";
 import { editTrip } from "../controllers/edit.controller.js";
 import { deleteTripByID } from "../controllers/delete.controller.js";
 import { getDashboardStats } from "../controllers/dashboard.controller.js";
+import {authMiddleware} from "../auth.middleware.js"
 
 
 
 const router = Router();
 
-router.post("/add", createTrip);
+router.post("/add", authMiddleware, createTrip);
 
-router.post("/fetchCustom", fetchCustomTrips);
+router.post("/fetchCustom",authMiddleware, fetchCustomTrips);
 
-router.put("/edit/:_id", editTrip);
+router.put("/edit/:_id", authMiddleware, editTrip);
 
-router.delete("/delete/:_id", deleteTripByID);
+router.delete("/delete/:_id", authMiddleware, deleteTripByID);
 
-router.get("/dashboard", getDashboardStats);
+router.get("/dashboard", authMiddleware, getDashboardStats);
 
 router.get("/hello", (req,res) => {
   res.send("hello");

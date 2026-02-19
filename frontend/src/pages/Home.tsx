@@ -67,6 +67,9 @@ const Start = () => {
     fetchFreshTrips();
   }, []);
 
+   const user = localStorage.getItem("userId");
+// console.log(user);
+
   return (
     <>
       <div className="min-h-screen bg-gray-100 from-slate-50 via-blue-50 to-indigo-100">
@@ -83,8 +86,11 @@ const Start = () => {
                     <div className="flex flex-col">
                       <h1 className="text-xl md:text-2xl font-[1000] tracking-tighter text-gray-900 uppercase leading-none">
                         
-                        <span className="text-blue-600 ml-1 not-italic relative tracking-widest">
-                          Trippy
+                        <span onClick={() => {
+                          localStorage.removeItem("userId")
+                          localStorage.removeItem("token")
+                        }} className="text-blue-600 ml-1 not-italic relative tracking-widest">
+                          Trippy {user}
                         </span>
                       </h1>
                     </div>

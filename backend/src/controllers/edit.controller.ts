@@ -1,13 +1,15 @@
-import type { Request, Response } from "express";
+import type { Response } from "express";
 import Trip from "../models/trips.models.js"
 import connectDB from "../db/config.js";
+import type { AuthRequest } from "../auth.middleware.js";
 
-export const editTrip = async (req: Request, res: Response) => {
+export const editTrip = async (req: AuthRequest, res: Response) => {
   try {
     await connectDB()
-    const { _id } = req.params;
-    const updatedTrip = await Trip.findByIdAndUpdate(
-      _id,
+    const { _id: tripId } = req.params;
+    
+    const updatedTrip = await Trip.findOneAndUpdate(
+      {_id: tripId, user: req.user!.id},
       {
         startPoint: req.body.startPoint,
         endPoint: req.body.endPoint,
@@ -15,14 +17,13 @@ export const editTrip = async (req: Request, res: Response) => {
         tripDate: req.body.tripDate,
         numberPlate: req.body.numberPlate,
         returnTrip: req.body.returnTrip,
-        updatedAt: Date.now(),
       },
       {
         new: true,
         runValidators: true,
       },
     );
-
+    
     if (!updatedTrip) {
       return res.status(404).json({
         status: "error",

@@ -1,31 +1,38 @@
-import type { Request, Response } from "express";
+import type { Response } from "express";
+import mongoose from "mongoose";
 import Trip from "../models/trips.models.js";
 import { getWeekTimestamp } from "../utils/dashboard.utils.js";
 import connectDB from "../db/config.js";
+import type { AuthRequest } from "../auth.middleware.js";
 
-export const getDashboardStats = async (req: Request, res: Response) => {
+export const getDashboardStats = async (req: AuthRequest, res: Response) => {
   try {
-    await connectDB()
-    console.log("ENV CHECK:", !!process.env.MONGO_URI,process.env.MONGO_URI);
+    await connectDB();
+    console.log("ENV CHECK:", !!process.env.MONGO_URI, process.env.MONGO_URI);
     const now = new Date();
 
-    const startOfMonth = new Date(`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-01T00:00:00+05:30`).getTime();
-    const endOfMonth = new Date(`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate()}T23:59:59+05:30`).getTime();
-
+    const startOfMonth = new Date(
+      `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-01T00:00:00+05:30`,
+    ).getTime();
+    const endOfMonth = new Date(
+      `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate()}T23:59:59+05:30`,
+    ).getTime();
 
     const { startTimeStamp, endTimeStamp } = getWeekTimestamp();
 
-    const startOfYear =
-      new Date(Date.UTC(now.getFullYear(), 0, 1, 0, 0, 0)).getTime() +
-      5.5 * 60 * 60 * 1000; 
+    const today = new Date();
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(today.getDate() - 7);
 
-    const endOfYear =
-      new Date(Date.UTC(now.getFullYear(), 11, 31, 23, 59, 59, 999)).getTime() +
-      5.5 * 60 * 60 * 1000;
-
+    const userId = req.user!.id;
 
     const monthStatsAgg = await Trip.aggregate([
-      { $match: { tripDate: { $gte: startOfMonth, $lte: endOfMonth } } },
+      {
+        $match: {
+          user: new mongoose.Types.ObjectId(userId),
+          tripDate: { $gte: startOfMonth, $lte: endOfMonth },
+        },
+      },
       {
         $group: {
           _id: null,
@@ -38,6 +45,15 @@ export const getDashboardStats = async (req: Request, res: Response) => {
 
     const last7Days = await Trip.aggregate([
       {
+        $match: {
+          user: new mongoose.Types.ObjectId(req.user!.id),
+          tripDate: {
+            $gte: sevenDaysAgo.getTime(),
+            $lte: today.getTime(),
+          },
+        },
+      },
+      {
         $group: {
           _id: {
             $dateToString: {
@@ -48,17 +64,15 @@ export const getDashboardStats = async (req: Request, res: Response) => {
           },
           totalRevenue: { $sum: "$fare" },
           totalTrips: { $sum: 1 },
-          lastTripDate: { $max: "$tripDate" },
         },
       },
-      { $sort: { lastTripDate: -1 } },
-      { $limit: 7 },
       { $sort: { _id: 1 } },
     ]);
 
     const thisWeek = await Trip.aggregate([
       {
         $match: {
+          user: new mongoose.Types.ObjectId(req.user!.id),
           tripDate: {
             $gte: startTimeStamp,
             $lte: endTimeStamp,
@@ -73,37 +87,41 @@ export const getDashboardStats = async (req: Request, res: Response) => {
       },
     ]);
 
-const monthlyRaw = await Trip.aggregate([
-  {
-    $match: {
-      $expr: {
-        $and: [
-          { $gte: [
-              { $toDate: "$tripDate" },
-              new Date(`${now.getFullYear()}-01-01T00:00:00+05:30`)
-          ] },
-          { $lte: [
-              { $toDate: "$tripDate" },
-              new Date(`${now.getFullYear()}-12-31T23:59:59+05:30`)
-          ] },
-        ],
-      },
-    },
-  },
-  {
-    $group: {
-      _id: {
-        $month: {
-          date: { $toDate: "$tripDate" },
-          timezone: "Asia/Kolkata",
+    const monthlyRaw = await Trip.aggregate([
+      {
+        $match: {
+          user: new mongoose.Types.ObjectId(req.user!.id),
+          $expr: {
+            $and: [
+              {
+                $gte: [
+                  { $toDate: "$tripDate" },
+                  new Date(`${now.getFullYear()}-01-01T00:00:00+05:30`),
+                ],
+              },
+              {
+                $lte: [
+                  { $toDate: "$tripDate" },
+                  new Date(`${now.getFullYear()}-12-31T23:59:59+05:30`),
+                ],
+              },
+            ],
+          },
         },
       },
-      totalRevenue: { $sum: "$fare" },
-    },
-  },
-  { $sort: { _id: 1 } },
-]);
-
+      {
+        $group: {
+          _id: {
+            $month: {
+              date: { $toDate: "$tripDate" },
+              timezone: "Asia/Kolkata",
+            },
+          },
+          totalRevenue: { $sum: "$fare" },
+        },
+      },
+      { $sort: { _id: 1 } },
+    ]);
 
     const monthStats = monthStatsAgg[0] || {
       totalRevenue: 0,

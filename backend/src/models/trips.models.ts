@@ -1,16 +1,22 @@
 import mongoose from "mongoose";
 
-
 const TripSchema = new mongoose.Schema(
   {
+   
     startPoint: { type: String, required: true },
     endPoint: { type: String, required: true },
     fare: { type: Number, required: true },
     tripDate: { type: Number, required: true },
     numberPlate: { type: String, default: null },
     returnTrip: { type: Boolean, default: false },
+     user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
   },
-  { timestamps: true }
+
+  { timestamps: true },
 );
 
 export default mongoose.model("Trip", TripSchema);

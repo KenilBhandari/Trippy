@@ -1,20 +1,21 @@
 import type { TripInput } from "../types/trips.types";
 import Trip from "../models/trips.models.js";
-import type { Request, Response } from "express";
+import type { Response } from "express";
 import connectDB from "../db/config.js";
+import type { AuthRequest } from "../auth.middleware";
 
-export const createTrip = async (req: Request, res: Response) => {
+
+   
+export const createTrip = async (req: AuthRequest, res: Response) => {
   try {
     await connectDB();
-    const input: TripInput = req.body;
+    const { trip } = req.body;
 
-    const trip = {
-      ...input,
-      numberPlate: input.numberPlate ?? null,
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
-    };
-    const newTrip = await Trip.create(trip);
+    const newTrip = await Trip.create({
+      ...trip,
+      user: req.user!.id,
+    });
+    
     return res.status(201).json({
       status: "success",
       data: newTrip,
