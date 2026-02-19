@@ -4,7 +4,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import type { CurrentReport, DashboardData, Trip } from "../types";
+import type { CurrentReport, DashboardData, Trip, User } from "../types";
 
 type TripContextType = {
   
@@ -17,6 +17,10 @@ type TripContextType = {
   
   activeTrip: Trip | null;
   setActiveTrip: React.Dispatch<React.SetStateAction<Trip | null>>;
+
+  user: User | null;
+  setUser: React.Dispatch<React.SetStateAction<User | null>>
+
   
   deletingTrip: Trip | null;
   setDeletingTrip: React.Dispatch<React.SetStateAction<Trip | null>>;
@@ -109,6 +113,7 @@ export function TripProvider({ children }: { children: ReactNode }) {
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
   const [dashboardNeedsRefresh, setDashboardNeedsRefresh] = useState(false);
 
+  const [user, setUser] = useState<User| null>(null);
 
   const [currentMonthlyReport, setCurrentMonthlyReport] = useState <CurrentReport>()
 
@@ -152,7 +157,9 @@ export function TripProvider({ children }: { children: ReactNode }) {
         dashboardNeedsRefresh,
         setDashboardNeedsRefresh,
         currentMonthlyReport,
-        setCurrentMonthlyReport
+        setCurrentMonthlyReport,
+        user,
+        setUser,
       }}
     >
       {children}

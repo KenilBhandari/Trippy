@@ -1,3 +1,11 @@
+export interface User {
+  email: string;
+  id: string;
+  name: string;
+  picture: string
+}
+
+
 // Trip basic structure
 export interface Trip {
   _id: string;

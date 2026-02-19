@@ -1,5 +1,5 @@
-import { useEffect, useMemo } from "react";
-import type { NewTripInput, TripFilter } from "../types";
+import { useEffect, useMemo, useState } from "react";
+import type { NewTripInput, TripFilter, User } from "../types";
 import { FileText, Home, Layers, Plus } from "lucide-react";
 import NewTrip from "../components/New/New";
 import Latest from "../components/Latest/Latest";
@@ -16,6 +16,8 @@ const Start = () => {
     setLast10Trips,
     setRecent25Trips,
     setDashboardNeedsRefresh,
+    user,
+    setUser
   } = useDataContext();
 
   const homeTabs = useMemo(
@@ -63,39 +65,118 @@ const Start = () => {
     if (recent25List.status === "success") setRecent25Trips(recent25List.data);
   };
 
+  // const [user, setUser] = useState<User | null>(null)
+
   useEffect(() => {
     fetchFreshTrips();
+
+    const storedUser = localStorage.getItem("user");
+
+    if (storedUser) {
+      try {
+        const parsedUser: User = JSON.parse(storedUser);
+        setUser(parsedUser);
+      } catch (err) {
+        console.error("Invalid user in localStorage");
+        setUser(null);
+      }
+    }
   }, []);
 
-   const user = localStorage.getItem("userId");
-// console.log(user);
+const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+
 
   return (
     <>
       <div className="min-h-screen bg-gray-100 from-slate-50 via-blue-50 to-indigo-100">
         {/* Header */}
-        <div className="top-0 z-50 bg-white/90 backdrop-blur-xl border-b border-gray-200">
+        <div className="relative z-50 bg-white/90 backdrop-blur-xl border-b border-gray-200">
           <div className="max-w-7xl mx-auto px-4 md:px-8">
             <div className="flex items-center justify-between h-14 md:h-20">
               {/* Brand */}
               <div className="flex items-center gap-3">
-                {/* Brand Text */}
                 <div>
                   <div className="flex items-center gap-3 group cursor-pointer">
-                    {/* The Brand Text */}
                     <div className="flex flex-col">
                       <h1 className="text-xl md:text-2xl font-[1000] tracking-tighter text-gray-900 uppercase leading-none">
-                        
-                        <span onClick={() => {
-                          localStorage.removeItem("userId")
-                          localStorage.removeItem("token")
-                        }} className="text-blue-600 ml-1 not-italic relative tracking-widest">
-                          Trippy {user}
+                        <span className="text-blue-600 ml-1 not-italic relative tracking-widest">
+                          Trippy
                         </span>
                       </h1>
                     </div>
                   </div>
                 </div>
+              </div>
+
+              {/* --- Profile Picture Button Section --- */}
+              <div className="relative flex items-center gap-3">
+                {/* Welcome Text */}
+                <div className="hidden sm:flex flex-col items-end leading-tight">
+                  <span className="text-xs text-gray-400">Welcome back,</span>
+                  <span className="text-sm font-medium text-gray-900">
+                    {user?.name || "Guest"}
+                  </span>
+                </div>
+
+                {/* Avatar */}
+                <button
+                  onClick={() => setIsMenuOpen(!isMenuOpen)}
+                  className="h-10 w-10 rounded-full overflow-hidden border border-gray-200 hover:border-gray-300 transition"
+                >
+                  <img
+                    src={user?.picture || "/Trippy_logo.png"}
+                    alt="Profile"
+                    className="h-full w-full object-cover"
+                  />
+                </button>
+
+                {/* Dropdown */}
+                {isMenuOpen && (
+                  <div
+                    className="
+                    absolute right-0 top-12 w-60 md:w-72 
+                    bg-white
+                    rounded-2xl
+                    border border-gray-100
+                    shadow-[0_12px_40px_rgba(0,0,0,0.08)]
+                    p-2
+                    z-[1000]
+                      "
+                  >
+                    {/* User Info Section */}
+                    <div className="px-4 py-4">
+                      <p className="text-sm font-semibold text-gray-900">
+                        {user?.name || "Guest"}
+                      </p>
+                      <p className="text-xs text-gray-500 mt-1 truncate">
+                        {user?.email || "no-email@trippy.com"}
+                      </p>
+                    </div>
+
+                    <div className="h-px bg-gray-100 my-1" />
+
+                    {/* Actions */}
+                    <div className="p-1">
+                      <button
+                        onClick={() => {
+                          localStorage.removeItem("user");
+                          localStorage.removeItem("token");
+                          window.location.reload();
+                        }}
+                        className="
+                          w-full text-left px-4 py-2.5
+                          text-sm font-medium text-red-500
+                          hover:bg-red-50
+                          rounded-xl
+                          transition
+                        "
+                      >
+                        Logout
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
