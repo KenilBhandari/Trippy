@@ -14,7 +14,10 @@ function App() {
          <Route path="/" element={<Landing />} />
       </Route>
 
-      <Route element={<ProtectedRoute />}>
+
+      //UNCOMMENT THIS VERY VERY IMPORTANT
+      {/* <Route element={<ProtectedRoute />}> */}
+      <Route>
         <Route
           path="/home"
           element={

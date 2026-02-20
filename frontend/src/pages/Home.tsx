@@ -90,159 +90,124 @@ const [isMenuOpen, setIsMenuOpen] = useState(false);
   return (
     <>
       <div className="min-h-screen bg-gray-100 from-slate-50 via-blue-50 to-indigo-100">
-        {/* Header */}
-        <div className="relative z-50 bg-white/90 backdrop-blur-xl border-b border-gray-200">
-          <div className="max-w-7xl mx-auto px-4 md:px-8">
-            <div className="flex items-center justify-between h-14 md:h-20">
-              {/* Brand */}
-              <div className="flex items-center gap-3">
-                <div>
-                  <div className="flex items-center gap-3 group cursor-pointer">
-                    <div className="flex flex-col">
-                      <h1 className="text-xl md:text-2xl font-[1000] tracking-tighter text-gray-900 uppercase leading-none">
-                        <span className="text-blue-600 ml-1 not-italic relative tracking-widest">
-                          Trippy
-                        </span>
-                      </h1>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* --- Profile Picture Button Section --- */}
-              <div className="relative flex items-center gap-3">
-                {/* Welcome Text */}
-                <div className="hidden sm:flex flex-col items-end leading-tight">
-                  <span className="text-xs text-gray-400">Welcome back,</span>
-                  <span className="text-sm font-medium text-gray-900">
-                    {user?.name || "Guest"}
-                  </span>
+        {/* --- THE RELIABLE ENTERPRISE HEADER --- */}
+        <header className="w-full bg-white border-b border-slate-200 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)]">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex justify-between items-center h-14 md:h-16 ">
+              {/* Left: Brand and Integrated Navigation */}
+              <div className="flex items-center gap-10">
+                {/* Brand: Grounded and Professional */}
+                <div className="flex items-center gap-2.5 shrink-0 group cursor-pointer">
+                  <h1 className="text-xl md:text-2xl font-[1000] tracking-tighter text-gray-900 uppercase leading-none">
+                    <span className="text-blue-600 ml-1 not-italic relative tracking-widest">
+                      Trippy
+                    </span>
+                  </h1>
                 </div>
 
-                {/* Avatar */}
-                <button
-                  onClick={() => setIsMenuOpen(!isMenuOpen)}
-                  className="h-10 w-10 rounded-full overflow-hidden border border-gray-200 hover:border-gray-300 transition"
-                >
-                  <img
-                    src={user?.picture || "/Trippy_logo.png"}
-                    alt="Profile"
-                    className="h-full w-full object-cover"
-                  />
-                </button>
-
-                {/* Dropdown */}
-                {isMenuOpen && (
-                  <div
-                    className="
-                    absolute right-0 top-12 w-60 md:w-72 
-                    bg-white
-                    rounded-2xl
-                    border border-gray-100
-                    shadow-[0_12px_40px_rgba(0,0,0,0.08)]
-                    p-2
-                    z-[1000]
-                      "
-                  >
-                    {/* User Info Section */}
-                    <div className="px-4 py-4">
-                      <p className="text-sm font-semibold text-gray-900">
-                        {user?.name || "Guest"}
-                      </p>
-                      <p className="text-xs text-gray-500 mt-1 truncate">
-                        {user?.email || "no-email@trippy.com"}
-                      </p>
-                    </div>
-
-                    <div className="h-px bg-gray-100 my-1" />
-
-                    {/* Actions */}
-                    <div className="p-1">
+                {/* Desktop Navigation: "The Workhorse" Style */}
+                <nav className="hidden md:flex items-center h-16">
+                  {homeTabs.map((tab) => {
+                    const Icon = tab.icon;
+                    const isActive = activeTab === tab.id;
+                    return (
                       <button
-                        onClick={() => {
-                          localStorage.removeItem("user");
-                          localStorage.removeItem("token");
-                          window.location.reload();
-                        }}
-                        className="
-                          w-full text-left px-4 py-2.5
-                          text-sm font-medium text-red-500
-                          hover:bg-red-50
-                          rounded-xl
-                          transition
-                        "
+                        key={tab.id}
+                        onClick={() => setActiveTab(tab.id)}
+                        className={`
+                  h-full px-5 flex items-center gap-2.5 text-sm font-medium transition-all relative
+                  ${
+                    isActive
+                      ? "text-blue-600 bg-blue-50/30"
+                      : "text-slate-500 hover:text-slate-900 hover:bg-slate-50"
+                  }
+                `}
                       >
-                        Logout
+                        <Icon size={18} strokeWidth={isActive ? 2.25 : 2} />
+                        {tab.label}
+
+                        {/* Fixed Underline Indicator - No Floating, Just Structure */}
+                        {isActive && (
+                          <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600" />
+                        )}
                       </button>
-                    </div>
-                  </div>
-                )}
+                    );
+                  })}
+                </nav>
               </div>
-            </div>
-          </div>
-        </div>
 
-        {/* Nav Bar */}
-        <div className="bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0 z-40">
-          <div className="max-w-7xl mx-auto px-4 md:px-6">
-            <div className="flex items-center justify-between">
-              <div className="flex w-full justify-between md:justify-start md:gap-2">
-                {homeTabs.map((tab) => {
-                  const Icon = tab.icon;
-                  const isActive = activeTab === tab.id;
-
-                  return (
-                    <button
-                      key={tab.id}
-                      onClick={() => setActiveTab(tab.id)}
-                      className={`
-                flex flex-col md:flex-row items-center justify-center gap-1.5 md:gap-3 
-                px-4 md:px-6 py-3 md:py-5 transition-all duration-500 relative shrink-0 group
-                ${isActive ? "text-blue-600" : "text-gray-500 hover:text-gray-600"}
-              `}
-                    >
-                      {/* The "Smooth" Highlight Pill */}
-                      <div
-                        className={`
-                absolute inset-y-2 inset-x-1 md:inset-y-3 md:inset-x-2 rounded-2xl transition-all duration-100
-                ${isActive ? "bg-blue-50/60 opacity-100 scale-100" : "bg-transparent opacity-0 scale-95"}
-              `}
+              {/* Right: Functional Actions */}
+              <div className="flex items-center gap-4">
+                {/* User Account Section */}
+                <div className="relative">
+                  <button
+                    onClick={() => setIsMenuOpen(!isMenuOpen)}
+                    className="flex items-center gap-3 pl-2.5 pr-1 py-1 rounded-full border border-slate-200 hover:bg-slate-50 transition-colors"
+                  >
+                    <div className="text-right ">
+                      <p className="text-xs font-bold text-slate-900 leading-none max-w-[120px] truncate whitespace-nowrap">
+                        Hi, {user?.name?.split(" ")[0] || "Guest"}!
+                      </p>
+                    </div>
+                    <div className="h-8 w-8 rounded-full bg-slate-100 border border-slate-200 overflow-hidden ring-2 ring-white">
+                      <img
+                        src={user?.picture || "/Trippy_logo.png"}
+                        alt="Profile"
+                        className="h-full w-full object-cover"
                       />
+                    </div>
+                  </button>
 
-                      {/* Icon - with a slight "jump" on active */}
-                      <div
-                        className={`
-                relative z-10 transition-all duration-100
-                ${isActive ? "-translate-y-0.5" : "group-hover:-translate-y-0.5"}
-              `}
-                      >
-                        <Icon size={20} strokeWidth={isActive ? 2.5 : 2} />
+                  {/* Standard Dropdown: Clean and Precise */}
+                  {isMenuOpen && (
+                    <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg border border-slate-200 shadow-xl z-[100] py-1 divide-y divide-slate-100 animate-in fade-in zoom-in-95 duration-100">
+                      <div className="px-4 py-3">
+                        <p className="text-xs text-slate-500 font-medium">
+                          Signed in as
+                        </p>
+                        <p className="text-sm font-bold text-slate-900 truncate">
+                          {user?.email || "user@example.com"}
+                        </p>
                       </div>
 
-                      {/* Label - Minimalist typography */}
-                      <span
-                        className={`
-                relative z-10 text-[10px] md:text-sm font-semibold tracking-wide transition-all duration-100
-                ${isActive ? "opacity-100" : "opacity-60"}
-              `}
-                      >
-                        {tab.label}
-                      </span>
-
-                      {/* Extraordinary Detail: The "Floating Dot" */}
-                      <div
-                        className={`
-                absolute bottom-1 md:bottom-2 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-blue-600 transition-all duration-100
-                ${isActive ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-0 translate-y-2"}
-              `}
-                      />
-                    </button>
-                  );
-                })}
+                      <div className="py-1">
+                        <button
+                          onClick={() => {
+                            localStorage.clear();
+                            window.location.reload();
+                          }}
+                          className="w-full text-left px-4 py-2 text-sm font-bold text-red-600 hover:bg-red-50 transition-colors"
+                        >
+                          Logout
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
-        </div>
+
+          {/* Mobile Navigation Dock */}
+          <div className="md:hidden border-t border-slate-100 flex justify-around items-center h-14 bg-white px-2">
+            {homeTabs.map((tab) => {
+              const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex flex-col items-center justify-center w-full h-full gap-0.5 ${isActive ? "text-blue-600" : "text-slate-400"}`}
+                >
+                  <Icon size={20} />
+                  <span className="text-[10px] font-bold tracking-tight">
+                    {tab.label}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </header>
 
         <div className="max-w-7xl mx-auto px-4 py-3 md:px-6 md:py-8">
           {activeTab === "dashboard" && <Dashboard />}
