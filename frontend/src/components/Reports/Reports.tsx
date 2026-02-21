@@ -22,7 +22,10 @@ const ReportsTab = () => {
   } = useDataContext();
 
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
-  const [activeMonth, setActiveMonth] = useState<{name: string; index: number;} | null>(null);
+  const [activeMonth, setActiveMonth] = useState<{
+    name: string;
+    index: number;
+  } | null>(null);
   const [viewReport, setViewReport] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
 
@@ -49,7 +52,6 @@ const ReportsTab = () => {
     );
   }, [currentMonthlyReport, activeMonth, selectedYear]);
 
-  
   const loadReportData = async () => {
     if (!activeMonth) return false;
     if (isDataValid) return true;
@@ -135,133 +137,153 @@ const ReportsTab = () => {
           />
         </div>
       ) : (
-        <div className="max-w-md mx-auto px-2">
-          {/* Year Header */}
-          <div className="flex items-center justify-between mb-8 mt-2">
-            <div className="flex flex-col">
-              <h2 className="text-2xl font-black text-gray-900 tracking-tight">
-                Reports
-              </h2>
-              <div className="h-1 w-6 bg-blue-500 rounded-full mt-1" />
-            </div>
-
-            <div className="flex items-center gap-1 bg-white p-1 rounded-2xl border border-gray-200 shadow-sm">
-              <button
-                onClick={() => setSelectedYear((v) => Math.max(2026, v - 1))}
-                disabled={selectedYear <= 2026}
-                className={`p-2 rounded-xl transition-all active:scale-90 ${
-                  selectedYear <= 2026
-                    ? "text-gray-300 cursor-not-allowed"
-                    : "text-gray-600 hover:bg-gray-50 active:bg-gray-100"
-                }`}
-              >
-                <ChevronLeft size={18} strokeWidth={2.5} />
-              </button>
-
-              <div className="flex flex-col items-center px-2 min-w-[56px]">
-                <span className="text-[10px] font-black text-blue-500 uppercase leading-none mb-0.5">
-                  Year
-                </span>
-                <span className="font-bold text-sm tabular-nums text-gray-900 leading-none">
-                  {selectedYear}
-                </span>
+        <div className="max-w-md mx-auto ">
+          <div className="bg-white border border-slate-300 rounded-lg overflow-hidden shadow-sm">
+            {/* Header */}
+            <div className="px-5 py-3.5 bg-slate-100 border-b border-slate-300 flex items-center justify-between">
+              <div>
+                <h2 className="text-xs font-bold tracking-widest text-slate-500 uppercase">
+                  Reports
+                </h2>
+                <p className="text-[9px] text-slate-400 tracking-wider mt-0.5 uppercase">
+                  Select a month
+                </p>
               </div>
 
-              <button
-                onClick={() => setSelectedYear((v) => v + 1)}
-                className="p-2 text-gray-600 hover:bg-gray-50 rounded-xl transition-all active:scale-90"
-              >
-                <ChevronRight size={18} strokeWidth={2.5} />
-              </button>
+              <div className="flex items-center bg-white border border-slate-300 rounded divide-x divide-slate-200">
+                <button
+                  onClick={() => setSelectedYear((v) => Math.max(2026, v - 1))}
+                  disabled={selectedYear <= 2026}
+                  className="p-2 hover:bg-slate-50 disabled:opacity-30 transition-colors"
+                >
+                  <ChevronLeft
+                    size={13}
+                    strokeWidth={3}
+                    className="text-slate-600"
+                  />
+                </button>
+                <div className="px-4 py-1.5 flex flex-col items-center min-w-[72px]">
+                  <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">
+                    Year
+                  </span>
+                  <span className="text-sm font-bold text-slate-900 tabular-nums leading-none">
+                    {selectedYear}
+                  </span>
+                </div>
+                <button
+                  onClick={() => setSelectedYear((v) => v + 1)}
+                  className="p-2 hover:bg-slate-50 transition-colors"
+                >
+                  <ChevronRight
+                    size={13}
+                    strokeWidth={3}
+                    className="text-slate-600"
+                  />
+                </button>
+              </div>
+            </div>
+
+            {/* Month Grid — same cols on all screens */}
+            <div className="grid grid-cols-3 bg-slate-200 gap-px">
+              {months.map((month, index) => (
+                <button
+                  key={month}
+                  onClick={() => setActiveMonth({ name: month, index })}
+                  className="flex flex-col items-center justify-center py-7 bg-white hover:bg-slate-50 active:bg-slate-100 transition-colors group"
+                >
+                  <div className="p-2 rounded border border-slate-200 bg-slate-50 group-hover:border-slate-300 group-hover:bg-white transition-all mb-2.5">
+                    <Calendar
+                      size={15}
+                      className="text-slate-400 group-hover:text-slate-600 transition-colors"
+                    />
+                  </div>
+                  <span className="text-[10px] font-bold text-slate-500 group-hover:text-slate-800 uppercase tracking-widest transition-colors">
+                    {month}
+                  </span>
+                </button>
+              ))}
             </div>
           </div>
 
-          {/* Month Grid */}
-          <div className="grid grid-cols-3 gap-4">
-            {months.map((month, index) => (
-              <button
-                key={month}
-                onClick={() => setActiveMonth({ name: month, index })}
-                className="group relative flex flex-col items-center justify-center aspect-square bg-white rounded-3xl border border-gray-100 shadow-sm hover:shadow-xl hover:shadow-blue-500/10 transition-all duration-300 active:scale-95"
-              >
-                <div className="p-2.5 rounded-2xl bg-blue-50 text-blue-600 mb-2 group-hover:bg-blue-600 group-hover:text-white transition-colors">
-                  <Calendar size={18} strokeWidth={2.5} />
-                </div>
-                <span className="text-xs font-bold text-gray-700 uppercase tracking-wider">
-                  {month}
-                </span>
-              </button>
-            ))}
-          </div>
-
-          {/* Month Action Modal */}
+          {/* Modal */}
           {activeMonth && (
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
               <div
-                className="absolute inset-0 bg-gray-900/20 backdrop-blur-sm"
+                className="absolute inset-0 bg-slate-900/40 backdrop-blur-[2px]"
                 onClick={() => !isFetching && setActiveMonth(null)}
               />
-
-              <div className="relative bg-white w-full max-w-[300px] rounded-[28px] p-5 shadow-xl animate-in fade-in zoom-in-95 duration-200">
-                <div className="flex items-start justify-between mb-6">
-                  <div>
-                    <h3 className="text-xl font-bold text-gray-900">
-                      {activeMonth.name}{" "}
-                      <span className="text-gray-400 font-light">
-                        {selectedYear}
-                      </span>
-                    </h3>
-                    <p className="text-[10px] font-bold text-blue-500 uppercase tracking-wider">
-                      Monthly Report
-                    </p>
+              <div className="relative bg-white w-full max-w-[300px] rounded-lg border border-slate-300 shadow-2xl overflow-hidden">
+                {/* Header */}
+                <div className="px-4 py-3 bg-slate-100 border-b border-slate-200 flex items-center justify-between">
+                  <div className="flex items-center gap-2.5">
+                    <div>
+                      <h3 className="text-[13px] font-bold text-slate-800 leading-none">
+                        {activeMonth.name}{" "}
+                        <span className="text-slate-400 font-medium">
+                          {selectedYear}
+                        </span>
+                      </h3>
+                      <p className="text-[9px] text-slate-400 uppercase tracking-widest mt-0.5">
+                        Monthly Report
+                      </p>
+                    </div>
                   </div>
-
                   <button
                     onClick={() => setActiveMonth(null)}
-                    className="p-1.5 text-gray-400 hover:bg-gray-50 rounded-full"
+                    className="p-1 text-slate-400 hover:text-slate-600 hover:bg-slate-200 rounded transition-colors"
                   >
-                    <X size={18} />
+                    <X size={14} />
                   </button>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3">
-                  {/* View Button */}
+                {/* Actions */}
+                <div className="grid grid-cols-2">
+                  {/* View (Neutral) */}
                   <button
                     onClick={handleOpenView}
                     disabled={isFetching}
-                    className={`flex flex-col items-center gap-2 py-4 rounded-2xl border-2 transition-all active:scale-95 w-full
-                      ${
-                        isFetching
-                          ? "bg-gray-50 border-gray-100 opacity-60"
-                          : "bg-white border-blue-100 hover:border-blue-200"
-                      }`}
+                    className="flex flex-col items-center gap-2 py-6 bg-white hover:bg-slate-50 transition-colors group disabled:opacity-50"
                   >
-                    <div className="text-blue-600">
-                      {isFetching ? (
-                        <div className="w-5 h-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
-                      ) : (
-                        <Eye size={20} strokeWidth={2.5} />
-                      )}
-                    </div>
-                    <span className="text-[11px] font-black text-blue-600 uppercase">
+                    {isFetching ? (
+                      <div className="w-4 h-4 border-2 border-slate-400 border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                      <Eye
+                        size={18}
+                        className="text-slate-400 group-hover:text-slate-600 transition-colors"
+                      />
+                    )}
+                    <div className="text-[10px] font-bold text-slate-500 group-hover:text-slate-700 uppercase tracking-widest">
                       {isFetching ? "Loading" : "View"}
-                    </span>
+                    </div>
+                    <div className="text-[8px] text-slate-400 uppercase tracking-wide -mt-1">
+                      Preview
+                    </div>
                   </button>
 
-                  {/* PDF Button – smart: show direct download when data ready */}
+                  {/* Export (Primary Concern) */}
                   <button
                     onClick={isDataValid ? handleDownloadPDF : loadReportData}
                     disabled={isFetching}
-                    className="flex flex-col items-center gap-2 py-4 rounded-2xl bg-blue-600 text-white w-full transition-all active:scale-95 shadow-lg shadow-blue-200"
+                    className="flex flex-col items-center gap-2 py-6 border-l border-slate-200 hover:bg-slate-50 transition-colors group disabled:opacity-50"
                   >
                     {isFetching ? (
-                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      <div className="w-4 h-4 border-2 border-slate-500 border-t-transparent rounded-full animate-spin" />
                     ) : (
-                      <Download size={20} strokeWidth={2.5} />
+                      <Download
+                        size={18}
+                        className="text-blue-600 group-hover:text-slate-600 transition-colors"
+                      />
                     )}
-                    <span className="text-[11px] font-bold uppercase">
-                      {isFetching ? "Working" : isDataValid ? "PDF" : "Get PDF"}
-                    </span>
+                    <div className="text-[10px] font-bold text-blue-600 group-hover:text-slate-800 uppercase tracking-widest">
+                      {isFetching
+                        ? "Working"
+                        : isDataValid
+                          ? "Download"
+                          : "Generate"}
+                    </div>
+                    <div className="text-[8px] text-blue-600 group-hover:text-slate-800 uppercase tracking-wide -mt-1">
+                      Export PDF
+                    </div>
                   </button>
                 </div>
               </div>

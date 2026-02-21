@@ -1,14 +1,15 @@
 
-export function formatDate(dateInput: number) {
+export function formatDate(dateInput: number, compact?: boolean) {
   if (!dateInput) return "-";
   const d = new Date(dateInput);
   if (isNaN(d.getTime())) return "Invalid";
   return d.toLocaleDateString("en-IN", { 
     day: "numeric", 
     month: "short", 
-    year: "numeric" 
+    year: compact ? "2-digit" : "numeric" 
   });
 }
+
 export function formatTime(dateInput: number): string {
   if (!dateInput) return "-";
   const d = new Date(dateInput);
