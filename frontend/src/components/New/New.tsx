@@ -266,7 +266,7 @@ const NewTripTab = ({ onAddTrip }: NewTripTabProps) => {
                     month: "short",
                     year: "2-digit",
                   })}
-                  <Calendar size={18} className="text-slate-500" />
+                  <Calendar size={18} className="text-slate-400" />
                 </button>
               }
             />

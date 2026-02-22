@@ -1,9 +1,6 @@
 import React, { useMemo, useState } from "react";
 import {
   ArrowRight,
-  Calendar,
-  Clock,
-  History,
   Trash2,
   Edit,
   Truck,
@@ -14,7 +11,7 @@ import EditModal from "../UI/EditModal";
 import { editTrip, deleteTripByID } from "../../api/trips";
 import { custFetch, fetchAndSetTrips } from "../../utils/BasicFetch";
 import TripFilterBar from "../UI/FilterBar";
-import { formatDate, formatTime } from "../../utils/FormatDate";
+import { formatDate } from "../../utils/FormatDate";
 import type { Trip, TripFilter } from "../../types";
 import DeleteModal from "../UI/DeleteModal";
 import TripModal from "../UI/TripModal";
@@ -104,128 +101,7 @@ const TripManagement = () => {
     }
   };
 
-  const tripsToRender2: Trip[] = [
-    {
-      _id: "trip_001",
-      tripDate: Date.now() - 1000 * 60 * 60 * 24 * 2, // 2 days ago
-      startPoint: "Ikeja",
-      endPoint: "Victoria Island",
-      returnTrip: true,
-      fare: 8500,
-      numberPlate: "GJ15AX5281",
-      recent: "2 days ago",
-      createdAt: Date.now() - 1000 * 60 * 60 * 24 * 2,
-      updatedAt: Date.now() - 1000 * 60 * 60 * 24 * 2,
-    },
-    {
-      _id: "trip_002",
-      tripDate: Date.now() - 1000 * 60 * 60 * 24, // 1 day ago
-      startPoint: "Lekki",
-      endPoint: "Surulere",
-      returnTrip: true,
-      fare: 12000,
-      numberPlate: "987ZT",
-      recent: "1 day ago",
-      createdAt: Date.now() - 1000 * 60 * 60 * 24,
-      updatedAt: Date.now() - 1000 * 60 * 60 * 24,
-    },
-    {
-      _id: "trip_003",
-      tripDate: Date.now(), // today
-      startPoint: "Yaba",
-      endPoint: "Ikoyi",
-      returnTrip: false,
-      fare: 6500,
-      numberPlate: null,
-      recent: "Today",
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
-    },
-    {
-      _id: "trip_001",
-      tripDate: Date.now() - 1000 * 60 * 60 * 24 * 2, // 2 days ago
-      startPoint: "Ikeja",
-      endPoint: "Victoria Island",
-      returnTrip: false,
-      fare: 8500,
-      numberPlate: "234XY",
-      recent: "2 days ago",
-      createdAt: Date.now() - 1000 * 60 * 60 * 24 * 2,
-      updatedAt: Date.now() - 1000 * 60 * 60 * 24 * 2,
-    },
-    {
-      _id: "trip_002",
-      tripDate: Date.now() - 1000 * 60 * 60 * 24, // 1 day ago
-      startPoint: "Lekki",
-      endPoint: "Surulere",
-      returnTrip: true,
-      fare: 12000,
-      numberPlate: "987ZT",
-      recent: "1 day ago",
-      createdAt: Date.now() - 1000 * 60 * 60 * 24,
-      updatedAt: Date.now() - 1000 * 60 * 60 * 24,
-    },
-    {
-      _id: "trip_003",
-      tripDate: Date.now(), // today
-      startPoint: "Yaba",
-      endPoint: "Ikoyi",
-      returnTrip: false,
-      fare: 6500,
-      numberPlate: null,
-      recent: "Today",
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
-    },
-    {
-      _id: "trip_001",
-      tripDate: Date.now() - 1000 * 60 * 60 * 24 * 2, // 2 days ago
-      startPoint: "Ikeja",
-      endPoint: "Victoria Island",
-      returnTrip: false,
-      fare: 8500,
-      numberPlate: "234XY",
-      recent: "2 days ago",
-      createdAt: Date.now() - 1000 * 60 * 60 * 24 * 2,
-      updatedAt: Date.now() - 1000 * 60 * 60 * 24 * 2,
-    },
-    {
-      _id: "trip_002",
-      tripDate: Date.now() - 1000 * 60 * 60 * 24, // 1 day ago
-      startPoint: "Lekki",
-      endPoint: "Surulere",
-      returnTrip: true,
-      fare: 12000,
-      numberPlate: "987ZT",
-      recent: "1 day ago",
-      createdAt: Date.now() - 1000 * 60 * 60 * 24,
-      updatedAt: Date.now() - 1000 * 60 * 60 * 24,
-    },
-    {
-      _id: "trip_003",
-      tripDate: Date.now(), // today
-      startPoint: "Yaba",
-      endPoint: "Ikoyi",
-      returnTrip: false,
-      fare: 6500,
-      numberPlate: null,
-      recent: "Today",
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
-    },
-    {
-      _id: "trip_003",
-      tripDate: Date.now(), // today
-      startPoint: "Yaba",
-      endPoint: "Ikoyi",
-      returnTrip: false,
-      fare: 6500,
-      numberPlate: null,
-      recent: "Today",
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
-    },
-  ];
+  
 
 return (
   <div className="max-w-4xl mx-auto space-y-3">

@@ -8,7 +8,7 @@ import type { AuthRequest } from "../auth.middleware.js";
 export const getDashboardStats = async (req: AuthRequest, res: Response) => {
   try {
     await connectDB();
-    console.log("ENV CHECK:", !!process.env.MONGO_URI, process.env.MONGO_URI);
+    // console.log("ENV CHECK:", !!process.env.MONGO_URI, process.env.MONGO_URI);
     const now = new Date();
 
     const startOfMonth = new Date(

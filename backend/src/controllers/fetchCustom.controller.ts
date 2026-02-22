@@ -82,7 +82,7 @@ export const fetchCustomTrips = async (req: AuthRequest, res: Response) => {
       }
     }
 
-    console.log(query);
+    // console.log(query);
 
     const tripList = await Trip.find(query).sort(sortBy).limit(limitDefault);
 

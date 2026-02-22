@@ -44,7 +44,7 @@ export const googleLogin = async (req: Request, res: Response) => {
 
     const token = generateToken(user._id.toString());
 
-    console.log("Verified user:", payload?.email);
+    // console.log("Verified user:", payload?.email);
     return res.json({
       token,
       user: {
