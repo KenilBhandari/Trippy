@@ -5,8 +5,10 @@ import {
   Check,
   ArrowUpDown,
   MapPin,
-  Edit,
   Truck,
+  ArrowRight,
+  Calendar,
+  XCircle,
 } from "lucide-react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -56,6 +58,9 @@ const EditModal = ({ onUpdate }: EditModalProps) => {
     } catch (error) {
       console.error(error);
       setUpdateFailed(true);
+         setTimeout(() => {
+           setUpdateFailed(false);
+      }, 900);
     } finally {
       setUpdating(false);
     }
@@ -65,69 +70,80 @@ const EditModal = ({ onUpdate }: EditModalProps) => {
     if (updateFailed) setUpdateFailed(false);
   }, [activeTrip]);
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto">
-      {/* Backdrop */}
-      <div
-        className="fixed inset-0 bg-gray-900/40 backdrop-blur-sm"
-        onClick={() => setActiveTrip(null)}
-      />
+return (
+  <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto">
+    {/* Backdrop */}
+    <div
+      className="fixed inset-0 bg-gray-900/40 backdrop-blur-sm"
+      onClick={() => setActiveTrip(null)}
+    />
 
-      {/* Modal Content */}
-      <div className="relative bg-white w-full max-w-md rounded-[28px] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 p-4 sm:p-6">
-        {/* Header matching New Trip style */}
-        <div className="flex items-center gap-3 mb-6">
-          <div className="flex items-center justify-center w-10 h-10 bg-blue-600 rounded-xl shadow-md">
-            <Edit size={20} className="text-white" />
-          </div>
-          <div>
-            <h2 className="text-lg sm:text-xl font-extrabold tracking-tight text-gray-800 leading-tight">
-              Edit Journey
-            </h2>
-          </div>
-        </div>
+    {/* Modal Content */}
+    <div className="relative bg-white w-full max-w-md rounded-xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+      {/* Header */}
+      <div className="px-6 py-4 bg-white border-b border-slate-300">
+        <h2 className="text-base font-bold tracking-wide text-slate-900 uppercase">
+          Edit Journey
+        </h2>
+      </div>
 
-        <div className="space-y-5 sm:space-y-6">
-          {/* Start Point Section */}
-          <div className="relative">
-            <MapPin
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-              size={18}
-            />
-            <input
-              type="text"
-              value={activeTrip.startPoint || ""}
-              placeholder="Starting from..."
-              onChange={(e) => {
-                handleChange("startPoint", e.target.value);
-                setShowStartSuggestions(false);
-              }}
-              onFocus={() => setShowStartSuggestions(true)}
-              onBlur={() =>
-                setTimeout(() => setShowStartSuggestions(false), 200)
-              }
-              className="w-full font-bold text-sm sm:text-base pl-10 pr-4 py-3 sm:py-4 bg-white border border-gray-200 rounded-2xl text-gray-900 shadow-sm transition-all hover:border-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 focus:outline-none"
-            />
-            {showStartSuggestions && (
-              <div className="absolute z-20 w-full mt-2 p-2 bg-white border border-gray-100 rounded-2xl shadow-xl animate-in fade-in zoom-in-95 duration-150">
-                <div className="max-h-52 overflow-y-auto p-2 space-y-1 scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent">
-                  {startLocations.map((loc) => (
-                    <button
-                      key={loc}
-                      type="button"
-                      onClick={() => handleChange("startPoint", loc)}
-                      className="w-full text-left px-3 py-2 bg-gray-50 hover:bg-blue-50 hover:text-gray-900 rounded-lg text-sm font-bold transition-all"
-                    >
-                      {loc}
-                    </button>
-                  ))}
-                </div>
+      <div className="p-5 sm:p-8 space-y-6">
+        {/* Route Section */}
+        <div className="space-y-4">
+          {/* Start Point */}
+          <div className="flex flex-col gap-1.5 relative">
+            <label className="ml-1 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+              Starting Point
+            </label>
+            <div className="relative group">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <MapPin
+                  size={18}
+                  className="text-slate-400 group-focus-within:text-blue-600 transition-colors"
+                />
               </div>
-            )}
+              <input
+                type="text"
+                value={activeTrip.startPoint || ""}
+                placeholder="Enter origin..."
+                onChange={(e) => {
+                  handleChange("startPoint", e.target.value);
+                  setShowStartSuggestions(false);
+                }}
+                onFocus={() => setShowStartSuggestions(true)}
+                onBlur={() =>
+                  setTimeout(() => setShowStartSuggestions(false), 200)
+                }
+                className="w-full font-bold text-sm sm:text-base pl-10 pr-4 py-3.5 bg-slate-50 border-2 border-slate-200 rounded-lg text-slate-900 focus:bg-white focus:border-slate-900 outline-none transition-all placeholder:text-slate-300"
+              />
+              {showStartSuggestions && (
+                <div className="absolute left-0 right-0 top-full mt-2 z-[100] bg-white border-2 border-slate-900 shadow-[6px_6px_0px_0px_rgba(15,23,42,0.1)] overflow-hidden">
+                  <div className="max-h-52 overflow-y-auto divide-y divide-slate-100">
+                    {startLocations.map((loc) => (
+                      <button
+                        key={loc}
+                        type="button"
+                        onClick={() => handleChange("startPoint", loc)}
+                        className="w-full text-left px-4 py-3 hover:bg-slate-900 hover:text-white text-xs font-black uppercase transition-colors flex items-center justify-between group"
+                      >
+                        {loc}
+                        <ArrowRight
+                          size={14}
+                          className="opacity-0 group-hover:opacity-100 transition-all"
+                        />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Return Trip Toggle Connector */}
-          <div className="flex items-center justify-center -my-1 sm:-my-2 relative z-10">
+          <div className="flex items-center justify-center relative py-1">
+            <div className="absolute inset-0 flex items-center" aria-hidden="true">
+              <div className="w-full border-t-2 border-slate-100"></div>
+            </div>
             <button
               type="button"
               onClick={() => {
@@ -136,176 +152,176 @@ const EditModal = ({ onUpdate }: EditModalProps) => {
                   returnTrip: !prev.returnTrip,
                 }));
               }}
-              className="bg-white p-2 rounded-full border border-gray-100 shadow-md text-blue-600 hover:scale-110 active:scale-95 transition-all duration-300"
+              className={`relative z-10 ${activeTrip.returnTrip ? "bg-blue-600 text-white" : "bg-white text-slate-600"} p-2 rounded-md border-2 border-slate-300 md:hover:border-slate-900 transition-all shadow-sm active:scale-90`}
             >
               {activeTrip.returnTrip ? (
-                <ArrowUpDown size={18} strokeWidth={2.5} />
+                <ArrowUpDown size={18} strokeWidth={3} />
               ) : (
-                <ArrowDown size={18} strokeWidth={2.5} />
+                <ArrowDown size={18} strokeWidth={3} />
               )}
             </button>
           </div>
 
-          {/* End Point Section */}
-          <div className="relative">
-            <MapPin
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-              size={18}
-            />
-            <input
-              type="text"
-              value={activeTrip.endPoint || ""}
-              placeholder="Going to..."
-              onChange={(e) => {
-                handleChange("endPoint", e.target.value);
-                setShowEndSuggestions(false);
-              }}
-              onFocus={() => setShowEndSuggestions(true)}
-              onBlur={() => setTimeout(() => setShowEndSuggestions(false), 200)}
-              className="w-full font-bold text-sm sm:text-base pl-10 pr-4 py-3 sm:py-4 bg-white border border-gray-200 rounded-2xl text-gray-900 shadow-sm transition-all hover:border-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 focus:outline-none"
-            />
-            {showEndSuggestions && (
-              <div className="absolute z-20 w-full mt-2 p-2 bg-white border border-gray-100 rounded-2xl shadow-xl animate-in fade-in zoom-in-95 duration-150">
-                <div className="max-h-44 overflow-y-auto p-2 space-y-1 scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent">
-                  {endLocations.map((loc) => (
-                    <button
-                      key={loc}
-                      type="button"
-                      onClick={() => handleChange("endPoint", loc)}
-                      className="w-full text-left px-3 py-2 bg-gray-50 hover:bg-blue-50 hover:text-gray-900 rounded-lg text-sm font-bold transition-all"
-                    >
-                      {loc}
-                    </button>
-                  ))}
-                </div>
+          {/* End Point */}
+          <div className="flex flex-col gap-1.5 relative">
+            <label className="ml-1 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+              Destination
+            </label>
+            <div className="relative group">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <MapPin
+                  size={18}
+                  className="text-slate-400 group-focus-within:text-blue-600 transition-colors"
+                />
               </div>
-            )}
+              <input
+                type="text"
+                value={activeTrip.endPoint || ""}
+                placeholder="Enter destination..."
+                onChange={(e) => {
+                  handleChange("endPoint", e.target.value);
+                  setShowEndSuggestions(false);
+                }}
+                onFocus={() => setShowEndSuggestions(true)}
+                onBlur={() =>
+                  setTimeout(() => setShowEndSuggestions(false), 200)
+                }
+                className="w-full font-bold text-sm sm:text-base pl-10 pr-4 py-3.5 bg-slate-50 border-2 border-slate-200 rounded-lg text-slate-900 focus:bg-white focus:border-slate-900 outline-none transition-all placeholder:text-slate-300"
+              />
+              {showEndSuggestions && (
+                <div className="absolute left-0 right-0 top-full mt-2 z-[100] bg-white border-2 border-slate-900 shadow-[6px_6px_0px_0px_rgba(15,23,42,0.1)] overflow-hidden">
+                  <div className="max-h-44 overflow-y-auto divide-y divide-slate-100">
+                    {endLocations.map((loc) => (
+                      <button
+                        key={loc}
+                        type="button"
+                        onClick={() => handleChange("endPoint", loc)}
+                        className="w-full text-left px-4 py-3 hover:bg-slate-900 hover:text-white text-xs font-black uppercase transition-colors flex items-center justify-between group"
+                      >
+                        {loc}
+                        <ArrowRight
+                          size={14}
+                          className="opacity-0 group-hover:opacity-100 transition-all"
+                        />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Fare Section */}
+        <div className="flex flex-col gap-1.5 pt-2">
+          <label className="ml-1 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+            Fare Amount
+          </label>
+          <div className="relative flex items-center">
+            <div className="absolute left-4 font-black text-slate-400 text-xl italic">
+              ₹
+            </div>
+            <input
+              type="number"
+              value={activeTrip.fare}
+              onChange={(e) => handleChange("fare", Number(e.target.value))}
+              placeholder="0.00"
+              className="w-full font-black text-base pl-10 pr-4 py-3.5 bg-slate-50 border-2 border-slate-200 rounded-lg text-slate-900 focus:bg-white focus:border-slate-900 outline-none transition-all"
+            />
+          </div>
+        </div>
+
+        {/* Info Grid */}
+        <div className="grid grid-cols-2 gap-4">
+          {/* Trip Date */}
+          <div className="flex flex-col gap-1.5">
+            <label className="ml-1 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+              Trip Date
+            </label>
+            <DatePicker
+              selected={new Date(activeTrip.tripDate)}
+              onChange={(date: Date | null) => {
+                if (date) handleChange("tripDate", date.getTime());
+              }}
+              maxDate={new Date()}
+              popperPlacement="bottom-start"
+              wrapperClassName="w-full"
+              customInput={
+                <button className="w-full flex items-center justify-between px-4 py-3.5 bg-slate-50 border-2 border-slate-200 rounded-lg text-sm font-black text-slate-900 hover:border-slate-400 transition-all">
+                  {new Date(activeTrip.tripDate).toLocaleDateString("en-GB", {
+                    day: "2-digit",
+                    month: "short",
+                    year: "2-digit",
+                  })}
+                  <Calendar size={18} className="text-slate-400" />
+                </button>
+              }
+            />
           </div>
 
-          {/* Fare Section */}
-          <div className="space-y-1.5">
-            <label className="ml-1 text-xs sm:text-sm font-medium text-gray-400">
-              Fare
+          {/* Vehicle Number */}
+          <div className="flex flex-col gap-1.5">
+            <label className="ml-1 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+              Vehicle No.
             </label>
-            <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
-                ₹
-              </span>
+            <div className="relative flex items-center">
+              <Truck className="absolute left-3 text-slate-400" size={18} />
               <input
-                type="number"
-                value={activeTrip.fare}
-                onChange={(e) => handleChange("fare", Number(e.target.value))}
-                placeholder="Enter fare"
-                className="w-full font-bold pl-7 pr-4 py-3 sm:py-3.5 bg-white border border-gray-300 rounded-2xl text-gray-900 text-sm sm:text-base shadow-sm hover:border-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 focus:outline-none transition-all"
+                type="text"
+                value={activeTrip.numberPlate ?? ""}
+                placeholder="GJ 15 AB 1234"
+                onChange={(e) =>
+                  handleChange("numberPlate", e.target.value.toUpperCase())
+                }
+                className="w-full font-black text-sm pl-11 pr-4 py-3.5 bg-slate-50 border-2 border-slate-200 rounded-lg text-slate-900 uppercase focus:bg-white focus:border-slate-900 outline-none"
               />
             </div>
           </div>
+        </div>
 
-          {/* Last Row */}
-          <div className="grid grid-cols-2 gap-4 items-end">
-            {/* Trip Date Section */}
-            <div className="flex flex-col space-y-1.5 h-full">
-              <label className="ml-1 text-xs sm:text-sm font-medium text-gray-400">
-                Trip Date
-              </label>
-              <div className="flex items-center p-1.5 bg-gray-100/50 rounded-2xl h-full border border-gray-100 min-h-[46px] sm:min-h-[54px] w-full">
-                <DatePicker
-                  selected={new Date(activeTrip.tripDate)}
-                  onChange={(date: Date | null) => {
-                    if (date) handleChange("tripDate", date.getTime());
-                  }}
-                  maxDate={new Date()}
-                  popperPlacement="bottom-start"
-                  // Ensures the datepicker library container spans the full width
-                  wrapperClassName="w-full"
-                  customInput={
-                    <button className="flex items-center justify-center gap-2 w-full h-full px-4 py-2 bg-white shadow-sm rounded-2xl text-[13px] sm:text-base text-gray-800 font-semibold hover:bg-gray-50 transition-all active:scale-95">
-                      <span className="text-blue-500 text-base sm:text-lg flex-shrink-0">
-                        ●
-                      </span>
-                      <span className="truncate">
-                        {new Date(activeTrip.tripDate).toLocaleDateString(
-                          "en-GB",
-                          {
-                            day: "2-digit",
-                            month: "short",
-                            year: "2-digit",
-                          },
-                        )}
-                      </span>
-                    </button>
-                  }
-                />
-              </div>
-            </div>
-
-            {/* Vehicle Number Section */}
-            <div className="flex flex-col space-y-1.5 h-full">
-              <label className="ml-1 text-xs sm:text-sm font-medium text-gray-400">
-                Vehicle Number
-              </label>
-
-              <div className="relative h-full flex items-center">
-                <Truck
-                  size={18}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-                />
-
-                <input
-                  type="text"
-                  value={activeTrip.numberPlate ?? ""}
-                  placeholder="GJ 15 AB 1234"
-                  onChange={(e) =>
-                    handleChange("numberPlate", e.target.value.toUpperCase())
-                  }
-                  className="w-full h-full font-bold text-sm sm:text-base pl-10 pr-4 py-2.5 sm:py-3 bg-white border border-gray-200 rounded-2xl text-gray-900 shadow-sm transition-all hover:border-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 focus:outline-none min-h-[46px] sm:min-h-[54px]"
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Action Buttons */}
-          <div className="flex gap-3 mt-2">
-            <button
-              onClick={() => setActiveTrip(null)}
-              className="flex-1 py-3 sm:py-3.5 bg-gray-100 text-gray-600 rounded-xl sm:rounded-2xl font-bold hover:bg-gray-200 transition-all text-sm sm:text-base"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={handleUpdate}
-              disabled={updating || updateSuccess}
-              className={`flex-[2] py-3 sm:py-3.5 font-bold rounded-xl sm:rounded-2xl shadow-md transition-all duration-200 flex items-center justify-center text-sm sm:text-base
-            ${
-              updateFailed
-                ? "bg-red-600 text-white"
-                : updateSuccess
-                  ? "bg-green-600 text-white"
-                  : "bg-blue-600 hover:bg-blue-700 text-white"
-            }
-          `}
-            >
-              {updating ? (
-                <div className="flex items-center gap-2">
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  <span>Saving…</span>
-                </div>
-              ) : updateSuccess ? (
-                <div className="flex items-center gap-2">
-                  <Check className="h-4 w-4" />
-                  <span>Updated!</span>
-                </div>
-              ) : updateFailed ? (
-                <span>Update Failed</span>
-              ) : (
-                "Save Changes"
-              )}
-            </button>
-          </div>
+        {/* Action Buttons */}
+        <div className="flex gap-3">
+          <button
+            onClick={() => setActiveTrip(null)}
+            className="flex-1 py-4 bg-slate-100 text-slate-600 rounded-lg font-black text-xs uppercase tracking-[0.2em] hover:bg-slate-200 transition-all"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleUpdate}
+            disabled={updating || updateSuccess}
+            className={`flex-[2] py-4 font-black text-xs uppercase tracking-[0.3em] rounded-lg transition-all duration-200 flex items-center justify-center gap-3
+              ${
+                updateFailed
+                  ? "bg-red-600 text-white shadow-lg shadow-red-100"
+                  : updateSuccess
+                    ? "bg-emerald-600 text-white shadow-lg shadow-emerald-100"
+                    : updating
+                      ? "bg-slate-400 text-white cursor-wait"
+                      : "bg-slate-900 text-white hover:bg-slate-800 shadow-lg shadow-slate-200 active:translate-y-[2px]"
+              }
+            `}
+          >
+            {updating ? (
+              <Loader2 className="h-5 w-5 animate-spin" />
+            ) : updateSuccess ? (
+              <Check className="h-5 w-5" strokeWidth={3} />
+            ) : updateFailed ? (
+              <XCircle className="h-5 w-5" />
+            ) : null}
+            {updating
+              ? "Saving"
+              : updateSuccess
+                ? "Saved"
+                : updateFailed
+                  ? "Failed"
+                  : "Save Changes"}
+          </button>
         </div>
       </div>
     </div>
-  );
+  </div>
+);
 };
 
 export default React.memo(EditModal);
