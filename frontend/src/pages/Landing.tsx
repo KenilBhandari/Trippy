@@ -6,71 +6,78 @@ const Landing = () => {
   const navigate = useNavigate();
 
 return (
-  <div className="flex min-h-screen flex-col items-center justify-center bg-slate-100 px-6 antialiased">
-    
-    <main className="flex w-full max-w-md flex-col items-center">
-      
-      {/* Logo */}
-      <div className="group mb-12">
-        <div className="flex h-24 w-24 items-center justify-center rounded-3xl bg-white shadow-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl">
-          <div className="absolute inset-0 rounded-3xl border border-slate-100 pointer-events-none" />
-          <img 
-            src="/Trippy_logo.png" 
-            className="h-16 w-16 object-contain" 
-            alt="Trippy Logo"
-          />
-        </div>
+  <div className="flex min-h-screen items-center justify-center bg-[#f3f4f6] px-6">
+
+    <main className="w-full max-w-[420px] rounded-3xl border border-slate-200 bg-white p-9 shadow-[0_20px_45px_-28px_rgba(15,23,42,0.25)]">
+
+      {/* Wordmark */}
+      <div className="mb-10 flex items-center gap-3">
+        <img
+          src="/Trippy_logo.png"
+          alt="Trippy Logo"
+          className="h-9 w-9 object-contain"
+        />
+        <h1 className="text-2xl font-[1000] tracking-tight uppercase leading-none text-gray-900">
+          <span className="tracking-widest text-blue-600">
+            Trippy<span className="text-gray-900">.</span>
+          </span>
+        </h1>
       </div>
 
       {/* Heading */}
-      <div className="mb-12 text-center">
-        <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl">
-          Trippy<span className="text-blue-600">.</span>
+      <div className="mb-10">
+        <h1 className="text-[36px] font-['Georgia'] font-extrabold leading-[1.05] tracking-tight text-slate-900">
+          Good to
+          <br />
+          <span className="italic opacity-70">see you.</span>
         </h1>
-        <p className="mt-4 text-lg font-medium text-slate-600">
-          Clean trip operations, <br />
-          <span className="text-slate-900">built for daily speed.</span>
+        <p className="mt-3 text-sm leading-relaxed text-slate-600">
+          Sign in to manage your trips.
         </p>
       </div>
 
-      {/* Action Card */}
-      <div className="w-full rounded-3xl border border-slate-300 bg-white p-3 shadow-xl">
-        <div className="flex flex-col items-center rounded-2xl border border-slate-100 bg-white px-8 py-10">
-          
-          <div className="mb-8 w-full">
-            <h2 className="text-center text-sm font-bold uppercase tracking-widest text-slate-500">
-              Secure Sign In
-            </h2>
+      {/* CTA Card */}
+      <div className="rounded-2xl border border-slate-200 bg-white p-6">
+
+        {/* Label */}
+        <div className="mb-5 flex items-center gap-2">
+           <div className="h-2 w-2 rounded-full p-1 border-4 border-blue-100 bg-blue-600" />
+          <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-blue-600">
+            Secure sign in
           </div>
-
-          <div className="flex w-full justify-center transition-transform hover:scale-105 active:scale-95">
-            <GoogleLogin
-              onSuccess={async (credentialResponse) => {
-                const res = await axios.post(
-                  "http://localhost:5000/user/auth/google",
-                  { credential: credentialResponse.credential }
-                );
-                localStorage.setItem("token", res.data.token);
-                localStorage.setItem("user", JSON.stringify(res.data.user));
-                navigate("/home");
-              }}
-              onError={() => console.log("Login failed")}
-              useOneTap
-              theme="filled_blue"
-              shape="rectangular"
-              text="continue_with"
-              width="200"
-              size="large"
-              
-              
-            />
-          </div>
-
-          <p className="mt-8 text-xs font-medium text-slate-400">
-            Continue to access your dashboard.
-          </p>
-
         </div>
+
+        {/* Google Button */}
+        <div className="flex w-full justify-center">
+          <GoogleLogin
+            onSuccess={async (credentialResponse) => {
+              const res = await axios.post(
+                "http://localhost:5000/user/auth/google",
+                { credential: credentialResponse.credential }
+              );
+              localStorage.setItem("token", res.data.token);
+              localStorage.setItem("user", JSON.stringify(res.data.user));
+              navigate("/home");
+            }}
+            onError={() => console.log("Login failed")}
+            useOneTap
+            theme="filled_blue"
+            shape="rectangular"
+            text="continue_with"
+            width="210"
+            size="large"
+          />
+        </div>
+
+        {/* Brand Signature */}
+        <div className="mt-6 flex items-center gap-3">
+          <div className="h-px flex-1 bg-slate-100" />
+          <span className="text-[11px] font-semibold tracking-[0.35em] text-slate-400">
+            SIMPLE<span className="text-blue-600"> · </span>FAST
+          </span>
+          <div className="h-px flex-1 bg-slate-100" />
+        </div>
+
       </div>
 
     </main>

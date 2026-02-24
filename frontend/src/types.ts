@@ -40,30 +40,38 @@ export interface TripFilter {
   dateTo?: number;
 }
 
-
-export interface DashboardData {
-  monthStats: {
-    totalRevenue: number;
-    totalTrips: number;
-    avgFare: number;
-  };
-  last7Days: {
-    _id: string;
-    totalRevenue: number;
-    totalTrips: number;
-  }[];
-  monthlyTotals: {
-    _id: number;
-    totalRevenue: number;
-  }[];
-  thisWeek: {
-    thisWeekRevenue: number;
-  }
-}
-
-
 export interface CurrentReport {
   month: number;
   year: number;
 }
+
+
+//DASHBOARD
+
+export type DashboardSummary = {
+  trips: number;
+  avgFare: number;
+  monthRevenue: number;
+  weekRevenue: number;
+};
+
+type Last7DaysPoint = {
+  _id: string;
+  dailyRevenue: number;
+  totalTrips: number;
+};
+
+type MonthlyPoint = {
+  _id: string;
+  monthlyRevenue: number;
+  totalTrips: number;
+};
+
+export type DashboardData = {
+  summary: DashboardSummary;
+  series: {
+    last7DaysSeries: Last7DaysPoint[];
+    monthlySeries: MonthlyPoint[];
+  };
+};
 

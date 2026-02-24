@@ -3,6 +3,7 @@ import type { TripFilter } from "../types/trips.types";
 import Trip from "../models/trips.models.js";
 import connectDB from "../db/config.js";
 import type { AuthRequest } from "../auth.middleware";
+import { getTimeStamps } from "../utils/fetchQuery.utils";
 
 export const fetchCustomTrips = async (req: AuthRequest, res: Response) => {
   try {
@@ -10,6 +11,7 @@ export const fetchCustomTrips = async (req: AuthRequest, res: Response) => {
     const filter: TripFilter = req.body;
 
     const { limit, sort, dateFrom, dateTo, searchString, recent } = filter;
+    const { todayTS, last7DaysTS, startOfMonthTS } = getTimeStamps();
 
     let limitDefault = Number(limit) || 100;
 
@@ -47,42 +49,25 @@ export const fetchCustomTrips = async (req: AuthRequest, res: Response) => {
     if (dateFrom || dateTo) {
       query.tripDate = {};
       if (dateFrom) {
-        const fromDate = new Date(dateFrom);
-        fromDate.setHours(0, 0, 0, 0);
-        query.tripDate.$gte = fromDate.getTime();
+        const from = new Date(dateFrom);
+        query.tripDate.$gte = from.getTime();
       }
 
       if (dateTo) {
-        const toDate = new Date(dateTo);
-        toDate.setHours(23, 59, 59, 999);
-        query.tripDate.$lte = toDate.getTime();
+        const to = new Date(dateTo);
+        query.tripDate.$lte = to.getTime();
       }
     }
 
     if (!dateFrom && !dateTo && recent) {
-      let from: number | undefined;
-
-      const now = new Date();
-
       if (recent === "today") {
-        now.setHours(0, 0, 0, 0);
-        from = now.getTime();
+        query.tripDate = { $gte: todayTS };
       } else if (recent === "last_7_days") {
-        now.setDate(now.getDate() - 7);
-        now.setHours(0, 0, 0, 0);
-        from = now.getTime();
+        query.tripDate = { $gte: last7DaysTS };
       } else if (recent === "month") {
-        now.setDate(now.getDate() - 30);
-        now.setHours(0, 0, 0, 0);
-        from = now.getTime();
-      }
-
-      if (from !== undefined) {
-        query.tripDate = { $gte: from };
+        query.tripDate = { $gte: startOfMonthTS };
       }
     }
-
-    // console.log(query);
 
     const tripList = await Trip.find(query).sort(sortBy).limit(limitDefault);
 
