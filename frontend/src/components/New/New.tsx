@@ -41,6 +41,8 @@ const NewTripTab = ({ onAddTrip }: NewTripTabProps) => {
     fare <= 0 ||
     addSuccess ||
     addFailed;
+  const sharedMainInputClass =
+    "w-full font-bold text-sm sm:text-base pl-10 pr-4 py-3.5 bg-slate-50 border-2 border-slate-200 rounded-lg text-slate-900 focus:bg-white focus:border-blue-500 outline-none transition-all placeholder:text-slate-300";
 
   const handleAdd = async () => {
     if (!startPoint || !endPoint || !tripDate) return;
@@ -81,10 +83,10 @@ const NewTripTab = ({ onAddTrip }: NewTripTabProps) => {
   };
 
   return (
-    <div className="bg-white border border-slate-200 rounded-xl shadow-sm w-full overflow-hidden">
+    <div className="bg-white border border-slate-200 rounded-lg shadow-sm w-full overflow-hidden">
       {/* Header - Refined & Grounded */}
       <div className="px-6 py-4 bg-white border-b border-slate-300">
-        <h2 className="text-base font-bold tracking-wide text-slate-900 uppercase">
+        <h2 className="text-sm font-bold tracking-wide text-slate-900 uppercase">
           New Trip
         </h2>
       </div>
@@ -117,12 +119,12 @@ const NewTripTab = ({ onAddTrip }: NewTripTabProps) => {
                 onBlur={() =>
                   setTimeout(() => setShowStartSuggestions(false), 200)
                 }
-                className="w-full font-bold text-sm sm:text-base pl-10 pr-4 py-3.5 bg-slate-50 border-2 border-slate-200 rounded-lg text-slate-900 focus:bg-white focus:border-slate-900 outline-none transition-all placeholder:text-slate-300"
+                className={sharedMainInputClass}
               />
 
               {/* Suggestions Dropdown */}
               {showStartSuggestions && startLocations.length > 0 && (
-                <div className="absolute left-0 right-0 top-full mt-2 z-[100] bg-white border-2 border-slate-900 shadow-[6px_6px_0px_0px_rgba(15,23,42,0.1)] overflow-hidden">
+                <div className="absolute left-0 right-0 top-full mt-2 z-[100] bg-white border-2 border-blue-200 shadow-[6px_6px_0px_0px_rgba(37,99,235,0.12)] overflow-hidden">
                   <div className="max-h-52 overflow-y-auto divide-y divide-slate-100">
                     {startLocations.map((loc) => (
                       <button
@@ -132,7 +134,7 @@ const NewTripTab = ({ onAddTrip }: NewTripTabProps) => {
                           setStartPoint(loc);
                           setShowStartSuggestions(false);
                         }}
-                        className="w-full text-left px-4 py-3 hover:bg-slate-900 hover:text-white text-xs font-black uppercase transition-colors flex items-center justify-between group"
+                        className="w-full text-left px-4 py-3 hover:bg-blue-600 hover:text-white text-xs font-black uppercase transition-colors flex items-center justify-between group"
                       >
                         {loc}
                         <ArrowRight
@@ -193,11 +195,11 @@ const NewTripTab = ({ onAddTrip }: NewTripTabProps) => {
                 onBlur={() =>
                   setTimeout(() => setShowEndSuggestions(false), 200)
                 }
-                className="w-full font-bold text-sm sm:text-base pl-10 pr-4 py-3.5 bg-slate-50 border-2 border-slate-200 rounded-lg text-slate-900 focus:bg-white focus:border-slate-900 outline-none transition-all placeholder:text-slate-300"
+                className={sharedMainInputClass}
               />
 
               {showEndSuggestions && endLocations.length > 0 && (
-                <div className="absolute left-0 right-0 top-full mt-2 z-[100] bg-white border-2 border-slate-900 shadow-[6px_6px_0px_0px_rgba(15,23,42,0.1)] overflow-hidden">
+                <div className="absolute left-0 right-0 top-full mt-2 z-[100] bg-white border-2 border-blue-200 shadow-[6px_6px_0px_0px_rgba(37,99,235,0.12)] overflow-hidden">
                   <div className="max-h-52 overflow-y-auto divide-y divide-slate-100">
                     {endLocations.map((loc) => (
                       <button
@@ -207,7 +209,7 @@ const NewTripTab = ({ onAddTrip }: NewTripTabProps) => {
                           setEndPoint(loc);
                           setShowEndSuggestions(false);
                         }}
-                        className="w-full text-left px-4 py-3 hover:bg-slate-900 hover:text-white text-xs font-black uppercase transition-colors flex items-center justify-between group"
+                        className="w-full text-left px-4 py-3 hover:bg-blue-600 hover:text-white text-xs font-black uppercase transition-colors flex items-center justify-between group"
                       >
                         {loc}
                         <ArrowRight
@@ -241,7 +243,7 @@ const NewTripTab = ({ onAddTrip }: NewTripTabProps) => {
                 if (/^[0-9]*$/.test(val)) setFare(val === "" ? 0 : Number(val));
               }}
               placeholder="0.00"
-              className="w-full font-black text-xl pl-10 pr-4 py-4 bg-slate-50 border-2 border-slate-200 rounded-lg text-slate-900 focus:bg-white focus:border-slate-900 outline-none transition-all"
+              className={sharedMainInputClass}
             />
           </div>
         </div>
@@ -260,13 +262,13 @@ const NewTripTab = ({ onAddTrip }: NewTripTabProps) => {
               // wrapperClassName allows the datepicker container to fill the parent
               wrapperClassName="w-full"
               customInput={
-                <button className="w-full flex items-center justify-between px-4 py-3.5 bg-slate-50 border-2 border-slate-200 rounded-lg text-sm font-black text-slate-900 hover:border-slate-400 transition-all">
+                <button className="w-full flex items-center justify-between px-4 py-3.5 bg-slate-50 border-2 border-slate-200 rounded-lg text-sm font-black text-slate-900 hover:border-blue-400 transition-all">
                   {tripDate.toLocaleDateString("en-GB", {
                     day: "2-digit",
                     month: "short",
                     year: "2-digit",
                   })}
-                  <Calendar size={18} className="text-slate-400" />
+                  <Calendar size={18} className="text-blue-500" />
                 </button>
               }
             />
@@ -277,13 +279,13 @@ const NewTripTab = ({ onAddTrip }: NewTripTabProps) => {
               Vehicle No.
             </label>
             <div className="relative flex items-center">
-              <Truck className="absolute left-3 text-slate-400" size={18} />
+              <Truck className="absolute left-3 text-blue-500" size={18} />
               <input
                 type="text"
                 value={numberPlate ?? ""}
                 placeholder="GJ 15..."
                 onChange={(e) => setNumberPlate(e.target.value.toUpperCase())}
-                className="w-full font-black text-sm pl-11 pr-4 py-3.5 bg-slate-50 border-2 border-slate-200 rounded-lg text-slate-900 uppercase focus:bg-white focus:border-slate-900 outline-none"
+                className="w-full font-black text-sm pl-11 pr-4 py-3.5 bg-slate-50 border-2 border-slate-200 rounded-lg text-slate-900 uppercase focus:bg-white focus:border-blue-500 outline-none"
               />
             </div>
           </div>
@@ -293,7 +295,7 @@ const NewTripTab = ({ onAddTrip }: NewTripTabProps) => {
         <button
           onClick={handleAdd}
           disabled={isDisabledAddBtn || addingTrip}
-          className={`w-full py-4 md:py-5 font-black text-sm uppercase tracking-[0.3em] rounded-lg transition-all duration-200 flex items-center justify-center gap-3 borde
+          className={`w-full py-4 md:py-5 font-black text-sm uppercase tracking-[0.3em] rounded-lg transition-all duration-200 flex items-center justify-center gap-3 border-2
           ${
             addFailed
               ? "bg-red-600 border-red-800 text-white shadow-lg shadow-red-100"
@@ -303,7 +305,7 @@ const NewTripTab = ({ onAddTrip }: NewTripTabProps) => {
                   ? "bg-slate-400 border-slate-500 text-white cursor-wait"
                   : isDisabledAddBtn
                     ? "bg-slate-100 border-slate-200 text-slate-300 cursor-not-allowed border-b-0"
-                    : "bg-slate-900 border-black text-white active:border-b-0 active:translate-y-[4px] shadow-lg shadow-slate-200"
+                    : "bg-blue-600 border-blue-700 text-white active:border-b-0 active:translate-y-[4px] shadow-lg shadow-blue-100 md:hover:bg-blue-700"
           }`}
         >
           {addingTrip ? (

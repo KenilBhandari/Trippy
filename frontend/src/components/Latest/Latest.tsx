@@ -13,8 +13,8 @@ const Latest = () => {
   return (
     <div className="bg-white border border-slate-300 rounded-lg w-full overflow-hidden">
       {/* Header */}
-      <div className="px-6 py-3 bg-slate-200 border-b border-slate-300 flex items-center justify-between">
-        <h2 className="text-sm font-bold tracking-wider text-slate-900 uppercase">
+      <div className="px-6 py-3 bg-white border-b border-slate-300 flex items-center justify-between">
+        <h2 className="text-sm font-bold tracking-wide text-slate-900 uppercase">
           Last 10 Trips
         </h2>
       </div>

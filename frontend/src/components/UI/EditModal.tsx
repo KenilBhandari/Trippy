@@ -82,7 +82,7 @@ return (
     <div className="relative bg-white w-full max-w-md rounded-xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
       {/* Header */}
       <div className="px-6 py-4 bg-white border-b border-slate-300">
-        <h2 className="text-base font-bold tracking-wide text-slate-900 uppercase">
+        <h2 className="text-sm font-bold tracking-wide text-slate-900 uppercase">
           Edit Journey
         </h2>
       </div>
@@ -114,17 +114,17 @@ return (
                 onBlur={() =>
                   setTimeout(() => setShowStartSuggestions(false), 200)
                 }
-                className="w-full font-bold text-sm sm:text-base pl-10 pr-4 py-3.5 bg-slate-50 border-2 border-slate-200 rounded-lg text-slate-900 focus:bg-white focus:border-slate-900 outline-none transition-all placeholder:text-slate-300"
+                className="w-full font-bold text-sm sm:text-base pl-10 pr-4 py-3.5 bg-slate-50 border-2 border-slate-200 rounded-lg text-slate-900 focus:bg-white focus:border-blue-500 outline-none transition-all placeholder:text-slate-300"
               />
               {showStartSuggestions && (
-                <div className="absolute left-0 right-0 top-full mt-2 z-[100] bg-white border-2 border-slate-900 shadow-[6px_6px_0px_0px_rgba(15,23,42,0.1)] overflow-hidden">
+                <div className="absolute left-0 right-0 top-full mt-2 z-[100] bg-white border-2 border-blue-200 shadow-[6px_6px_0px_0px_rgba(37,99,235,0.12)] overflow-hidden">
                   <div className="max-h-52 overflow-y-auto divide-y divide-slate-100">
                     {startLocations.map((loc) => (
                       <button
                         key={loc}
                         type="button"
                         onClick={() => handleChange("startPoint", loc)}
-                        className="w-full text-left px-4 py-3 hover:bg-slate-900 hover:text-white text-xs font-black uppercase transition-colors flex items-center justify-between group"
+                        className="w-full text-left px-4 py-3 hover:bg-blue-600 hover:text-white text-xs font-black uppercase transition-colors flex items-center justify-between group"
                       >
                         {loc}
                         <ArrowRight
@@ -186,17 +186,17 @@ return (
                 onBlur={() =>
                   setTimeout(() => setShowEndSuggestions(false), 200)
                 }
-                className="w-full font-bold text-sm sm:text-base pl-10 pr-4 py-3.5 bg-slate-50 border-2 border-slate-200 rounded-lg text-slate-900 focus:bg-white focus:border-slate-900 outline-none transition-all placeholder:text-slate-300"
+                className="w-full font-bold text-sm sm:text-base pl-10 pr-4 py-3.5 bg-slate-50 border-2 border-slate-200 rounded-lg text-slate-900 focus:bg-white focus:border-blue-500 outline-none transition-all placeholder:text-slate-300"
               />
               {showEndSuggestions && (
-                <div className="absolute left-0 right-0 top-full mt-2 z-[100] bg-white border-2 border-slate-900 shadow-[6px_6px_0px_0px_rgba(15,23,42,0.1)] overflow-hidden">
+                <div className="absolute left-0 right-0 top-full mt-2 z-[100] bg-white border-2 border-blue-200 shadow-[6px_6px_0px_0px_rgba(37,99,235,0.12)] overflow-hidden">
                   <div className="max-h-44 overflow-y-auto divide-y divide-slate-100">
                     {endLocations.map((loc) => (
                       <button
                         key={loc}
                         type="button"
                         onClick={() => handleChange("endPoint", loc)}
-                        className="w-full text-left px-4 py-3 hover:bg-slate-900 hover:text-white text-xs font-black uppercase transition-colors flex items-center justify-between group"
+                        className="w-full text-left px-4 py-3 hover:bg-blue-600 hover:text-white text-xs font-black uppercase transition-colors flex items-center justify-between group"
                       >
                         {loc}
                         <ArrowRight
@@ -226,7 +226,7 @@ return (
               value={activeTrip.fare}
               onChange={(e) => handleChange("fare", Number(e.target.value))}
               placeholder="0.00"
-              className="w-full font-black text-base pl-10 pr-4 py-3.5 bg-slate-50 border-2 border-slate-200 rounded-lg text-slate-900 focus:bg-white focus:border-slate-900 outline-none transition-all"
+              className="w-full font-black text-base pl-10 pr-4 py-3.5 bg-slate-50 border-2 border-slate-200 rounded-lg text-slate-900 focus:bg-white focus:border-blue-500 outline-none transition-all"
             />
           </div>
         </div>
@@ -247,13 +247,13 @@ return (
               popperPlacement="bottom-start"
               wrapperClassName="w-full"
               customInput={
-                <button className="w-full flex items-center justify-between px-4 py-3.5 bg-slate-50 border-2 border-slate-200 rounded-lg text-sm font-black text-slate-900 hover:border-slate-400 transition-all">
+                <button className="w-full flex items-center justify-between px-4 py-3.5 bg-slate-50 border-2 border-slate-200 rounded-lg text-sm font-black text-slate-900 hover:border-blue-400 transition-all">
                   {new Date(activeTrip.tripDate).toLocaleDateString("en-GB", {
                     day: "2-digit",
                     month: "short",
                     year: "2-digit",
                   })}
-                  <Calendar size={18} className="text-slate-400" />
+                  <Calendar size={18} className="text-blue-500" />
                 </button>
               }
             />
@@ -265,7 +265,7 @@ return (
               Vehicle No.
             </label>
             <div className="relative flex items-center">
-              <Truck className="absolute left-3 text-slate-400" size={18} />
+              <Truck className="absolute left-3 text-blue-500" size={18} />
               <input
                 type="text"
                 value={activeTrip.numberPlate ?? ""}
@@ -273,7 +273,7 @@ return (
                 onChange={(e) =>
                   handleChange("numberPlate", e.target.value.toUpperCase())
                 }
-                className="w-full font-black text-sm pl-11 pr-4 py-3.5 bg-slate-50 border-2 border-slate-200 rounded-lg text-slate-900 uppercase focus:bg-white focus:border-slate-900 outline-none"
+                className="w-full font-black text-sm pl-11 pr-4 py-3.5 bg-slate-50 border-2 border-slate-200 rounded-lg text-slate-900 uppercase focus:bg-white focus:border-blue-500 outline-none"
               />
             </div>
           </div>
@@ -298,7 +298,7 @@ return (
                     ? "bg-emerald-600 text-white shadow-lg shadow-emerald-100"
                     : updating
                       ? "bg-slate-400 text-white cursor-wait"
-                      : "bg-slate-900 text-white hover:bg-slate-800 shadow-lg shadow-slate-200 active:translate-y-[2px]"
+                      : "bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-100 active:translate-y-[2px]"
               }
             `}
           >

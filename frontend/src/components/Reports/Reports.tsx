@@ -140,12 +140,12 @@ const ReportsTab = () => {
         <div className="max-w-md mx-auto ">
           <div className="bg-white border border-slate-300 rounded-lg overflow-hidden shadow-sm">
             {/* Header */}
-            <div className="px-5 py-3.5 bg-slate-200 border-b border-slate-300 flex items-center justify-between">
+            <div className="px-5 py-3.5 bg-white border-b border-slate-300 flex items-center justify-between">
               <div>
-                <h2 className="text-xs font-bold tracking-widest text-slate-900 uppercase">
+                <h2 className="text-sm font-bold tracking-wide text-slate-900 uppercase">
                   Reports
                 </h2>
-                <p className="text-[9px] text-slate-900 tracking-wider mt-0.5 uppercase">
+                <p className="text-[9px] text-slate-500 tracking-wider mt-0.5 uppercase">
                   Select a month
                 </p>
               </div>
@@ -214,16 +214,16 @@ const ReportsTab = () => {
               />
               <div className="relative bg-white w-full max-w-[300px] rounded-lg border border-slate-300 shadow-2xl overflow-hidden">
                 {/* Header */}
-                <div className="px-4 py-3 bg-slate-100 border-b border-slate-200 flex items-center justify-between">
+                <div className="px-4 py-3 bg-white border-b border-slate-300 flex items-center justify-between">
                   <div className="flex items-center gap-2.5">
                     <div>
-                      <h3 className="text-md font-bold text-slate-800 leading-none">
+                      <h3 className="text-sm font-bold tracking-wide text-slate-900 uppercase leading-none">
                         {activeMonth.name}{" "}
                         <span className="text-slate-400 font-medium">
                           {selectedYear}
                         </span>
                       </h3>
-                      <p className="text-[11px] text-slate-400 uppercase tracking-widest mt-0.5">
+                      <p className="text-[11px] text-slate-500 uppercase tracking-widest mt-0.5">
                         Monthly Report
                       </p>
                     </div>

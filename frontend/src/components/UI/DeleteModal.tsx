@@ -51,23 +51,29 @@ return (
   <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
     {/* Backdrop */}
     <div
-      className="fixed inset-0 bg-black/30 backdrop-blur-sm"
+      className="fixed inset-0 bg-gray-900/40 backdrop-blur-sm"
       onClick={() => !deleting && onClose()}
     />
     {/* Modal */}
-    <div className="relative bg-white w-full max-w-xs rounded-xl shadow-xl border border-slate-200 animate-in zoom-in-95 duration-150 overflow-hidden">
+    <div className="relative bg-white w-full max-w-sm rounded-lg shadow-2xl border border-slate-300 animate-in zoom-in-95 duration-150 overflow-hidden">
+      {/* Header */}
+      <div className="px-5 py-3 bg-white border-b border-slate-300">
+        <h2 className="text-sm font-bold tracking-wide text-slate-900 uppercase">
+          Delete Trip
+        </h2>
+      </div>
 
       {/* Body */}
-      <div className="px-5 pt-5 pb-4">
+      <div className="px-5 py-5">
         {/* Icon + Title */}
-        <div className="flex flex-col items-center text-center gap-2 mb-4">
+        <div className="flex flex-col items-center text-center gap-2 mb-5">
           <div
-            className={`w-10 h-10 rounded-full flex items-center justify-center ${
+            className={`w-11 h-11 rounded-full flex items-center justify-center ${
               deleteSuccess
-                ? "bg-green-100 text-green-600"
+                ? "bg-emerald-100 text-emerald-600"
                 : deleteFailed
-                  ? "bg-red-100 text-red-500"
-                  : "bg-slate-100 text-slate-500"
+                  ? "bg-red-100 text-red-600"
+                  : "bg-slate-100 text-slate-600"
             }`}
           >
             {deleteSuccess ? (
@@ -79,14 +85,14 @@ return (
             )}
           </div>
           <div>
-            <h3 className="text-[14px] font-bold text-slate-800">
+            <h3 className="text-sm font-bold tracking-wide text-slate-900 uppercase">
               {deleteSuccess
                 ? "Trip Deleted"
                 : deleteFailed
                   ? "Delete Failed"
                   : "Delete Trip?"}
             </h3>
-            <p className="text-[12px] text-slate-400 mt-0.5">
+            <p className="text-xs text-slate-500 mt-1">
               {deleteSuccess
                 ? "The trip was removed successfully."
                 : deleteFailed
@@ -102,7 +108,7 @@ return (
             <button
               onClick={onClose}
               disabled={deleting}
-              className="flex-1 py-2 rounded-lg text-[12px] font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 disabled:opacity-50 transition-colors"
+              className="flex-1 py-3 rounded-lg text-xs font-bold uppercase tracking-[0.2em] text-slate-600 bg-slate-100 hover:bg-slate-200 disabled:opacity-50 transition-colors"
             >
               Cancel
             </button>
@@ -110,11 +116,11 @@ return (
           <button
             onClick={handleDelete}
             disabled={deleting || deleteSuccess}
-            className={`flex-1 py-2 rounded-lg text-[12px] font-semibold flex items-center justify-center gap-1.5 transition-colors
+            className={`flex-1 py-3 rounded-lg text-xs font-bold uppercase tracking-[0.2em] flex items-center justify-center gap-1.5 transition-colors
               ${
                 deleteSuccess
-                  ? "bg-green-100 text-green-700"
-                  : "bg-red-500 text-white hover:bg-red-600 disabled:opacity-60"
+                  ? "bg-emerald-600 text-white"
+                  : "bg-red-600 text-white hover:bg-red-700 disabled:opacity-60"
               }
             `}
           >
