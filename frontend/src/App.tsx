@@ -1,4 +1,4 @@
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import Home from "../src/pages/Home";
 import "./App.css";
 import { TripProvider } from "./context/TripContext";
@@ -7,8 +7,12 @@ import ProtectedRoute from "./ProtectedRoute";
 import PublicRoute from "./PublicRoutes";
 import { useEffect } from "react";
 import axios from "axios";
+import Footer from "./components/UI/Footer";
 
 function App() {
+  const location = useLocation();
+  const isLanding = location.pathname === "/";
+
   useEffect(() => {
     const interceptorId = axios.interceptors.response.use(
       (response) => response,
@@ -38,29 +42,29 @@ function App() {
   }, []);
 
   return (
-    <Routes>
+    <div className="flex min-h-screen flex-col">
+      <main className={`flex-1 `}>
+        <Routes>
+          <Route element={<PublicRoute />}>
+            <Route path="/" element={<Landing />} />
+          </Route>
 
-      <Route element={<PublicRoute/>}>
-         <Route path="/" element={<Landing />} />
-      </Route>
+          <Route element={<ProtectedRoute />}>
+            <Route
+              path="/home"
+              element={
+                <TripProvider>
+                  <Home />
+                </TripProvider>
+              }
+            />
+          </Route>
 
-
-      //UNCOMMENT THIS VERY VERY IMPORTANT
-      <Route element={<ProtectedRoute />}>
-      {/* <Route> */}
-        <Route
-          path="/home"
-          element={
-            <TripProvider>
-              <Home />
-            </TripProvider>
-          }
-        />
-      </Route>
-
-      <Route path="*" element={<Navigate to="/" replace />} />
-
-    </Routes>
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </main>
+      <Footer fixed={isLanding} />
+    </div>
   );
 }
 

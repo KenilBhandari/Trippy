@@ -91,7 +91,7 @@ const [isMenuOpen, setIsMenuOpen] = useState(false);
     <>
       <div className="min-h-screen bg-gray-100 from-slate-50 via-blue-50 to-indigo-100">
         {/* --- THE RELIABLE ENTERPRISE HEADER --- */}
-        <header className="w-full bg-white border-b border-slate-200 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)]">
+        <header className="w-full  bg-white border-b border-slate-200 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)]">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center h-14 md:h-16 ">
               {/* Left: Brand and Integrated Navigation */}

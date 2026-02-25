@@ -1,4 +1,4 @@
-import { Document, Page, Text, View, StyleSheet, Font } from "@react-pdf/renderer";
+import { Document, Page, Text, View, StyleSheet, Font, Link } from "@react-pdf/renderer";
 import type { Trip } from "../types";
 import { formatDate } from "./FormatDate";
 
@@ -12,151 +12,268 @@ Font.register({
 
 const styles = StyleSheet.create({
   page: {
-    paddingTop: 72,
-    paddingBottom: 50,
+    paddingTop: 68,
+    paddingBottom: 36,
     paddingHorizontal: 36,
-    fontSize: 10,
+    fontSize: 8,
     fontFamily: "NotoSans",
-    color: "#111827",
+    color: "#000000",
+    backgroundColor: "#ffffff",
   },
+
+  // ── HEADER ──────────────────────────────────────────────
   header: {
     position: "absolute",
-    top: 16,
+    top: 14,
     left: 36,
     right: 36,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-end",
-    paddingBottom: 6,
-    borderBottom: "2 solid #f97316",
+    paddingBottom: 8,
+    borderBottom: "2 solid #000000",
   },
-  headerLeft: { gap: 2 },
-  title: { fontSize: 18, fontWeight: "bold", letterSpacing: 0.5 },
-  subtitle: { fontSize: 11, color: "#f97316", fontWeight: "bold" },
-  address: { fontSize: 9, color: "#6b7280", marginTop: 2 },
-  statementText: { fontSize: 11, fontWeight: "bold" },
+  headerLeft: {
+    flexDirection: "column",
+    alignItems: "flex-start",
+    flex: 1,
+  },
+  ownerName: {
+    fontSize: 15,
+    fontWeight: "bold",
+    color: "#000000",
+    letterSpacing: 0.8,
+    textTransform: "uppercase",
+    textAlign: "center",
+  },
+  businessLine: {
+    fontSize: 8.5,
+    color: "#333333",
+    marginTop: 2,
+    textAlign: "center",
+  },
+  address: {
+    fontSize: 7.5,
+    color: "#555555",
+    marginTop: 1.5,
+    textAlign: "center",
+  },
+  statementBlock: {
+    alignItems: "flex-end",
+  },
+  statementLabel: {
+    fontSize: 6.5,
+    color: "#666666",
+    textTransform: "uppercase",
+    letterSpacing: 0.6,
+  },
+  statementText: {
+    fontSize: 9,
+    fontWeight: "bold",
+    color: "#000000",
+    marginTop: 1,
+  },
+
+  // ── TABLE HEADER ─────────────────────────────────────────
   tableHeader: {
     flexDirection: "row",
-    backgroundColor: "#f2f2f2",
-    color: "#1f2937",
-    paddingVertical: 8,
+    backgroundColor: "#eeeeee",
+    paddingVertical: 4.5,
     paddingHorizontal: 6,
-    marginTop: 10,
-    fontSize: 10,
+    marginTop: 8,
+    fontSize: 7.8,
     fontWeight: "bold",
+    color: "#000000",
+    borderTop: "1 solid #000000",
+    borderBottom: "1 solid #000000",
   },
+
+  // ── ROW ──────────────────────────────────────────────────
   row: {
     flexDirection: "row",
-    paddingVertical: 6,
+    paddingVertical: 3.6,
     paddingHorizontal: 6,
-    borderBottom: "1 solid #e5e7eb",
+    borderBottom: "0.5 solid #dddddd",
     alignItems: "center",
   },
-  cellDate: { width: "15%" },
-  cellRoute: { width: "45%", flexDirection: "column", justifyContent: "center" },
-  cellType: { width: "15%" },
-  cellAmount: { width: "25%", textAlign: "right", fontWeight: "bold" },
-  routeText: { fontSize: 10 },
-  routeSeparator: { color: "#7c828c", fontWeight: "normal" },
+  rowAlt: { backgroundColor: "#f9f9f9" },
 
-  
-plateWrapper: {
-  marginTop: 1,           
-  // paddingVertical: 1,   
-  paddingHorizontal: 3,   
-  backgroundColor: "#f3f4f6", 
-  alignSelf: "flex-start",  
-},
-plateText: {
-  fontSize: 7,               
-  fontWeight: "normal",
-  color: "#111827",          
+  // ── COLUMNS ──────────────────────────────────────────────
+  cellSerial:  { width: "5%",  fontSize: 7.5, color: "#666666" },
+  cellDate:    { width: "11%", fontSize: 7.8, color: "#222222" },
+  cellRoute:   { width: "40%", flexDirection: "row", alignItems: "center" },
+  cellVehicle: { width: "17%" },
+  cellType:    { width: "13%" },
+  cellAmount:  { width: "14%", textAlign: "right", fontWeight: "bold", color: "#000000", fontSize: 8.2 },
+
+  routePoint: {
+    fontSize: 8.2,
+    color: "#000000",
+  },
+  routeSep: {
+    fontSize: 8,
+    color: "#aaaaaa",
+    paddingHorizontal: 4,
+  },
+
+  vehicleText: {
+    fontSize: 7.2,
+    fontWeight: "bold",
+    color: "#000000",
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+  },
+  vehicleEmpty: {
+    fontSize: 7.5,
+    color: "#cccccc",
+  },
+
+badgeReturn: {
+  width: 42,
+  textAlign: "center",
+  paddingVertical: 1.5,
+  borderRadius: 2,
+  fontSize: 6.3,
+  fontWeight: "bold",
   textTransform: "uppercase",
+  letterSpacing: 0.2,
+  backgroundColor: "#e8e8e8",
+  color: "#000000",
+  border: "0.5 solid #999999",
+},
+badgeOneWay: {
+  width: 42,
+  textAlign: "center",
+  paddingVertical: 1.5,
+  borderRadius: 2,
+  fontSize: 6.3,
+  fontWeight: "bold",
+  textTransform: "uppercase",
+  letterSpacing: 0.2,
+  backgroundColor: "#ffffff",
+  color: "#444444",
+  border: "0.5 solid #bbbbbb",
 },
 
-
-  summarySection: { marginTop: 12, flexDirection: "row", justifyContent: "flex-end" },
+  // ── SUMMARY ──────────────────────────────────────────────
+  summarySection: {
+    marginTop: 10,
+    flexDirection: "row",
+    justifyContent: "flex-end",
+  },
   totalBox: {
-    width: "40%",
-    borderTop: "1.5 solid #f97316",
-    borderBottom: "1.5 solid #f97316",
-    paddingVertical: 8,
-    paddingHorizontal: 6,
+    width: "34%",
+    borderTop: "1.5 solid #000000",
+    paddingTop: 6,
+    paddingHorizontal: 2,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    backgroundColor: "#fff9f2",
   },
-  totalLabel: { fontWeight: "bold", fontSize: 10, color: "#c2410c" },
-  totalValue: { fontWeight: "bold", fontSize: 11, color: "#111827" },
+  totalLabel: {
+    fontWeight: "bold",
+    fontSize: 8,
+    color: "#000000",
+    textTransform: "uppercase",
+    letterSpacing: 0.4,
+  },
+  totalValue: {
+    fontWeight: "bold",
+    fontSize: 11,
+    color: "#000000",
+  },
+
+  // ── FOOTER ──────────────────────────────────────────────
   footer: {
     position: "absolute",
-    bottom: 24,
+    bottom: 14,
     left: 36,
     right: 36,
-    paddingTop: 8,
-    borderTop: "1 solid #e5e7eb",
+    paddingTop: 5,
+    borderTop: "0.5 solid #cccccc",
     flexDirection: "row",
-    justifyContent: "flex-end",
-    fontSize: 10,
+    justifyContent: "space-between",
+    alignItems: "center",
   },
-  sign: { color: "#6b7280" },
+  footerNote: { color: "#999999", fontSize: 7 },
+  pageNum:    { color: "#999999", fontSize: 7 },
+  appLink:    { color: "#555555", fontSize: 7.5, textDecoration: "none" },
+  sign:       { color: "#555555", fontSize: 7.5 },
 });
 
 interface Props {
   trips: Trip[];
   monthName: string;
   year: number | string;
+  headerDetails?: {
+    ownerName?: string;
+    businessLine?: string;
+    address?: string;
+  };
 }
 
-export const MonthlyReportPDF = ({ trips, monthName, year }: Props) => {
-  const totalFare = trips.reduce((sum, t) => sum + Number(t.fare || 0), 0);
+export const MonthlyReportPDF = ({ trips, monthName, year, headerDetails }: Props) => {
+  const totalFare    = trips.reduce((sum, t) => sum + Number(t.fare || 0), 0);
+  const ownerName    = headerDetails?.ownerName?.trim()    || "TRIPPY TECHNOLOGIES";
+  const businessLine = headerDetails?.businessLine?.trim() || "Web Services Provider";
+  const address      = headerDetails?.address?.trim()      || "Vadodara, Gujarat";
 
   return (
     <Document>
       <Page size="A4" style={styles.page}>
-        {/* HEADER */}
+
+        {/* ── HEADER ── */}
         <View style={styles.header} fixed>
+          {/* Left: name / business / address stacked */}
           <View style={styles.headerLeft}>
-            <Text style={styles.title}>NARESH C BHANDARI</Text>
-            <Text style={styles.subtitle}>Tempo Carrier & Transport Services</Text>
-            <Text style={styles.address}>Sarigam Fansa Char Rasta, Umbergaon, Gujarat</Text>
+            <Text style={styles.ownerName}>{ownerName}</Text>
+            <Text style={styles.businessLine}>{businessLine}</Text>
+            <Text style={styles.address}>{address}</Text>
           </View>
-          <Text style={styles.statementText}>
-            Statement - {monthName} {year}
-          </Text>
+
+          {/* Right: statement label + month year */}
+          <View style={styles.statementBlock}>
+            <Text style={styles.statementLabel}>Monthly Statement</Text>
+            <Text style={styles.statementText}>{monthName} {year}</Text>
+          </View>
         </View>
 
-        {/* TABLE HEADER */}
+        {/* ── TABLE HEADER ── */}
         <View style={styles.tableHeader} fixed>
+          <Text style={styles.cellSerial}>Sr.</Text>
           <Text style={styles.cellDate}>Date</Text>
-          <Text style={styles.cellRoute}>Route / Vehicle</Text>
+          <Text style={styles.cellRoute}>Route</Text>
+          <Text style={styles.cellVehicle}>Vehicle No.</Text>
           <Text style={styles.cellType}>Type</Text>
           <Text style={styles.cellAmount}>Amount</Text>
         </View>
 
-        {/* TABLE BODY */}
+        {/* ── ROWS ── */}
         {trips.map((trip, i) => (
-          <View key={i} style={styles.row} wrap={false}>
+          <View
+            key={i}
+            style={i % 2 !== 0 ? [styles.row, styles.rowAlt] : styles.row}
+            wrap={false}
+          >
+            <Text style={styles.cellSerial}>{i + 1}</Text>
+
             <Text style={styles.cellDate}>{formatDate(trip.tripDate)}</Text>
 
             <View style={styles.cellRoute}>
-              <Text style={styles.routeText}>
-                {trip.startPoint}
-                <Text style={styles.routeSeparator}> to </Text>
-                {trip.endPoint}
-              </Text>
-
-              {/* Number Plate */}
-              {trip.numberPlate && (
-  <View style={styles.plateWrapper}>
-    <Text style={styles.plateText}>{trip.numberPlate.toUpperCase()}</Text>
-  </View>
-)}
-
+              <Text style={styles.routePoint}>{trip.startPoint}</Text>
+              <Text style={styles.routeSep}>—</Text>
+              <Text style={styles.routePoint}>{trip.endPoint}</Text>
             </View>
 
-            <Text style={styles.cellType}>{trip.returnTrip ? "Return" : "One-Way"}</Text>
+            <Text style={[styles.cellVehicle, trip.numberPlate ? styles.vehicleText : styles.vehicleEmpty]}>
+              {trip.numberPlate ? trip.numberPlate.toUpperCase() : "—"}
+            </Text>
+
+            <View style={styles.cellType}>
+              <Text style={trip.returnTrip ? styles.badgeReturn : styles.badgeOneWay}>
+                {trip.returnTrip ? "Return" : "One-Way"}
+              </Text>
+            </View>
 
             <Text style={styles.cellAmount}>
               ₹ {Number(trip.fare).toLocaleString("en-IN")}
@@ -164,7 +281,7 @@ export const MonthlyReportPDF = ({ trips, monthName, year }: Props) => {
           </View>
         ))}
 
-        {/* SUMMARY */}
+        {/* ── SUMMARY ── */}
         <View style={styles.summarySection} wrap={false}>
           <View style={styles.totalBox}>
             <Text style={styles.totalLabel}>Grand Total</Text>
@@ -174,10 +291,20 @@ export const MonthlyReportPDF = ({ trips, monthName, year }: Props) => {
           </View>
         </View>
 
-        {/* FOOTER */}
+        {/* ── FOOTER ── */}
         <View style={styles.footer} fixed>
-          <Text style={styles.sign}>Authorized Signatory</Text>
+          <Text style={styles.footerNote}> {"Generated from "}
+              <Link src="https://trippyyer.vercel.app" style={styles.appLink}>
+            Trippy
+          </Link>
+          </Text>
+          <Text
+            style={styles.pageNum}
+            render={({ pageNumber, totalPages }) => `Page ${pageNumber} / ${totalPages}`}
+          />
+            <Text style={styles.sign}>Authorized Signatory</Text>
         </View>
+
       </Page>
     </Document>
   );

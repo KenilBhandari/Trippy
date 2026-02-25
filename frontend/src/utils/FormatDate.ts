@@ -16,12 +16,24 @@ export function formatTime(dateInput: number): string {
   return d.toLocaleTimeString("en-IN", { hour: "numeric", minute: "2-digit", hour12: true }) || "Invalid";
 }
 
+export function toTimestamp(dateStr?: string, dateTo?: boolean): number | undefined {
+  if (!dateStr) return undefined;
 
-export function toTimestamp(dateStr?: string): number | undefined {
-    if (!dateStr) return undefined; // if empty, return undefined
-    const date = new Date(dateStr);
-    if (isNaN(date.getTime())) return undefined; // invalid date
-    return date.getTime(); // returns timestamp in milliseconds
+  const isDateOnly = /^\d{4}-\d{2}-\d{2}$/.test(dateStr);
+
+  let normalizedStr: string;
+  if (isDateOnly) {
+    normalizedStr = dateTo
+      ? `${dateStr}T23:59:59.999+05:30`
+      : `${dateStr}T00:00:00.000+05:30`;
+  } else {
+    normalizedStr = dateStr;
+  }
+
+  const date = new Date(normalizedStr);
+  if (isNaN(date.getTime())) return undefined;
+
+  return date.getTime();
 }
 
 

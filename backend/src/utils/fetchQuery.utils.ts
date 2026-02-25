@@ -1,28 +1,32 @@
 export const getTimeStamps = () => {
-  const IST_OFFSET = 5.5 * 60 * 60 * 1000;
+  const toMidnightUTC = (date: Date): number => {
+    // Get midnight IST as a UTC timestamp
+    const istMidnight = new Date(
+      date.toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" }) + "T00:00:00+05:30"
+    );
+    return istMidnight.getTime();
+  };
 
   const now = new Date();
-  const nowIST = new Date(now.getTime() + IST_OFFSET);
 
   // -------- TODAY --------
-  const startOfTodayIST = new Date(nowIST);
-  startOfTodayIST.setHours(0, 0, 0, 0);
+  const todayTS = toMidnightUTC(now);
 
   // -------- LAST 7 DAYS --------
-  const last7DaysIST = new Date(nowIST);
-  last7DaysIST.setDate(nowIST.getDate() - 7);
-  last7DaysIST.setHours(0, 0, 0, 0);
+  const last7DaysDate = new Date(now);
+  last7DaysDate.setDate(now.getDate() - 7);
+  const last7DaysTS = toMidnightUTC(last7DaysDate);
 
-  // -------- Start Of Month --------
-const startOfMonthIST = new Date(
-  nowIST.getFullYear(),
-  nowIST.getMonth(),
-  1
-);
+  // -------- START OF MONTH --------
+  const istDateStr = now.toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" });
+  const [year, month] = istDateStr.split("-").map(Number);
+  const startOfMonthTS = new Date(`${year}-${String(month).padStart(2, "0")}-01T00:00:00+05:30`).getTime();
 
+
+  
   return {
-    todayTS: startOfTodayIST.getTime() - IST_OFFSET,
-    last7DaysTS: last7DaysIST.getTime() - IST_OFFSET,
-    startOfMonthTS: startOfMonthIST.getTime() - IST_OFFSET,
+    todayTS,
+    last7DaysTS,
+    startOfMonthTS,
   };
 };

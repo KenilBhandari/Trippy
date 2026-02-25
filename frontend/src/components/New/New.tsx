@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
 import type { NewTripInput } from "../../types";
 import {
@@ -10,7 +10,7 @@ import {
   MapPin,
   XCircle,
   Calendar,
-  ArrowRight,
+  X,
 } from "lucide-react";
 import DatePicker from "react-datepicker";
 import { useDataContext } from "../../context/TripContext";
@@ -18,6 +18,9 @@ import { useDataContext } from "../../context/TripContext";
 interface NewTripTabProps {
   onAddTrip: (trip: NewTripInput) => Promise<void> | void;
 }
+
+const MAX_FARE_DIGITS = 7;
+const MAX_NUMBER_PLATE_LENGTH = 15;
 
 const NewTripTab = ({ onAddTrip }: NewTripTabProps) => {
   const [startPoint, setStartPoint] = useState("SDY");
@@ -31,8 +34,19 @@ const NewTripTab = ({ onAddTrip }: NewTripTabProps) => {
   const [addSuccess, setAddSuccess] = useState(false);
   const [addFailed, setAddFailed] = useState(false);
 
-  const { addingTrip, setAddingTrip, startLocations, endLocations } =
+  const { addingTrip, setAddingTrip, recentLocations, setRecentLocations } =
     useDataContext();
+  
+  const recentStartLocations = useMemo(
+    () => Array.from(new Set(recentLocations.map((loc) => loc.start))),
+    [recentLocations],
+  );
+
+  const recentEndLocations = useMemo(
+    () => Array.from(new Set(recentLocations.map((loc) => loc.end))),
+    [recentLocations],
+  );
+  
   const tripTimestamp = tripDate.setHours(0, 1, 0, 1);
   const isDisabledAddBtn =
     !startPoint.trim() ||
@@ -50,6 +64,17 @@ const NewTripTab = ({ onAddTrip }: NewTripTabProps) => {
     try {
       setAddingTrip(true);
       setAddSuccess(false);
+      const updatedRecentLocations = [
+        { start: startPoint, end: endPoint },
+        ...recentLocations.filter(
+          (loc) => !(loc.start === startPoint && loc.end === endPoint),
+        ),
+      ].slice(0, 15);
+      localStorage.setItem(
+        "recent_loc",
+        JSON.stringify(updatedRecentLocations),
+      );
+      setRecentLocations(updatedRecentLocations);
 
       await onAddTrip({
         startPoint,
@@ -80,6 +105,14 @@ const NewTripTab = ({ onAddTrip }: NewTripTabProps) => {
     } finally {
       setAddingTrip(false);
     }
+  };
+
+  const removeRecentLocation = (value: string, type: "start" | "end") => {
+    const updatedRecentLocations = recentLocations.filter((loc) =>
+      type === "start" ? loc.start !== value : loc.end !== value,
+    );
+    localStorage.setItem("recent_loc", JSON.stringify(updatedRecentLocations));
+    setRecentLocations(updatedRecentLocations);
   };
 
   return (
@@ -123,25 +156,37 @@ const NewTripTab = ({ onAddTrip }: NewTripTabProps) => {
               />
 
               {/* Suggestions Dropdown */}
-              {showStartSuggestions && startLocations.length > 0 && (
+              {showStartSuggestions && recentStartLocations.length > 0 && (
                 <div className="absolute left-0 right-0 top-full mt-2 z-[100] bg-white border-2 border-blue-200 shadow-[6px_6px_0px_0px_rgba(37,99,235,0.12)] overflow-hidden">
                   <div className="max-h-52 overflow-y-auto divide-y divide-slate-100">
-                    {startLocations.map((loc) => (
-                      <button
+                    {recentStartLocations.map((loc) => (
+                      <div
                         key={loc}
-                        type="button"
-                        onMouseDown={() => {
-                          setStartPoint(loc);
-                          setShowStartSuggestions(false);
-                        }}
-                        className="w-full text-left px-4 py-3 hover:bg-blue-600 hover:text-white text-xs font-black uppercase transition-colors flex items-center justify-between group"
+                        className="flex items-center justify-between gap-2 px-2 py-1"
                       >
-                        {loc}
-                        <ArrowRight
-                          size={14}
-                          className="opacity-0 group-hover:opacity-100 transition-all"
-                        />
-                      </button>
+                        <button
+                          type="button"
+                          onMouseDown={() => {
+                            setStartPoint(loc);
+                            setShowStartSuggestions(false);
+                          }}
+                          className="flex-1 text-left px-2 py-2 hover:bg-blue-600 hover:text-white text-xs font-black uppercase transition-colors"
+                        >
+                          {loc}
+                        </button>
+                        <button
+                          type="button"
+                          aria-label={`Delete ${loc}`}
+                          onMouseDown={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            removeRecentLocation(loc, "start");
+                          }}
+                          className="h-7 w-7 shrink-0 flex items-center justify-center rounded border border-slate-200 text-slate-400 hover:text-red-600 hover:border-red-200 hover:bg-red-50 transition-colors"
+                        >
+                          <X size={14} />
+                        </button>
+                      </div>
                     ))}
                   </div>
                 </div>
@@ -198,25 +243,37 @@ const NewTripTab = ({ onAddTrip }: NewTripTabProps) => {
                 className={sharedMainInputClass}
               />
 
-              {showEndSuggestions && endLocations.length > 0 && (
+              {showEndSuggestions && recentEndLocations.length > 0 && (
                 <div className="absolute left-0 right-0 top-full mt-2 z-[100] bg-white border-2 border-blue-200 shadow-[6px_6px_0px_0px_rgba(37,99,235,0.12)] overflow-hidden">
                   <div className="max-h-52 overflow-y-auto divide-y divide-slate-100">
-                    {endLocations.map((loc) => (
-                      <button
+                    {recentEndLocations.map((loc) => (
+                      <div
                         key={loc}
-                        type="button"
-                        onMouseDown={() => {
-                          setEndPoint(loc);
-                          setShowEndSuggestions(false);
-                        }}
-                        className="w-full text-left px-4 py-3 hover:bg-blue-600 hover:text-white text-xs font-black uppercase transition-colors flex items-center justify-between group"
+                        className="flex items-center justify-between gap-2 px-2 py-1"
                       >
-                        {loc}
-                        <ArrowRight
-                          size={14}
-                          className="opacity-0 group-hover:opacity-100 transition-all"
-                        />
-                      </button>
+                        <button
+                          type="button"
+                          onMouseDown={() => {
+                            setEndPoint(loc);
+                            setShowEndSuggestions(false);
+                          }}
+                          className="flex-1 text-left px-2 py-2 hover:bg-blue-600 hover:text-white text-xs font-black uppercase transition-colors"
+                        >
+                          {loc}
+                        </button>
+                        <button
+                          type="button"
+                          aria-label={`Delete ${loc}`}
+                          onMouseDown={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            removeRecentLocation(loc, "end");
+                          }}
+                          className="h-7 w-7 shrink-0 flex items-center justify-center rounded border border-slate-200 text-slate-400 hover:text-red-600 hover:border-red-200 hover:bg-red-50 transition-colors"
+                        >
+                          <X size={14} />
+                        </button>
+                      </div>
                     ))}
                   </div>
                 </div>
@@ -240,7 +297,9 @@ const NewTripTab = ({ onAddTrip }: NewTripTabProps) => {
               value={fare === 0 ? "" : fare}
               onChange={(e) => {
                 const val = e.target.value;
-                if (/^[0-9]*$/.test(val)) setFare(val === "" ? 0 : Number(val));
+                if (/^[0-9]*$/.test(val) && val.length <= MAX_FARE_DIGITS) {
+                  setFare(val === "" ? 0 : Number(val));
+                }
               }}
               placeholder="0.00"
               className={sharedMainInputClass}
@@ -284,7 +343,11 @@ const NewTripTab = ({ onAddTrip }: NewTripTabProps) => {
                 type="text"
                 value={numberPlate ?? ""}
                 placeholder="GJ 15..."
-                onChange={(e) => setNumberPlate(e.target.value.toUpperCase())}
+                onChange={(e) =>
+                  setNumberPlate(
+                    e.target.value.toUpperCase().slice(0, MAX_NUMBER_PLATE_LENGTH),
+                  )
+                }
                 className="w-full font-black text-sm pl-11 pr-4 py-3.5 bg-slate-50 border-2 border-slate-200 rounded-lg text-slate-900 uppercase focus:bg-white focus:border-blue-500 outline-none"
               />
             </div>

@@ -50,7 +50,7 @@ const TripFilterBar: React.FC<TripFilterBarProps> = ({ onFilter }) => {
         recent: quickDate,
         searchString: trimmed || undefined,
         dateFrom: fromDate ? toTimestamp(fromDate) : undefined,
-        dateTo: toDate ? toTimestamp(toDate) : undefined,
+        dateTo: toDate ? toTimestamp(toDate, true) : undefined,
       });
 
       setSearch(trimmed);

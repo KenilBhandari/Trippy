@@ -45,6 +45,11 @@ export interface CurrentReport {
   year: number;
 }
 
+export type RecentLocation = {
+  start: string;
+  end: string;
+};
+
 
 //DASHBOARD
 

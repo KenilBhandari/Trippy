@@ -48,7 +48,10 @@ const TripModal = ({ trip, isOpen, onClose }: TripModalProps) => {
               <label className="block text-[9px] font-black text-slate-400 uppercase tracking-widest mb-0.5">
                 From
               </label>
-              <p className="text-[15px] font-black text-slate-900 leading-tight">
+              <p
+                title={trip.startPoint}
+                className="text-[15px] font-black text-slate-900 leading-tight truncate"
+              >
                 {trip.startPoint}
               </p>
             </div>
@@ -58,7 +61,10 @@ const TripModal = ({ trip, isOpen, onClose }: TripModalProps) => {
               <label className="block text-[9px] font-black text-slate-400 uppercase tracking-widest mb-0.5">
                 To
               </label>
-              <p className="text-[15px] font-black text-slate-900 leading-tight">
+              <p
+                title={trip.endPoint}
+                className="text-[15px] font-black text-slate-900 leading-tight truncate"
+              >
                 {trip.endPoint}
               </p>
             </div>

@@ -4,40 +4,48 @@ export const getTimeStamps = (): {
   startOfWeekTS: number;
   endOfWeekTS: number;
 } => {
-  const IST_OFFSET = 5.5 * 60 * 60 * 1000;
+  const toISTTimestamp = (dateStr: string, time: string): number => {
+    return new Date(`${dateStr}T${time}+05:30`).getTime();
+  };
 
   const now = new Date();
-  const nowIST = new Date(now.getTime() + IST_OFFSET);
 
-  // IST
-  const startOfMonthIST = new Date(nowIST.getFullYear(), nowIST.getMonth(), 1);
+  // Get current date parts in IST
+  const istDateStr = now.toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" });
+  const [year, month, day] = istDateStr.split("-").map(Number);
 
-  const endOfMonthIST = new Date(
-    nowIST.getFullYear(),
-    nowIST.getMonth() + 1,
-    0,
-    23,
-    59,
-    59,
-    999,
+  // -------- START OF MONTH --------
+  const startOfMonthTS = toISTTimestamp(
+    `${year}-${String(month).padStart(2, "0")}-01`,
+    "00:00:00.000"
   );
 
-  const day = nowIST.getDay(); // 0 = Sunday
-  const adjustedDay = day === 0 ? 7 : day; // For monday based
+  // -------- END OF MONTH --------
+  const lastDay = new Date(year, month, 0).getDate(); // last date of current month
+  const endOfMonthTS = toISTTimestamp(
+    `${year}-${String(month).padStart(2, "0")}-${String(lastDay).padStart(2, "0")}`,
+    "23:59:59.999"
+  );
 
-  const startOfWeekIST = new Date(nowIST);
-  startOfWeekIST.setDate(nowIST.getDate() - (adjustedDay - 1));
-  startOfWeekIST.setHours(0, 0, 0, 0);
+  // -------- START OF WEEK (Monday-based) --------
+  const istDate = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Kolkata" }));
+  const dayOfWeek = istDate.getDay(); // 0 = Sunday
+  const adjustedDay = dayOfWeek === 0 ? 7 : dayOfWeek; // Monday = 1 ... Sunday = 7
+  const mondayDate = day - (adjustedDay - 1);
+  const mondayDatePadded = new Date(year, month - 1, mondayDate);
 
-  const endOfWeekIST = new Date(startOfWeekIST);
-  endOfWeekIST.setDate(startOfWeekIST.getDate() + 6);
-  endOfWeekIST.setHours(23, 59, 59, 999);
+  const startOfWeekTS = toISTTimestamp(
+    mondayDatePadded.toLocaleDateString("en-CA"),
+    "00:00:00.000"
+  );
 
-  const startOfMonthTS = startOfMonthIST.getTime() - IST_OFFSET;
-  const endOfMonthTS = endOfMonthIST.getTime() - IST_OFFSET;
+  // -------- END OF WEEK (Sunday) --------
+  const sundayDatePadded = new Date(year, month - 1, mondayDate + 6);
 
-  const startOfWeekTS = startOfWeekIST.getTime() - IST_OFFSET;
-  const endOfWeekTS = endOfWeekIST.getTime() - IST_OFFSET;
+  const endOfWeekTS = toISTTimestamp(
+    sundayDatePadded.toLocaleDateString("en-CA"),
+    "23:59:59.999"
+  );
 
   return { startOfMonthTS, endOfMonthTS, startOfWeekTS, endOfWeekTS };
 };

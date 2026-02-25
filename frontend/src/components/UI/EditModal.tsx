@@ -19,6 +19,9 @@ type EditModalProps = {
   onUpdate: (updatedTrip: Trip) => Promise<void>;
 };
 
+const MAX_FARE_DIGITS = 7;
+const MAX_NUMBER_PLATE_LENGTH = 15;
+
 const EditModal = ({ onUpdate }: EditModalProps) => {
   const [showStartSuggestions, setShowStartSuggestions] = useState(false);
   const [showEndSuggestions, setShowEndSuggestions] = useState(false);
@@ -222,9 +225,15 @@ return (
               ₹
             </div>
             <input
-              type="number"
+              type="text"
+              inputMode="numeric"
               value={activeTrip.fare}
-              onChange={(e) => handleChange("fare", Number(e.target.value))}
+              onChange={(e) => {
+                const val = e.target.value;
+                if (/^[0-9]*$/.test(val) && val.length <= MAX_FARE_DIGITS) {
+                  handleChange("fare", val === "" ? 0 : Number(val));
+                }
+              }}
               placeholder="0.00"
               className="w-full font-black text-base pl-10 pr-4 py-3.5 bg-slate-50 border-2 border-slate-200 rounded-lg text-slate-900 focus:bg-white focus:border-blue-500 outline-none transition-all"
             />
@@ -271,7 +280,10 @@ return (
                 value={activeTrip.numberPlate ?? ""}
                 placeholder="GJ 15 AB 1234"
                 onChange={(e) =>
-                  handleChange("numberPlate", e.target.value.toUpperCase())
+                  handleChange(
+                    "numberPlate",
+                    e.target.value.toUpperCase().slice(0, MAX_NUMBER_PLATE_LENGTH),
+                  )
                 }
                 className="w-full font-black text-sm pl-11 pr-4 py-3.5 bg-slate-50 border-2 border-slate-200 rounded-lg text-slate-900 uppercase focus:bg-white focus:border-blue-500 outline-none"
               />

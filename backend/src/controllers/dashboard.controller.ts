@@ -11,7 +11,7 @@ export const getDashboardStats = async (req: AuthRequest, res: Response) => {
 
     const { startOfMonthTS, endOfMonthTS, startOfWeekTS, endOfWeekTS } =
       getTimeStamps();
-
+      
     const userId = req.user!.id;
 
     const defaultSummary = {

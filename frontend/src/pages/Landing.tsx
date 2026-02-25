@@ -1,9 +1,12 @@
 import { GoogleLogin } from "@react-oauth/google";
 import axios from "axios";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const Landing = () => {
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
 return (
   <div className="flex min-h-screen items-center justify-center bg-[#f3f4f6] px-6">
@@ -49,25 +52,51 @@ return (
 
         {/* Google Button */}
         <div className="flex w-full justify-center">
-          <GoogleLogin
-            onSuccess={async (credentialResponse) => {
-              const res = await axios.post(
-                "http://localhost:5000/user/auth/google",
-                { credential: credentialResponse.credential }
-              );
-              localStorage.setItem("token", res.data.token);
-              localStorage.setItem("user", JSON.stringify(res.data.user));
-              navigate("/home");
-            }}
-            onError={() => console.log("Login failed")}
-            useOneTap
-            theme="filled_blue"
-            shape="rectangular"
-            text="continue_with"
-            width="210"
-            size="large"
-          />
+          {isLoading ? (
+            <div className="flex w-[210px] items-center justify-center gap-2 rounded-md border border-slate-200 bg-slate-50 py-3 text-sm font-medium text-slate-700">
+              <span className="h-4 w-4 animate-spin rounded-full border-2 border-slate-300 border-t-blue-600" />
+              Signing you in...
+            </div>
+          ) : (
+            <GoogleLogin
+              onSuccess={async (credentialResponse) => {
+                if (!credentialResponse.credential) {
+                  setErrorMessage("Google login did not return a credential.");
+                  return;
+                }
+
+                setErrorMessage("");
+                setIsLoading(true);
+                try {
+                  const res = await axios.post(
+                    "http://localhost:5000/user/auth/google",
+                    { credential: credentialResponse.credential }
+                  );
+                  localStorage.setItem("token", res.data.token);
+                  localStorage.setItem("user", JSON.stringify(res.data.user));
+                  navigate("/home");
+                } catch (error) {
+                  console.error("Google login failed:", error);
+                  setErrorMessage("Unable to sign in right now. Please try again.");
+                } finally {
+                  setIsLoading(false);
+                }
+              }}
+              onError={() => setErrorMessage("Google login failed. Please try again.")}
+              // useOneTap
+              theme="filled_blue"
+              shape="rectangular"
+              text="continue_with"
+              width="210"
+              size="large"
+            />
+          )}
         </div>
+        {errorMessage && (
+          <p className="mt-3 text-center text-xs font-medium text-red-600">
+            {errorMessage}
+          </p>
+        )}
 
         {/* Brand Signature */}
         <div className="mt-6 flex items-center gap-3">

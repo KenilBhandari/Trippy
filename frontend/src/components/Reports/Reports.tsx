@@ -6,6 +6,7 @@ import {
   ChevronRight,
   X,
   Eye,
+  FileText,
 } from "lucide-react";
 import { pdf } from "@react-pdf/renderer";
 import { useDataContext } from "../../context/TripContext";
@@ -28,6 +29,12 @@ const ReportsTab = () => {
   } | null>(null);
   const [viewReport, setViewReport] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
+  const [showPdfConfig, setShowPdfConfig] = useState(false);
+  const [pdfHeaderDetails, setPdfHeaderDetails] = useState({
+    ownerName: "TRIPPY TECHNOLOGIES",
+    businessLine: "Web Services Provider",
+    address: "Vadodara, Gujarat",
+  });
 
   const months = [
     "Jan",
@@ -58,15 +65,15 @@ const ReportsTab = () => {
 
     setIsFetching(true);
 
-    const startOfMonth = new Date(selectedYear, activeMonth.index, 1).getTime();
-    const endOfMonth = new Date(
-      selectedYear,
-      activeMonth.index + 1,
-      0,
-      23,
-      59,
-      59,
-    ).getTime();
+const startOfMonth = new Date(
+  `${selectedYear}-${String(activeMonth.index + 1).padStart(2, "0")}-01T00:00:00+05:30`
+).getTime();
+const lastDay = new Date(selectedYear, activeMonth.index + 1, 0).getDate();
+const endOfMonth = new Date(
+  `${selectedYear}-${String(activeMonth.index + 1).padStart(2, "0")}-${String(lastDay).padStart(2, "0")}T23:59:59.999+05:30`
+).getTime();
+
+
 
     const filter = {
       limit: -1,
@@ -103,6 +110,7 @@ const ReportsTab = () => {
           trips={monthlyReport}
           monthName={activeMonth.name}
           year={selectedYear}
+          headerDetails={pdfHeaderDetails}
         />,
       ).toBlob();
 
@@ -183,6 +191,31 @@ const ReportsTab = () => {
               </div>
             </div>
 
+            <div className="px-5 py-3.5 bg-slate-50 border-b border-slate-200">
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div className="p-1.5 rounded-md bg-blue-100 border border-blue-200">
+                    <FileText size={13} className="text-blue-700" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-[10px] font-black text-slate-600 uppercase tracking-[0.16em]">
+                      PDF Header (Used In Download)
+                    </p>
+                    <p className="text-[11px] text-slate-500 truncate">
+                      {pdfHeaderDetails.ownerName} • {pdfHeaderDetails.businessLine}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowPdfConfig(true)}
+                  className="shrink-0 px-2.5 py-1.5 text-[10px] font-bold border border-slate-300 rounded-md bg-white hover:bg-slate-100 text-slate-700 uppercase tracking-wider transition-colors"
+                >
+                  Configure
+                </button>
+              </div>
+            </div>
+
             {/* Month Grid — same cols on all screens */}
             <div className="grid grid-cols-3 bg-slate-200 gap-px">
               {months.map((month, index) => (
@@ -206,6 +239,99 @@ const ReportsTab = () => {
           </div>
 
           {/* Modal */}
+          {showPdfConfig && (
+            <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+              <div
+                className="absolute inset-0 bg-slate-900/40 backdrop-blur-[2px]"
+                onClick={() => setShowPdfConfig(false)}
+              />
+              <div className="relative bg-white w-full max-w-md rounded-lg border border-slate-300 shadow-2xl overflow-hidden">
+                <div className="px-4 py-3 bg-white border-b border-slate-300 flex items-center justify-between">
+                  <div>
+                    <h3 className="text-sm font-bold tracking-wide text-slate-900 uppercase leading-none">
+                      PDF Header Details
+                    </h3>
+                    <p className="text-[11px] text-slate-500 uppercase tracking-widest mt-1">
+                      Used in monthly report download
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setShowPdfConfig(false)}
+                    className="p-1 text-slate-400 hover:text-slate-600 hover:bg-slate-200 rounded transition-colors"
+                  >
+                    <X size={14} />
+                  </button>
+                </div>
+
+                <div className="p-4 space-y-3">
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                      Name
+                    </label>
+                    <input
+                      type="text"
+                      value={pdfHeaderDetails.ownerName}
+                      onChange={(e) =>
+                        setPdfHeaderDetails((prev) => ({
+                          ...prev,
+                          ownerName: e.target.value,
+                        }))
+                      }
+                      placeholder="Enter name"
+                      className="w-full px-3 py-2.5 text-xs font-semibold border border-slate-300 rounded-md bg-white focus:outline-none focus:border-blue-500"
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                      Business
+                    </label>
+                    <input
+                      type="text"
+                      value={pdfHeaderDetails.businessLine}
+                      onChange={(e) =>
+                        setPdfHeaderDetails((prev) => ({
+                          ...prev,
+                          businessLine: e.target.value,
+                        }))
+                      }
+                      placeholder="Enter business line"
+                      className="w-full px-3 py-2.5 text-xs font-semibold border border-slate-300 rounded-md bg-white focus:outline-none focus:border-blue-500"
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                      Address
+                    </label>
+                    <input
+                      type="text"
+                      value={pdfHeaderDetails.address}
+                      onChange={(e) =>
+                        setPdfHeaderDetails((prev) => ({
+                          ...prev,
+                          address: e.target.value,
+                        }))
+                      }
+                      placeholder="Enter address"
+                      className="w-full px-3 py-2.5 text-xs font-semibold border border-slate-300 rounded-md bg-white focus:outline-none focus:border-blue-500"
+                    />
+                  </div>
+                </div>
+
+                <div className="px-4 py-3 border-t border-slate-200 flex justify-end">
+                  <button
+                    type="button"
+                    onClick={() => setShowPdfConfig(false)}
+                    className="px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider rounded-md border border-slate-300 text-slate-700 hover:bg-slate-100 transition-colors"
+                  >
+                    Done
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
           {activeMonth && (
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
               <div

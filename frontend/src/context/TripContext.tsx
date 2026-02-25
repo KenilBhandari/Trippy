@@ -4,7 +4,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import type { CurrentReport, DashboardData, Trip, User } from "../types";
+import type { CurrentReport, DashboardData, RecentLocation, Trip, User } from "../types";
 
 type TripContextType = {
   
@@ -57,6 +57,8 @@ type TripContextType = {
 
   startLocations: string[];
   endLocations: string[];
+  recentLocations: RecentLocation[];
+  setRecentLocations: React.Dispatch<React.SetStateAction<RecentLocation[]>>;
 
   dashboardData: DashboardData | null;
   setDashboardData: React.Dispatch<React.SetStateAction<DashboardData | null>>;
@@ -110,6 +112,16 @@ export function TripProvider({ children }: { children: ReactNode }) {
     "Phase 3",
   ];
 
+  const [recentLocations, setRecentLocations] = useState<RecentLocation[]>(() => {
+    try {
+      return JSON.parse(localStorage.getItem("recent_loc") || "[]");
+    } catch {
+      return [];
+    }
+  });
+
+  
+  
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
   const [dashboardNeedsRefresh, setDashboardNeedsRefresh] = useState(false);
 
@@ -152,6 +164,8 @@ export function TripProvider({ children }: { children: ReactNode }) {
         setToDate,
         startLocations,
         endLocations,
+        recentLocations,
+        setRecentLocations,
         dashboardData,
         setDashboardData,
         dashboardNeedsRefresh,
