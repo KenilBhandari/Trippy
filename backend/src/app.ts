@@ -13,17 +13,17 @@ if (!process.env.MONGO_URI) {
 const app = express();
 
 app.use(
-  cors({origin: "*"}),
-  // cors({
-  //   origin: [
-  //     "http://localhost:5173",
-  //     "http://localhost:5174",
-  //     "https://trippyyer.vercel.app",
-  //     "http://192.168.0.105:5173",
-  //     "http://localhost:3000",
-  //     "https://trippy-serverless.vercel.app",
-  //   ],
-  // }),
+  // cors({origin: "*"}),
+  cors({
+    origin: [
+      "http://localhost:5173",
+      "http://localhost:5174",
+      "https://trippyyer.vercel.app",
+      "http://192.168.0.105:5173",
+      "http://localhost:3000",
+      "https://trippy-serverless.vercel.app",
+    ],
+  }),
 );
 
 app.use(express.json());
