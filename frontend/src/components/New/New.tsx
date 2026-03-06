@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
 import type { NewTripInput } from "../../types";
 import {
@@ -34,18 +34,14 @@ const NewTripTab = ({ onAddTrip }: NewTripTabProps) => {
   const [addSuccess, setAddSuccess] = useState(false);
   const [addFailed, setAddFailed] = useState(false);
 
-  const { addingTrip, setAddingTrip, recentLocations, setRecentLocations } =
-    useDataContext();
-  
-  const recentStartLocations = useMemo(
-    () => Array.from(new Set(recentLocations.map((loc) => loc.start))),
-    [recentLocations],
-  );
-
-  const recentEndLocations = useMemo(
-    () => Array.from(new Set(recentLocations.map((loc) => loc.end))),
-    [recentLocations],
-  );
+  const {
+    addingTrip,
+    setAddingTrip,
+    recentStartLocations,
+    setRecentStartLocations,
+    recentEndLocations,
+    setRecentEndLocations,
+  } = useDataContext();
   
   const tripTimestamp = tripDate.setHours(0, 1, 0, 1);
   const isDisabledAddBtn =
@@ -64,17 +60,21 @@ const NewTripTab = ({ onAddTrip }: NewTripTabProps) => {
     try {
       setAddingTrip(true);
       setAddSuccess(false);
-      const updatedRecentLocations = [
-        { start: startPoint, end: endPoint },
-        ...recentLocations.filter(
-          (loc) => !(loc.start === startPoint && loc.end === endPoint),
-        ),
+      const updatedStartLocations = [
+        startPoint,
+        ...recentStartLocations.filter((loc) => loc !== startPoint),
+      ].slice(0, 15);
+      const updatedEndLocations = [
+        endPoint,
+        ...recentEndLocations.filter((loc) => loc !== endPoint),
       ].slice(0, 15);
       localStorage.setItem(
-        "recent_loc",
-        JSON.stringify(updatedRecentLocations),
+        "recent_start_loc",
+        JSON.stringify(updatedStartLocations),
       );
-      setRecentLocations(updatedRecentLocations);
+      localStorage.setItem("recent_end_loc", JSON.stringify(updatedEndLocations));
+      setRecentStartLocations(updatedStartLocations);
+      setRecentEndLocations(updatedEndLocations);
 
       await onAddTrip({
         startPoint,
@@ -101,18 +101,31 @@ const NewTripTab = ({ onAddTrip }: NewTripTabProps) => {
       setTimeout(() => {
         setAddFailed(false);
       }, 1500);
-      // alert("Trip could not be saved. Please try again.");
     } finally {
       setAddingTrip(false);
     }
   };
 
   const removeRecentLocation = (value: string, type: "start" | "end") => {
-    const updatedRecentLocations = recentLocations.filter((loc) =>
-      type === "start" ? loc.start !== value : loc.end !== value,
+    if (type === "start") {
+      const updatedStartLocations = recentStartLocations.filter(
+        (loc) => loc !== value,
+      );
+      localStorage.setItem(
+        "recent_start_loc",
+        JSON.stringify(updatedStartLocations),
+      );
+      setRecentStartLocations(updatedStartLocations);
+      return;
+    }
+    const updatedEndLocations = recentEndLocations.filter(
+      (loc) => loc !== value,
     );
-    localStorage.setItem("recent_loc", JSON.stringify(updatedRecentLocations));
-    setRecentLocations(updatedRecentLocations);
+    localStorage.setItem(
+      "recent_end_loc",
+      JSON.stringify(updatedEndLocations),
+    );
+    setRecentEndLocations(updatedEndLocations);
   };
 
   return (

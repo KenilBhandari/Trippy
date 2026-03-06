@@ -69,7 +69,7 @@ return (
                 setIsLoading(true);
                 try {
                   const res = await axios.post(
-                    "https://backend-fake-sand.vercel.app/user/auth/google",
+                    "http://localhost:5000/user/auth/google",
                     { credential: credentialResponse.credential }
                   );
                   localStorage.setItem("token", res.data.token);

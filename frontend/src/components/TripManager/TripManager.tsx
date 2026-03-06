@@ -1,11 +1,5 @@
 import React, { useMemo, useState } from "react";
-import {
-  ArrowRight,
-  Trash2,
-  Edit,
-  Truck,
-  ArrowUpDown,
-} from "lucide-react";
+import { ArrowRight, Trash2, Edit, Truck } from "lucide-react";
 import { useDataContext } from "../../context/TripContext";
 import EditModal from "../UI/EditModal";
 import { editTrip, deleteTripByID } from "../../api/trips";
@@ -15,6 +9,8 @@ import { formatDate } from "../../utils/FormatDate";
 import type { Trip, TripFilter } from "../../types";
 import DeleteModal from "../UI/DeleteModal";
 import TripModal from "../UI/TripModal";
+import Skeleton from "../UI/Skeleton";
+import ReturnTripBadge from "../UI/ReturnTripBadge";
 
 const TripManagement = () => {
   const {
@@ -32,6 +28,7 @@ const TripManagement = () => {
     fromDate,
     toDate,
     setDashboardNeedsRefresh,
+    tripsLoading
   } = useDataContext();
 
   const [selectedTrip, setSelectedTrip] = useState<Trip | null>(null);
@@ -110,7 +107,33 @@ return (
       {/* Header */}
 
       <div className="divide-y divide-slate-100">
-        {tripsToRender.length === 0 ? (
+        {tripsLoading ? (
+          <div className="divide-y">
+            {Array.from({ length: 5 }).map((_, index) => (
+              <div
+                key={`latest-skeleton-${index}`}
+                className="flex items-center justify-between gap-3 px-4 py-3 border border-slate-200"
+              >
+                <div className="flex-1 min-w-0 space-y-2">
+                  <div className="flex items-center gap-2">
+                    <Skeleton className="h-4 w-24 sm:w-32 rounded-md" />
+                    <Skeleton className="h-3 w-3 rounded-full" />
+                    <Skeleton className="h-4 w-28 sm:w-36 rounded-md" />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Skeleton className="h-3 w-20 rounded-md" />
+                    <Skeleton className="h-4 w-16 rounded-md" />
+                    <Skeleton className="h-4 w-10 rounded-md" />
+                  </div>
+                </div>
+                <div className="shrink-0 text-right min-w-[70px] space-y-1">
+                  <Skeleton className="h-5 w-16 rounded-md" />
+                  <Skeleton className="h-3 w-8 rounded-md" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : tripsToRender.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-10 border border-dashed border-slate-200 rounded-md">
             <Truck size={26} className="text-slate-300 mb-2" />
             <p className="text-slate-400 font-semibold uppercase tracking-wide text-xs">
@@ -154,8 +177,8 @@ return (
                     <>
                       <span className="text-slate-300 select-none">·</span>
                       <div className="inline-flex items-center gap-[3px] px-1.5 py-[3px] rounded-sm border border-slate-200 bg-slate-50 sm:border-slate-300 sm:bg-slate-100">
-                        <Truck size={9} className="text-slate-500 shrink-0" />
-                        <span className="text-[9px] sm:text-[10px] font-bold text-slate-600 sm:text-slate-600 tracking-widest uppercase leading-none">
+                        <Truck size={10} className="text-slate-500 shrink-0" />
+                        <span className="text-[10px] sm:text-[10px] font-bold text-slate-600 sm:text-slate-600 tracking-widest uppercase leading-[4px]">
                           {trip.numberPlate}
                         </span>
                       </div>
@@ -167,23 +190,7 @@ return (
                       <span className="text-slate-200 sm:text-slate-300 select-none leading-none">
                         ·
                       </span>
-                      <div className="inline-flex items-center gap-1 px-1.5 py-[3px] rounded-sm sm:hidden bg-blue-500 border border-blue-500">
-                        <ArrowUpDown
-                          size={8}
-                          strokeWidth={3}
-                          className="text-white shrink-0"
-                        />
-                      </div>
-                      <div className="hidden sm:inline-flex items-center gap-1 px-2 py-[3px] rounded-sm border border-blue-300 bg-blue-50">
-                        <ArrowUpDown
-                          size={9}
-                          strokeWidth={3}
-                          className="text-blue-500 shrink-0"
-                        />
-                        <span className="text-[10px] font-bold uppercase tracking-widest text-blue-600 leading-none">
-                          Return
-                        </span>
-                      </div>
+                      <ReturnTripBadge />
                     </>
                   )}
                 </div>

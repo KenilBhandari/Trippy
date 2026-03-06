@@ -8,7 +8,6 @@ import {
   ArrowDown,
   ArrowUp,
   Truck,
-  ArrowUpDown,
 } from "lucide-react";
 import type { Trip } from "../../types";
 import { useDataContext } from "../../context/TripContext";
@@ -18,6 +17,7 @@ import { fetchAndSetTrips } from "../../utils/BasicFetch";
 import { formatDate } from "../../utils/FormatDate";
 import DeleteModal from "../UI/DeleteModal";
 import TripModal from "../UI/TripModal";
+import ReturnTripBadge from "../UI/ReturnTripBadge";
 
 interface ViewReportProps {
   trips?: Trip[];
@@ -87,7 +87,7 @@ return (
             </h2>
           )}
 
-     <button
+          <button
             onClick={toggleSort}
             className="flex items-center gap-1 p-1.5 bg-slate-200 rounded-full hover:bg-slate-300 text-slate-700 border border-slate-300 transition-colors"
             title="Toggle Sort"
@@ -144,8 +144,8 @@ return (
                     <>
                       <span className="text-slate-300 select-none">·</span>
                       <div className="inline-flex items-center gap-[3px] px-1.5 py-[3px] rounded-sm border border-slate-200 bg-slate-50 sm:border-slate-300 sm:bg-slate-100">
-                        <Truck size={9} className="text-slate-500 shrink-0" />
-                        <span className="text-[9px] sm:text-[10px] font-bold text-slate-600 sm:text-slate-600 tracking-widest uppercase leading-none">
+                        <Truck size={10} className="text-slate-500 shrink-0" />
+                        <span className="text-[10px] sm:text-[10px] font-bold text-slate-600 sm:text-slate-600 tracking-widest uppercase leading-[4px]">
                           {trip.numberPlate}
                         </span>
                       </div>
@@ -157,23 +157,7 @@ return (
                       <span className="text-slate-200 sm:text-slate-300 select-none leading-none">
                         ·
                       </span>
-                      <div className="inline-flex items-center gap-1 px-1.5 py-[3px] rounded-sm sm:hidden bg-blue-500 border border-blue-500">
-                        <ArrowUpDown
-                          size={8}
-                          strokeWidth={3}
-                          className="text-white shrink-0"
-                        />
-                      </div>
-                      <div className="hidden sm:inline-flex items-center gap-1 px-2 py-[3px] rounded-sm border border-blue-300 bg-blue-50">
-                        <ArrowUpDown
-                          size={9}
-                          strokeWidth={3}
-                          className="text-blue-500 shrink-0"
-                        />
-                        <span className="text-[10px] font-bold uppercase tracking-widest text-blue-600 leading-none">
-                          Return
-                        </span>
-                      </div>
+                      <ReturnTripBadge />
                     </>
                   )}
                 </div>

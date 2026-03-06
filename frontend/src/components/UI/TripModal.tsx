@@ -1,6 +1,7 @@
-import { X, Calendar, Clock, Truck, ArrowUpDown } from "lucide-react";
+import { X, Calendar, Clock, Truck } from "lucide-react";
 import type { Trip } from "../../types";
 import { formatDate, formatTime } from "../../utils/FormatDate";
+import ReturnTripBadge from "./ReturnTripBadge";
 
 interface TripModalProps {
   trip: Trip;
@@ -110,16 +111,7 @@ const TripModal = ({ trip, isOpen, onClose }: TripModalProps) => {
               </div>
             </div>
             {trip.returnTrip && (
-              <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 border border-blue-200 rounded-md">
-                <ArrowUpDown
-                  size={10}
-                  strokeWidth={3}
-                  className="text-blue-600"
-                />
-                <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest">
-                  Return
-                </span>
-              </div>
+              <ReturnTripBadge variant="full" />
             )}
           </div>
 

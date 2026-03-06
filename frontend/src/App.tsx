@@ -48,7 +48,6 @@ function App() {
           <Route element={<PublicRoute />}>
             <Route path="/" element={<Landing />} />
           </Route>
-
           <Route element={<ProtectedRoute />}>
             <Route
               path="/home"

@@ -14,6 +14,13 @@ import { fetchReports } from "../../utils/BasicFetch";
 import { MonthlyReportPDF } from "../../utils/MonthlyReportPrint";
 import ViewReport from "../ViewReport/ViewReport";
 
+
+type PdfHeaderType = {
+ ownerName: string;
+      businessLine: string;
+      address: string;
+}
+
 const ReportsTab = () => {
   const {
     monthlyReport,
@@ -30,11 +37,32 @@ const ReportsTab = () => {
   const [viewReport, setViewReport] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
   const [showPdfConfig, setShowPdfConfig] = useState(false);
-  const [pdfHeaderDetails, setPdfHeaderDetails] = useState({
-    ownerName: "TRIPPY TECHNOLOGIES",
-    businessLine: "Web Services Provider",
-    address: "Vadodara, Gujarat",
-  });
+  const [pdfHeaderDetails, setPdfHeaderDetails] = useState<PdfHeaderType>(
+    () => {
+      const defaults = {
+        ownerName: "Trippy Technologies",
+        businessLine: "Carrier & Transport Services",
+        address: "Ring Road, Surat, Gujarat - 395002",
+      };
+      try {
+        const stored = JSON.parse(
+          localStorage.getItem("reports_pdf_header") || "null",
+        );
+        if (
+          stored &&
+          typeof stored === "object" &&
+          typeof stored.ownerName === "string" &&
+          typeof stored.businessLine === "string" &&
+          typeof stored.address === "string"
+        ) {
+          return stored;
+        }
+      } catch {
+        // ignore invalid localStorage
+      }
+      return defaults;
+    },
+  );
 
   const months = [
     "Jan",
@@ -59,21 +87,20 @@ const ReportsTab = () => {
     );
   }, [currentMonthlyReport, activeMonth, selectedYear]);
 
+
   const loadReportData = async () => {
     if (!activeMonth) return false;
     if (isDataValid) return true;
 
     setIsFetching(true);
 
-const startOfMonth = new Date(
-  `${selectedYear}-${String(activeMonth.index + 1).padStart(2, "0")}-01T00:00:00+05:30`
-).getTime();
-const lastDay = new Date(selectedYear, activeMonth.index + 1, 0).getDate();
-const endOfMonth = new Date(
-  `${selectedYear}-${String(activeMonth.index + 1).padStart(2, "0")}-${String(lastDay).padStart(2, "0")}T23:59:59.999+05:30`
-).getTime();
-
-
+    const startOfMonth = new Date(
+      `${selectedYear}-${String(activeMonth.index + 1).padStart(2, "0")}-01T00:00:00+05:30`,
+    ).getTime();
+    const lastDay = new Date(selectedYear, activeMonth.index + 1, 0).getDate();
+    const endOfMonth = new Date(
+      `${selectedYear}-${String(activeMonth.index + 1).padStart(2, "0")}-${String(lastDay).padStart(2, "0")}T23:59:59.999+05:30`,
+    ).getTime();
 
     const filter = {
       limit: -1,
@@ -130,6 +157,14 @@ const endOfMonth = new Date(
   const handleOpenView = async () => {
     const ready = await loadReportData();
     if (ready) setViewReport(true);
+  };
+
+  const handleConfigSave = () => {
+    localStorage.setItem(
+      "reports_pdf_header",
+      JSON.stringify(pdfHeaderDetails),
+    );
+    setShowPdfConfig(false);
   };
 
   return (
@@ -199,17 +234,18 @@ const endOfMonth = new Date(
                   </div>
                   <div className="min-w-0">
                     <p className="text-[10px] font-black text-slate-600 uppercase tracking-[0.16em]">
-                      PDF Header (Used In Download)
+                      PDF Header
                     </p>
                     <p className="text-[11px] text-slate-500 truncate">
-                      {pdfHeaderDetails.ownerName} • {pdfHeaderDetails.businessLine}
+                      {pdfHeaderDetails.ownerName} •{" "}
+                      {pdfHeaderDetails.businessLine}
                     </p>
                   </div>
                 </div>
                 <button
                   type="button"
                   onClick={() => setShowPdfConfig(true)}
-                  className="shrink-0 px-2.5 py-1.5 text-[10px] font-bold border border-slate-300 rounded-md bg-white hover:bg-slate-100 text-slate-700 uppercase tracking-wider transition-colors"
+                  className="shrink-0 px-2.5 py-1.5 text-[10px] leading-5 font-[1000] border border-slate-300 rounded-md bg-white hover:bg-slate-100 text-slate-700 uppercase tracking-wider transition-colors"
                 >
                   Configure
                 </button>
@@ -242,7 +278,7 @@ const endOfMonth = new Date(
           {showPdfConfig && (
             <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
               <div
-                className="absolute inset-0 bg-slate-900/40 backdrop-blur-[2px]"
+                className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"
                 onClick={() => setShowPdfConfig(false)}
               />
               <div className="relative bg-white w-full max-w-md rounded-lg border border-slate-300 shadow-2xl overflow-hidden">
@@ -251,9 +287,6 @@ const endOfMonth = new Date(
                     <h3 className="text-sm font-bold tracking-wide text-slate-900 uppercase leading-none">
                       PDF Header Details
                     </h3>
-                    <p className="text-[11px] text-slate-500 uppercase tracking-widest mt-1">
-                      Used in monthly report download
-                    </p>
                   </div>
                   <button
                     onClick={() => setShowPdfConfig(false)}
@@ -322,10 +355,10 @@ const endOfMonth = new Date(
                 <div className="px-4 py-3 border-t border-slate-200 flex justify-end">
                   <button
                     type="button"
-                    onClick={() => setShowPdfConfig(false)}
-                    className="px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider rounded-md border border-slate-300 text-slate-700 hover:bg-slate-100 transition-colors"
+                    onClick={handleConfigSave}
+                    className="px-3 py-1.5 text-[11px] font-bold uppercase leading-1 tracking-wider rounded-md border border-slate-300 text-slate-700 hover:bg-slate-100 transition-colors"
                   >
-                    Done
+                    Save
                   </button>
                 </div>
               </div>
@@ -335,7 +368,7 @@ const endOfMonth = new Date(
           {activeMonth && (
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
               <div
-                className="absolute inset-0 bg-slate-900/40 backdrop-blur-[2px]"
+                className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"
                 onClick={() => !isFetching && setActiveMonth(null)}
               />
               <div className="relative bg-white w-full max-w-[300px] rounded-lg border border-slate-300 shadow-2xl overflow-hidden">

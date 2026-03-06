@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   TrendingUp,
   Truck,
@@ -15,6 +15,7 @@ import {
   getMonthName,
 } from "../../utils/dashboard.utils";
 import type { DashboardSummary } from "../../types";
+import Skeleton from "../UI/Skeleton";
 
 type StatCardItem = {
   icon: LucideIcon;
@@ -53,6 +54,18 @@ const StatCard = ({ icon: Icon, label, value }: StatCardItem) => {
       <p className="text-lg sm:text-xl font-semibold text-slate-900 tabular-nums">
         {value}
       </p>
+    </div>
+  );
+};
+
+const StatCardSkeleton = () => {
+  return (
+    <div className="bg-white border border-slate-300 px-3 py-3 sm:px-4 sm:py-4">
+      <div className="flex items-center justify-between mb-2">
+        <Skeleton className="h-3 w-20 rounded-sm" />
+        <Skeleton className="h-4 w-4 rounded-sm" />
+      </div>
+      <Skeleton className="h-6 w-24 rounded-sm" />
     </div>
   );
 };
@@ -122,6 +135,7 @@ const Dashboard = () => {
     dashboardNeedsRefresh,
     setDashboardNeedsRefresh,
   } = useDataContext();
+  const [dashboardLoading, setDashboardLoading] = useState(false);
 
   const summary: DashboardSummary = dashboardData?.summary ?? EMPTY_SUMMARY;
 
@@ -182,15 +196,22 @@ const Dashboard = () => {
 
   useEffect(() => {
     if (!dashboardData) {
-      loadDashboard(setDashboardData);
+      setDashboardLoading(true);
+      loadDashboard(setDashboardData)
+        .catch(() => null)
+        .finally(() => setDashboardLoading(false));
     }
   }, [dashboardData, setDashboardData]);
 
   useEffect(() => {
     if (activeTab === "dashboard" && dashboardNeedsRefresh) {
-      loadDashboard(setDashboardData).finally(() => {
-        setDashboardNeedsRefresh(false);
-      });
+      setDashboardLoading(true);
+      loadDashboard(setDashboardData)
+        .catch(() => null)
+        .finally(() => {
+          setDashboardNeedsRefresh(false);
+          setDashboardLoading(false);
+        });
     }
   }, [
     activeTab,
@@ -208,14 +229,18 @@ const Dashboard = () => {
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        {statCards.map((card) => (
-          <StatCard
-            key={card.label}
-            icon={card.icon}
-            label={card.label}
-            value={card.value}
-          />
-        ))}
+        {dashboardLoading
+          ? Array.from({ length: 4 }).map((_, index) => (
+              <StatCardSkeleton key={`stat-skeleton-${index}`} />
+            ))
+          : statCards.map((card) => (
+              <StatCard
+                key={card.label}
+                icon={card.icon}
+                label={card.label}
+                value={card.value}
+              />
+            ))}
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
@@ -228,7 +253,18 @@ const Dashboard = () => {
 
           <div className="px-3 sm:px-4 py-4 sm:py-5">
             <div className="flex items-end justify-between h-52 sm:h-64 gap-2 sm:gap-3">
-              {weeklyBars.length > 0 ? (
+              {dashboardLoading ? (
+                Array.from({ length: 7 }).map((_, index) => (
+                  <div
+                    key={`weekly-skeleton-${index}`}
+                    className="flex-1 flex flex-col items-center justify-end h-full"
+                  >
+                    <Skeleton className="mb-2 h-3 w-10 rounded-sm" />
+                    <Skeleton className="w-full max-w-[18px] sm:max-w-[22px] rounded-sm h-32" />
+                    <Skeleton className="mt-2 h-3 w-6 rounded-sm" />
+                  </div>
+                ))
+              ) : weeklyBars.length > 0 ? (
                 weeklyBars.map((day) => (
                   <RenderBar
                     key={day.key}
@@ -258,7 +294,18 @@ const Dashboard = () => {
                 monthlyBars.length > 0 ? "min-w-[480px]" : ""
               }`}
             >
-              {monthlyBars.length > 0 ? (
+              {dashboardLoading ? (
+                Array.from({ length: 7 }).map((_, index) => (
+                  <div
+                    key={`monthly-skeleton-${index}`}
+                    className="flex-1 flex flex-col items-center justify-end h-full"
+                  >
+                    <Skeleton className="mb-2 h-3 w-10 rounded-sm" />
+                    <Skeleton className="w-full max-w-[18px] sm:max-w-[22px] rounded-sm h-32" />
+                    <Skeleton className="mt-2 h-3 w-6 rounded-sm" />
+                  </div>
+                ))
+              ) : monthlyBars.length > 0 ? (
                 monthlyBars.map((month) => (
                   <RenderBar
                     key={month.key}

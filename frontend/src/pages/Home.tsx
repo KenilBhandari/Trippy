@@ -17,7 +17,8 @@ const Start = () => {
     setRecent25Trips,
     setDashboardNeedsRefresh,
     user,
-    setUser
+    setUser,
+    setTripsLoading
   } = useDataContext();
 
   const homeTabs = useMemo(
@@ -68,24 +69,33 @@ const Start = () => {
   // const [user, setUser] = useState<User | null>(null)
 
   useEffect(() => {
-    fetchFreshTrips();
-
-    const storedUser = localStorage.getItem("user");
-
-    if (storedUser) {
+    const init = async () => {
+      setTripsLoading(true);
       try {
-        const parsedUser: User = JSON.parse(storedUser);
-        setUser(parsedUser);
+        await fetchFreshTrips();
       } catch (err) {
-        console.error("Invalid user in localStorage");
-        setUser(null);
+        console.error("Failed to fetch trips", err);
+      } finally {
+        setTripsLoading(false);
       }
-    }
+
+      const storedUser = localStorage.getItem("user");
+
+      if (storedUser) {
+        try {
+          const parsedUser: User = JSON.parse(storedUser);
+          setUser(parsedUser);
+        } catch (err) {
+          console.error("Invalid user in localStorage");
+          setUser(null);
+        }
+      }
+    };
+
+    init();
   }, []);
 
 const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-
 
   return (
     <>
@@ -153,7 +163,11 @@ const [isMenuOpen, setIsMenuOpen] = useState(false);
                       <img
                         src={user?.picture || "/Trippy_logo.png"}
                         alt="Profile"
+                        referrerPolicy="no-referrer"
                         className="h-full w-full object-cover"
+                        onError={(e) => {
+                          e.currentTarget.src = "/Trippy_logo.png";
+                        }}
                       />
                     </div>
                   </button>

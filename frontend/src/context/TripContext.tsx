@@ -4,7 +4,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import type { CurrentReport, DashboardData, RecentLocation, Trip, User } from "../types";
+import type { CurrentReport, DashboardData, Trip, User } from "../types";
 
 type TripContextType = {
   
@@ -37,6 +37,9 @@ type TripContextType = {
   recent25Trips: Trip[];
   setRecent25Trips: React.Dispatch<React.SetStateAction<Trip[]>>;
 
+  tripsLoading: boolean;
+  setTripsLoading: React.Dispatch<React.SetStateAction<boolean>>;
+
   filteredTrips: Trip[];
   setFilteredTrips: React.Dispatch<React.SetStateAction<Trip[]>>;
 
@@ -57,8 +60,10 @@ type TripContextType = {
 
   startLocations: string[];
   endLocations: string[];
-  recentLocations: RecentLocation[];
-  setRecentLocations: React.Dispatch<React.SetStateAction<RecentLocation[]>>;
+  recentStartLocations: string[];
+  setRecentStartLocations: React.Dispatch<React.SetStateAction<string[]>>;
+  recentEndLocations: string[];
+  setRecentEndLocations: React.Dispatch<React.SetStateAction<string[]>>;
 
   dashboardData: DashboardData | null;
   setDashboardData: React.Dispatch<React.SetStateAction<DashboardData | null>>;
@@ -77,29 +82,26 @@ const TripContext = createContext<TripContextType | undefined>(undefined);
 
 
 export function TripProvider({ children }: { children: ReactNode }) {
-  
-    const [activeTab, setActiveTab] = useState<string>("new");
+  const [activeTab, setActiveTab] = useState<string>("new");
   const [addingTrip, setAddingTrip] = useState<boolean>(false);
   const [activeTrip, setActiveTrip] = useState<Trip | null>(null);
   const [deletingTrip, setDeletingTrip] = useState<Trip | null>(null);
   const [filterActive, setFilterActive] = useState<boolean>(false);
-  
+
   const [allTrips, setAllTrips] = useState<Trip[]>([]);
   const [last10Trips, setLast10Trips] = useState<Trip[]>([]);
   const [recent25Trips, setRecent25Trips] = useState<Trip[]>([]);
+  const [tripsLoading, setTripsLoading] = useState<boolean>(true);
   const [filteredTrips, setFilteredTrips] = useState<Trip[]>([]);
   const [monthlyReport, setMonthlyReport] = useState<Trip[]>([]);
-  
+
   const [quickDate, setQuickDate] = useState<string>("recent");
   const [search, setSearch] = useState<string>("");
   const [fromDate, setFromDate] = useState<string>("");
   const [toDate, setToDate] = useState<string>("");
 
-  const startLocations: string[] = [
-    "SDY",
-    "Shree Hans",
-  ];
-  
+  const startLocations: string[] = ["SDY", "Shree Hans"];
+
   const endLocations: string[] = [
     "Vapi",
     "Umbergaon",
@@ -112,24 +114,47 @@ export function TripProvider({ children }: { children: ReactNode }) {
     "Phase 3",
   ];
 
-  const [recentLocations, setRecentLocations] = useState<RecentLocation[]>(() => {
-    try {
-      return JSON.parse(localStorage.getItem("recent_loc") || "[]");
-    } catch {
-      return [];
-    }
-  });
+  const [recentStartLocations, setRecentStartLocations] = useState<string[]>(
+    () => {
+      try {
+        const stored = JSON.parse(
+          localStorage.getItem("recent_start_loc") || "[]",
+        );
+        if (Array.isArray(stored) && stored.length > 0) {
+          return stored;
+        }
+        return [];
+      } catch {
+        return [];
+      }
+    },
+  );
 
-  
-  
-  const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
+  const [recentEndLocations, setRecentEndLocations] = useState<string[]>(
+    () => {
+      try {
+        const stored = JSON.parse(
+          localStorage.getItem("recent_end_loc") || "[]",
+        );
+        if (Array.isArray(stored) && stored.length > 0) {
+          return stored;
+        }
+        return [];
+      } catch {
+        return [];
+      }
+    },
+  );
+
+  const [dashboardData, setDashboardData] = useState<DashboardData | null>(
+    null,
+  );
   const [dashboardNeedsRefresh, setDashboardNeedsRefresh] = useState(false);
 
-  const [user, setUser] = useState<User| null>(null);
+  const [user, setUser] = useState<User | null>(null);
 
-  const [currentMonthlyReport, setCurrentMonthlyReport] = useState <CurrentReport>()
-
-
+  const [currentMonthlyReport, setCurrentMonthlyReport] =
+    useState<CurrentReport>();
 
   return (
     <TripContext.Provider
@@ -150,6 +175,8 @@ export function TripProvider({ children }: { children: ReactNode }) {
         setLast10Trips,
         recent25Trips,
         setRecent25Trips,
+        tripsLoading,
+        setTripsLoading,
         filteredTrips,
         setFilteredTrips,
         monthlyReport,
@@ -164,8 +191,10 @@ export function TripProvider({ children }: { children: ReactNode }) {
         setToDate,
         startLocations,
         endLocations,
-        recentLocations,
-        setRecentLocations,
+        recentStartLocations,
+        setRecentStartLocations,
+        recentEndLocations,
+        setRecentEndLocations,
         dashboardData,
         setDashboardData,
         dashboardNeedsRefresh,
