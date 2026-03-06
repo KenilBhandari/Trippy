@@ -69,8 +69,9 @@ return (
                 setIsLoading(true);
                 try {
                   const res = await axios.post(
-                    "http://localhost:5000/user/auth/google",
-                    { credential: credentialResponse.credential }
+                    // "http://localhost:5000/user/auth/google",
+                    "https://trippy-serverless.vercel.app/user/auth/google",
+                    { credential: credentialResponse.credential },
                   );
                   localStorage.setItem("token", res.data.token);
                   localStorage.setItem("user", JSON.stringify(res.data.user));
