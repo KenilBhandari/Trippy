@@ -4,8 +4,9 @@
       "runtime": "vercel-nodejs@18"
     }
   },
-  "rewrites": [
-    { "source": "/api/:match*", "destination": "/backend/src/:match*" },
-    { "source": "/(.*)", "destination": "/index.html" }
+  "routes": [
+    { "src": "^/api/(.*)", "dest": "/backend/src/$1.ts" },
+    { "handle": "filesystem" },
+    { "src": "/.*", "dest": "/index.html" }
   ]
 }
