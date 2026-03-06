@@ -6,6 +6,6 @@
   },
   "rewrites": [
     { "source": "/api/:match*", "destination": "/backend/src/:match*" },
-    { "source": "/(.*)", "destination": "/frontend/$1" }
+    { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
