@@ -33,7 +33,6 @@ export default async function connectDB(): Promise<Mongoose> {
   const cache = getCache();
 
   if (cache.conn) return cache.conn;
-  console.log("ENV CHECK:", !!process.env.MONGO_URI, MONGO_URI);
 
   if (!cache.promise) {
     cache.promise = mongoose.connect(MONGO_URI);

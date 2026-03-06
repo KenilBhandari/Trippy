@@ -70,7 +70,7 @@ return (
                 try {
                   const res = await axios.post(
                     // "http://localhost:5000/user/auth/google",
-                    "https://trippy-serverless.vercel.app/user/auth/google",
+                   "https://backend-fake-sand.vercel.app/user/auth/google",
                     { credential: credentialResponse.credential },
                   );
                   localStorage.setItem("token", res.data.token);
