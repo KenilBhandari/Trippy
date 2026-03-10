@@ -291,7 +291,7 @@ const Dashboard = () => {
           <div className="px-3 sm:px-4 py-4 sm:py-5 overflow-x-auto">
             <div
               className={`flex items-end justify-between h-52 sm:h-64 gap-2 sm:gap-3 sm:min-w-full ${
-                monthlyBars.length > 0 ? "min-w-[480px]" : ""
+                monthlyBars.length > 0 ? "min-w-fit" : ""
               }`}
             >
               {dashboardLoading ? (
