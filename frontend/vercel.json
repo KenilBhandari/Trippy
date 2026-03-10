@@ -1,9 +1,4 @@
 {
-"functions": {
-"backend/src/**/*.ts": {
-"runtime": "[vercel-nodejs@18.x](mailto:vercel-nodejs@18.x)"
-}
-},
 "routes": [
 { "src": "^/api/(.*)", "dest": "/backend/src/$1.ts" },
 { "src": "/(.*)", "dest": "/index.html" }
