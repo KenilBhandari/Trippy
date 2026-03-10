@@ -7,9 +7,10 @@ const Landing = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [showAuth, setShowAuth] = useState(false);
 
 return (
-  <div className="flex min-h-screen items-center justify-center bg-[#f3f4f6] px-6">
+  <div className="flex min-h-dvh md:min-h-lvh  items-center justify-center bg-[#f3f4f6] px-6">
 
     <main className="w-full max-w-[420px] rounded-3xl border border-slate-200 bg-white p-9 shadow-[0_20px_45px_-28px_rgba(15,23,42,0.25)]">
 
@@ -43,56 +44,64 @@ return (
       <div className="rounded-2xl border border-slate-200 bg-white p-6">
 
         {/* Label */}
-        <div className="mb-5 flex items-center gap-2">
-           <div className="h-2 w-2 rounded-full p-1 border-4 border-blue-100 bg-blue-600" />
+        <div className="mb-8 flex items-center gap-2">
+          <div className="h-2 w-2 rounded-full p-1 border-4 border-blue-100 bg-blue-600" />
           <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-blue-600">
             Secure sign in
           </div>
         </div>
 
-        {/* Google Button */}
+        {/* Get Started → Google Button */}
         <div className="flex w-full justify-center">
-          {isLoading ? (
+          {!showAuth ? (
+            <button
+              onClick={() => setShowAuth(true)}
+              className="w-[210px] rounded-md bg-black py-3 text-sm font-semibold text-white tracking-wide transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md active:translate-y-0"
+            >
+              Get Started
+            </button>
+          ) : isLoading ? (
             <div className="flex w-[210px] items-center justify-center gap-2 rounded-md border border-slate-200 bg-slate-50 py-3 text-sm font-medium text-slate-700">
               <span className="h-4 w-4 animate-spin rounded-full border-2 border-slate-300 border-t-blue-600" />
               Signing you in...
             </div>
           ) : (
-            <GoogleLogin
-              onSuccess={async (credentialResponse) => {
-                if (!credentialResponse.credential) {
-                  setErrorMessage("Google login did not return a credential.");
-                  return;
-                }
-
-                setErrorMessage("");
-                setIsLoading(true);
-                try {
-                  const res = await axios.post(
-                    // "http://localhost:5000/user/auth/google",
-                   "https://backend-fake-sand.vercel.app/user/auth/google",
-                    { credential: credentialResponse.credential },
-                  );
-                  localStorage.setItem("token", res.data.token);
-                  localStorage.setItem("user", JSON.stringify(res.data.user));
-                  navigate("/home");
-                } catch (error) {
-                  console.error("Google login failed:", error);
-                  setErrorMessage("Unable to sign in right now. Please try again.");
-                } finally {
-                  setIsLoading(false);
-                }
-              }}
-              onError={() => setErrorMessage("Google login failed. Please try again.")}
-              // useOneTap
-              theme="filled_blue"
-              shape="rectangular"
-              text="continue_with"
-              width="210"
-              size="large"
-            />
+            <div style={{ animation: 'fadeIn 0.25s ease both' }}>
+              <style>{`@keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }`}</style>
+              <GoogleLogin
+                onSuccess={async (credentialResponse) => {
+                  if (!credentialResponse.credential) {
+                    setErrorMessage("Google login did not return a credential.");
+                    return;
+                  }
+                  setErrorMessage("");
+                  setIsLoading(true);
+                  try {
+                    const res = await axios.post(
+                      import.meta.env.VITE_BACKEND_URL,
+                      { credential: credentialResponse.credential },
+                    );
+                    localStorage.setItem("token", res.data.token);
+                    localStorage.setItem("user", JSON.stringify(res.data.user));
+                    navigate("/home");
+                  } catch (error) {
+                    console.error("Google login failed:", error);
+                    setErrorMessage("Unable to sign in right now. Please try again.");
+                  } finally {
+                    setIsLoading(false);
+                  }
+                }}
+                onError={() => setErrorMessage("Google login failed. Please try again.")}
+                theme="filled_blue"
+                shape="rectangular"
+                text="continue_with"
+                width="210"
+                size="large"
+              />
+            </div>
           )}
         </div>
+
         {errorMessage && (
           <p className="mt-3 text-center text-xs font-medium text-red-600">
             {errorMessage}

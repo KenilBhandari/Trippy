@@ -2,6 +2,7 @@ import {
   createContext,
   useContext,
   useState,
+  useEffect,
   type ReactNode,
 } from "react";
 import type { CurrentReport, DashboardData, Trip, User } from "../types";
@@ -58,12 +59,15 @@ type TripContextType = {
   toDate: string;
   setToDate: React.Dispatch<React.SetStateAction<string>>;
 
-  startLocations: string[];
-  endLocations: string[];
   recentStartLocations: string[];
   setRecentStartLocations: React.Dispatch<React.SetStateAction<string[]>>;
   recentEndLocations: string[];
   setRecentEndLocations: React.Dispatch<React.SetStateAction<string[]>>;
+  
+  lastFare: number;
+  setLastFare: React.Dispatch<React.SetStateAction<number>>
+  lastNumberPlate: string;
+  setLastNumberPlate: React.Dispatch<React.SetStateAction<string>>
 
   dashboardData: DashboardData | null;
   setDashboardData: React.Dispatch<React.SetStateAction<DashboardData | null>>;
@@ -100,19 +104,6 @@ export function TripProvider({ children }: { children: ReactNode }) {
   const [fromDate, setFromDate] = useState<string>("");
   const [toDate, setToDate] = useState<string>("");
 
-  const startLocations: string[] = ["SDY", "Shree Hans"];
-
-  const endLocations: string[] = [
-    "Vapi",
-    "Umbergaon",
-    "Dadra",
-    "Daman",
-    "Vapi Karvad",
-    "Surat",
-    "Udvada",
-    "Local",
-    "Phase 3",
-  ];
 
   const [recentStartLocations, setRecentStartLocations] = useState<string[]>(
     () => {
@@ -145,6 +136,41 @@ export function TripProvider({ children }: { children: ReactNode }) {
       }
     },
   );
+
+  const [lastFare, setLastFare] = useState<number>(() => {
+    try {
+      const stored = localStorage.getItem("last_fare");
+      const parsed = stored ? Number(JSON.parse(stored)) : 1400;
+      return Number.isFinite(parsed) ? parsed : 1400;
+    } catch {
+      return 0;
+    }
+  });
+
+  const [lastNumberPlate, setLastNumberPlate] = useState<string>(() => {
+    try {
+      const stored = localStorage.getItem("last_number_plate");
+      return stored ? String(JSON.parse(stored)) : "9999";
+    } catch {
+      return "";
+    }
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem("last_fare", JSON.stringify(lastFare));
+    } catch {
+      // ignore write errors (private mode, quota, etc.)
+    }
+  }, [lastFare]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem("last_number_plate", JSON.stringify(lastNumberPlate));
+    } catch {
+      // ignore write errors (private mode, quota, etc.)
+    }
+  }, [lastNumberPlate]);
 
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(
     null,
@@ -189,8 +215,6 @@ export function TripProvider({ children }: { children: ReactNode }) {
         setFromDate,
         toDate,
         setToDate,
-        startLocations,
-        endLocations,
         recentStartLocations,
         setRecentStartLocations,
         recentEndLocations,
@@ -203,6 +227,10 @@ export function TripProvider({ children }: { children: ReactNode }) {
         setCurrentMonthlyReport,
         user,
         setUser,
+        lastFare,
+        setLastFare,
+        lastNumberPlate,
+        setLastNumberPlate
       }}
     >
       {children}

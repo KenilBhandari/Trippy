@@ -2,7 +2,7 @@ import type { TripInput } from "../types/trips.types";
 import Trip from "../models/trips.models.js";
 import type { Response } from "express";
 import connectDB from "../db/config.js";
-import type { AuthRequest } from "../auth.middleware";
+import type { AuthRequest } from "../auth.middleware.js";
 
 
    

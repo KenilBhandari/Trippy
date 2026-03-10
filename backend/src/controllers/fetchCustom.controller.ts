@@ -1,9 +1,9 @@
 import type { Request, Response } from "express";
-import type { TripFilter } from "../types/trips.types";
+import type { TripFilter } from "../types/trips.types.js";
 import Trip from "../models/trips.models.js";
 import connectDB from "../db/config.js";
-import type { AuthRequest } from "../auth.middleware";
-import { getTimeStamps } from "../utils/fetchQuery.utils";
+import type { AuthRequest } from "../auth.middleware.js";
+import { getTimeStamps } from "../utils/fetchQuery.utils.js";
 
 export const fetchCustomTrips = async (req: AuthRequest, res: Response) => {
   try {

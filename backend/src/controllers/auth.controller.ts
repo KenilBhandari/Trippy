@@ -1,7 +1,8 @@
 import type { Request, Response } from "express";
 import { OAuth2Client } from "google-auth-library";
-import User from "../models/users.models";
-import { generateToken } from "../utils/generateToken";
+import User from "../models/users.models.js";
+import { generateToken } from "../utils/generateToken.js";
+import connectDB from "../db/config.js";
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -31,6 +32,7 @@ export const googleLogin = async (req: Request, res: Response) => {
       throw new Error("Invalid issuer");
     }
 
+    await connectDB();
     let user = await User.findOne({ email: payload.email });
 
     if (!user) {

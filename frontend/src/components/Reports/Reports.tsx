@@ -309,7 +309,7 @@ const ReportsTab = () => {
                           ...prev,
                           ownerName: e.target.value,
                         }))
-                      }
+                      } 
                       placeholder="Enter name"
                       className="w-full px-3 py-2.5 text-xs font-semibold border border-slate-300 rounded-md bg-white focus:outline-none focus:border-blue-500"
                     />

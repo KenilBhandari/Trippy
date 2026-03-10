@@ -23,25 +23,38 @@ const MAX_FARE_DIGITS = 7;
 const MAX_NUMBER_PLATE_LENGTH = 15;
 
 const NewTripTab = ({ onAddTrip }: NewTripTabProps) => {
-  const [startPoint, setStartPoint] = useState("SDY");
-  const [endPoint, setEndPoint] = useState("Vapi");
-  const [tripDate, setTripDate] = useState<Date>(new Date());
-  const [fare, setFare] = useState<number>(1200);
-  const [numberPlate, setNumberPlate] = useState<string | null>("5281");
-  const [showStartSuggestions, setShowStartSuggestions] = useState(false);
-  const [showEndSuggestions, setShowEndSuggestions] = useState(false);
-  const [isReturnTrip, setIsReturnTrip] = useState(false);
-  const [addSuccess, setAddSuccess] = useState(false);
-  const [addFailed, setAddFailed] = useState(false);
 
-  const {
+
+
+    const {
     addingTrip,
     setAddingTrip,
     recentStartLocations,
     setRecentStartLocations,
     recentEndLocations,
     setRecentEndLocations,
+    lastFare,
+    lastNumberPlate,
+    setLastFare,
+    setLastNumberPlate
   } = useDataContext();
+
+
+
+  const [startPoint, setStartPoint] = useState(recentStartLocations[0] || "Green Tech");
+  const [endPoint, setEndPoint] = useState(recentEndLocations[0] || "Welspun Corp");
+  const [tripDate, setTripDate] = useState<Date>(new Date());
+  const [fare, setFare] = useState<number>(() =>
+    Number.isFinite(lastFare) ? lastFare : 0,
+  );
+  const [numberPlate, setNumberPlate] = useState<string>(lastNumberPlate);
+  const [showStartSuggestions, setShowStartSuggestions] = useState(false);
+  const [showEndSuggestions, setShowEndSuggestions] = useState(false);
+  const [isReturnTrip, setIsReturnTrip] = useState(false);
+  const [addSuccess, setAddSuccess] = useState(false);
+  const [addFailed, setAddFailed] = useState(false);
+
+
   
   const tripTimestamp = tripDate.setHours(0, 1, 0, 1);
   const isDisabledAddBtn =
@@ -75,6 +88,8 @@ const NewTripTab = ({ onAddTrip }: NewTripTabProps) => {
       localStorage.setItem("recent_end_loc", JSON.stringify(updatedEndLocations));
       setRecentStartLocations(updatedStartLocations);
       setRecentEndLocations(updatedEndLocations);
+      setLastFare(fare);
+      setLastNumberPlate(numberPlate);
 
       await onAddTrip({
         startPoint,
@@ -87,10 +102,10 @@ const NewTripTab = ({ onAddTrip }: NewTripTabProps) => {
 
       setAddSuccess(true);
 
-      setStartPoint("SDY");
-      setEndPoint("Vapi");
+      setStartPoint(startPoint);
+      setEndPoint(endPoint);
       setTripDate(tripDate);
-      setFare(1200);
+      setNumberPlate(numberPlate);
 
       setTimeout(() => {
         setAddSuccess(false);
@@ -354,7 +369,7 @@ const NewTripTab = ({ onAddTrip }: NewTripTabProps) => {
               <Truck className="absolute left-3 text-blue-500" size={18} />
               <input
                 type="text"
-                value={numberPlate ?? ""}
+                value={numberPlate}
                 placeholder="GJ 15..."
                 onChange={(e) =>
                   setNumberPlate(

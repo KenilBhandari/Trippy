@@ -29,7 +29,7 @@ const EditModal = ({ onUpdate }: EditModalProps) => {
   const [updateSuccess, setUpdateSuccess] = useState(false);
   const [updateFailed, setUpdateFailed] = useState(false);
 
-  const { startLocations, endLocations, activeTrip, setActiveTrip } =
+  const { recentStartLocations, recentEndLocations, activeTrip, setActiveTrip } =
     useDataContext();
 
   if (!activeTrip) return null;
@@ -119,10 +119,10 @@ return (
                 }
                 className="w-full font-bold text-sm sm:text-base pl-10 pr-4 py-3.5 bg-slate-50 border-2 border-slate-200 rounded-lg text-slate-900 focus:bg-white focus:border-blue-500 outline-none transition-all placeholder:text-slate-300"
               />
-              {showStartSuggestions && (
+              {showStartSuggestions && recentStartLocations.length > 0 && (
                 <div className="absolute left-0 right-0 top-full mt-2 z-[100] bg-white border-2 border-blue-200 shadow-[6px_6px_0px_0px_rgba(37,99,235,0.12)] overflow-hidden">
                   <div className="max-h-52 overflow-y-auto divide-y divide-slate-100">
-                    {startLocations.map((loc) => (
+                    {recentStartLocations.map((loc) => (
                       <button
                         key={loc}
                         type="button"
@@ -191,10 +191,10 @@ return (
                 }
                 className="w-full font-bold text-sm sm:text-base pl-10 pr-4 py-3.5 bg-slate-50 border-2 border-slate-200 rounded-lg text-slate-900 focus:bg-white focus:border-blue-500 outline-none transition-all placeholder:text-slate-300"
               />
-              {showEndSuggestions && (
+              {showEndSuggestions && recentEndLocations.length > 0 && (
                 <div className="absolute left-0 right-0 top-full mt-2 z-[100] bg-white border-2 border-blue-200 shadow-[6px_6px_0px_0px_rgba(37,99,235,0.12)] overflow-hidden">
                   <div className="max-h-44 overflow-y-auto divide-y divide-slate-100">
-                    {endLocations.map((loc) => (
+                    {recentEndLocations.map((loc) => (
                       <button
                         key={loc}
                         type="button"
